@@ -1,10 +1,6 @@
 var ExtPlaneJs = require("extplanejs");
+const { delay } = require("./utils");
 
-function delay(time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-// Configuration for the radios and their respective data references
 const radioConfig = {
   com1: {
     dataRef: {
@@ -27,42 +23,97 @@ const radioConfig = {
   },
 };
 
-// Automatically generate the data object based on the radioConfig
 let data = Object.fromEntries(
   Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef).map((key) => [key, 0]))])
 );
 
-const ExtPlane = new ExtPlaneJs({
-  host: "127.0.0.1",
-  port: 51000,
-  broadcast: true,
-});
 
-// Update the data object when ExtPlane sends data
-ExtPlane.on("loaded", () => {
-  ExtPlane.client.interval(0.01);
-  connected = true;
+const fsTimeRef = "sim/time/total_running_time_sec";
+const reconnectionTime = 2000;
+let updateTimeout;
+let fsConnected = false;
 
-  // Subscribe to the data references
-  Object.values(radioConfig).forEach((radio) => {
-    Object.values(radio.dataRef).forEach((dataRef) => {
-      ExtPlane.client.subscribe(dataRef);
+function onVariableStale() {
+  console.log(`Sim has not been running for ${reconnectionTime} milliseconds`);
+  fsConnected = false;
+  sendMessageToClient(JSON.stringify({ fsConnected: false }));
+}
+
+function updateSimRunTime(value) {
+  simRunTime = value;
+  if (updateTimeout) {
+    clearTimeout(updateTimeout);
+  }
+  updateTimeout = setTimeout(onVariableStale, reconnectionTime);
+
+  if (!fsConnected) {
+    fsConnected = true;
+    sendMessageToClient(JSON.stringify({ fsConnected: true }));
+    sendMessageToClient(JSON.stringify(data));
+  }
+}
+
+
+
+let ExtPlane;
+let retryInterval = reconnectionTime; // Time in milliseconds to wait before retrying connection
+
+function connectExtPlane() {
+  ExtPlane = new ExtPlaneJs({
+    host: "127.0.0.1",
+    port: 51000,
+    broadcast: true,
+  });
+
+  ExtPlane.on("loaded", () => {
+    console.log("ExtPlane connected");
+    ExtPlane.client.interval(0.01);
+    fsConnected = true;
+
+    ExtPlane.client.subscribe(fsTimeRef);
+
+    Object.values(radioConfig).forEach((radio) => {
+      Object.values(radio.dataRef).forEach((dataRef) => {
+        ExtPlane.client.subscribe(dataRef);
+      });
+    });
+
+    ExtPlane.on("data-ref", (data_ref, value) => {
+      if (data_ref === fsTimeRef) {
+        updateSimRunTime(value);
+      }
+      for (let radio in radioConfig) {
+        for (let key in radioConfig[radio].dataRef) {
+          if (radioConfig[radio].dataRef[key] === data_ref) {
+            console.log("DataRef: " + data_ref + " Value: " + value);
+            data[radio][key] = value;
+            sendMessageToClient(JSON.stringify(data));
+          }
+        }
+      }
     });
   });
 
-  // Listen for data updates from ExtPlane
-  ExtPlane.on("data-ref", (data_ref, value) => {
-    for (let radio in radioConfig) {
-      for (let key in radioConfig[radio].dataRef) {
-        if (radioConfig[radio].dataRef[key] === data_ref) {
-          // Update the corresponding value in the data object
-          data[radio][key] = value;
-        }
-      }
-    }
-    sendMessageToClient(JSON.stringify(data));
+  ExtPlane.on("error", (err) => {
+    console.error("ExtPlane error:", err);
+    fsConnected = false;
+    sendMessageToClient(JSON.stringify({ fsConnected: false }));
+    setTimeout(connectExtPlane, retryInterval); // Retry connection after a delay
   });
-});
+}
+
+function checkConnection() {
+  if (!fsConnected) {
+    console.log("Attempting to reconnect...");
+    connectExtPlane();
+  }
+}
+
+// Initial connection attempt
+connectExtPlane();
+
+// Periodically check if we need to reconnect
+setInterval(checkConnection, 10000); // Check every 10 seconds
 
 function handleRecieve(obj) {
   if (obj.hasOwnProperty("command")) {
@@ -93,43 +144,38 @@ function handleRecieve(obj) {
 
 async function commandTrigger(command) {
   ExtPlane.client.begin(command);
-  await delay(50);
+  await delay(20);
   ExtPlane.client.end(command);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// Importing required modules
+// ------------------ Websocket Server ------------------
 const WebSocket = require("ws");
-
-// Create a WebSocket server
 const wss = new WebSocket.Server({ port: 3000 });
 console.log("WebsocketStarted");
 
 let connectedClient = null;
 
-// Event listener for when a client connects
 wss.on("connection", function connection(ws) {
   console.log("Client connected");
-
-  // Set the connected client
   connectedClient = ws;
-  sendMessageToClient(JSON.stringify(data));
 
-  // Event listener for messages received from the client
+  sendMessageToClient(JSON.stringify({ fsConnected: fsConnected }));
+  if (fsConnected) {
+    sendMessageToClient(JSON.stringify(data));
+  }
+
   ws.on("message", function incoming(message) {
     obj = JSON.parse(message);
     handleRecieve(obj);
   });
 
-  // Event listener for when the client closes the connection
   ws.on("close", function () {
     console.log("Client disconnected");
     connectedClient = null;
   });
 });
 
-// Function to send a message to the connected client
 function sendMessageToClient(message) {
   if (connectedClient) {
     connectedClient.send(message);

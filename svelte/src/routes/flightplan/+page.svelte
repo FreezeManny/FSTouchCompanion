@@ -14,18 +14,20 @@
           "&json=1"
       );
       data = await response.json();
-      htmlExpression = setFontSize(data.text.plan_html, customFontSize);
+      htmlExpression = processHtml(data.text.plan_html, customFontSize);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
   });
 
-  function setFontSize(html, fontSize) {
-    // Use regular expression to find and replace inline font-size styles
-    return html.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSize}`);
+  function processHtml(html, fontSize) {
+    // Remove all hyperlinks
+    let cleanedHtml = html.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1');
+    // Set custom font size
+    cleanedHtml = cleanedHtml.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSize}`);
+    return cleanedHtml;
   }
 </script>
-
 
 <div class="card m-1">
     <div class="px-1 py-5">
