@@ -121,6 +121,8 @@
   // Button handler for Simbrief
   async function simbriefButtonHandler() {
     await fetchSimbriefRoute();
+    fetchAirportData(fetchMode.DEP);
+    fetchAirportData(fetchMode.ARR);
   }
 
   // Error handler

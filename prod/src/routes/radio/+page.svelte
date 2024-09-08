@@ -5,37 +5,40 @@
   import { getModalStore } from "@skeletonlabs/skeleton";
 
   import { source } from "sveltekit-sse";
+  import { sendCommand, sendDataRef } from "./functions";
 
   const modalStore = getModalStore();
   const COM1_Modal = {
     type: "component",
     component: "radioModal",
     title: "COM1 Frequency-Pad",
-    response: (r) => r !== undefined && COM1_recieved(r),
+    response: (r) => r !== undefined && sendDataRef("com1-stby", r),
   };
   const COM2_Modal = {
     type: "component",
     component: "radioModal",
     title: "COM2 Frequency-Pad",
-    response: (r) => r !== undefined && COM2_recieved(r),
+    response: (r) => r !== undefined && sendDataRef("com2-stby", r),
   };
 
+  let COM1_ACT_FREQ = "---.---";
+  let COM1_STBY_FREQ = "---.---";
+  let COM2_ACT_FREQ = "---.---";
+  let COM2_STBY_FREQ = "---.---";
 
   // Initialize the SSE connection
-  const connection = source('/xpConnect')
-  const json = connection.select('data').json(
-    function or({ error, raw, previous }) {
-      //console.error(`Could not parse "${raw}" as json.`, error)
-      return previous  // This will be the new value of the store
-    }
-  )
-  
+  const connection = source("/xpConnect");
+  const json = connection.select("data").json(function or({ error, raw, previous }) {
+    //console.error(`Could not parse "${raw}" as json.`, error)
+    return previous; // This will be the new value of the store
+  });
+
   // Reactive statement to update frequency variables when json data changes
   $: {
     if ($json) {
       const com1 = $json.com1 || {};
       const com2 = $json.com2 || {};
-      
+
       COM1_ACT_FREQ = formatFrequency(com1.active);
       COM1_STBY_FREQ = formatFrequency(com1.standby);
       COM2_ACT_FREQ = formatFrequency(com2.active);
@@ -44,40 +47,21 @@
   }
 
   function formatFrequency(frequency) {
-    if (frequency === undefined) {
-      return "---.---";
-    }
-    
+    if (frequency === undefined) return "---.---";
     // Convert frequency to string and pad with leading zeros if necessary
-    let freqStr = frequency.toString().padStart(6, '0');
-    
+    let freqStr = frequency.toString().padStart(6, "0");
     // Insert the dot to format the frequency
     return `${freqStr.slice(0, 3)}.${freqStr.slice(3)}`;
   }
 
-  let COM1_ACT_FREQ = "---.---";
-  let COM1_STBY_FREQ = "---.---";
-  let COM2_ACT_FREQ = "---.---";
-  let COM2_STBY_FREQ = "---.---";
-
-  function COM1_recieved(r) {
-    console.log("COM1 entered: " + r);
-  }
-  function COM2_recieved(r) {
-    console.log("COM2 entered: " + r);
-  }
-
   function com1SwitchButton() {
-    console.log("COM1 Switch Button");
+    sendCommand("switch-com1");
   }
   function com2SwitchButton() {
-    console.log("COM2 Switch Button");
+    sendCommand("switch-com2");
   }
-
-  
 </script>
 
-<h1 class="h1">Radio</h1>
 <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
   <svelte:fragment slot="lead">
     <button type="button" id="btn_COM1" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM1 </button>
