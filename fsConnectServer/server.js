@@ -27,7 +27,6 @@ let data = Object.fromEntries(
   Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef).map((key) => [key, 0]))])
 );
 
-
 const fsTimeRef = "sim/time/total_running_time_sec";
 const reconnectionTime = 2000;
 let updateTimeout;
@@ -52,8 +51,6 @@ function updateSimRunTime(value) {
     sendMessageToClient(JSON.stringify(data));
   }
 }
-
-
 
 let ExtPlane;
 let retryInterval = reconnectionTime; // Time in milliseconds to wait before retrying connection
@@ -147,7 +144,6 @@ async function commandTrigger(command) {
   await delay(20);
   ExtPlane.client.end(command);
 }
-
 
 // ------------------ Websocket Server ------------------
 const WebSocket = require("ws");

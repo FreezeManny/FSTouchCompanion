@@ -45,7 +45,6 @@
     ws.onmessage = (event) => {
       try {
         const json = JSON.parse(event.data);
-        console.log("Received WebSocket message:", json);
         if (json.hasOwnProperty("fsConnected")) {
           fsConnected = json.fsConnected;
           console.log("fsConnected set to:", fsConnected);
