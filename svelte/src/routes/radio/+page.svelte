@@ -4,6 +4,7 @@
 
   import { getModalStore } from "@skeletonlabs/skeleton";
 
+  let fsConnected = false;
 
   const modalStore = getModalStore();
   const COM1_Modal = {
@@ -33,13 +34,27 @@
     ws.onmessage = (event) => {
       try {
         const json = JSON.parse(event.data);
-        const com1 = json.com1 || {};
-        const com2 = json.com2 || {};
+        console.log("WebSocket message:", json);
+        if (json.hasOwnProperty("fsConnected")) {
+          fsConnected = json.fsConnected;
+        }
+        console.log("fsConnected: ", fsConnected);
 
-        COM1_ACT_FREQ = formatFrequency(com1.active);
-        COM1_STBY_FREQ = formatFrequency(com1.standby);
-        COM2_ACT_FREQ = formatFrequency(com2.active);
-        COM2_STBY_FREQ = formatFrequency(com2.standby);
+        if (fsConnected) {
+          const com1 = json.com1 || {};
+          const com2 = json.com2 || {};
+
+          COM1_ACT_FREQ = formatFrequency(com1.active);
+          COM1_STBY_FREQ = formatFrequency(com1.standby);
+          COM2_ACT_FREQ = formatFrequency(com2.active);
+          COM2_STBY_FREQ = formatFrequency(com2.standby);
+        }
+        else {
+          COM1_ACT_FREQ = "---.---";
+          COM1_STBY_FREQ = "---.---";
+          COM2_ACT_FREQ = "---.---";
+          COM2_STBY_FREQ = "---.---";
+        }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
@@ -96,6 +111,15 @@
     sendMessage(data);
   }
 </script>
+
+{#if !fsConnected}
+  <aside class="alert variant-filled-warning m-5">
+    <!-- Message -->
+    <div class="alert-message">
+      <h3 class="h3">Flightsim not connected/paused</h3>
+    </div>
+  </aside>
+{:else}
 
 <hr class="!border-t-8" />
 <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
@@ -183,3 +207,5 @@
     </button>
   </svelte:fragment>
 </AppBar>
+
+{/if}
