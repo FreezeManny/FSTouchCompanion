@@ -1,6 +1,6 @@
 <script lang="js">
   import { AppBar } from "@skeletonlabs/skeleton";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
 
   import { getModalStore } from "@skeletonlabs/skeleton";
 
@@ -20,6 +20,17 @@
     title: "COM2 Frequency-Pad",
     response: (r) => r !== undefined && sendDataRef("com2-stby", r),
   };
+
+  onDestroy(async () => {
+    try {
+      const response = await fetch(`/xpConnect?function=disconnect`);
+      if (!response.ok) {
+        console.error('Failed to fetch data');
+      }
+    } catch (err) {
+      console.error('Error: ' + err.message);
+    }
+  });
 
   let COM1_ACT_FREQ = "---.---";
   let COM1_STBY_FREQ = "---.---";

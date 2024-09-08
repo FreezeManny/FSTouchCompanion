@@ -2,6 +2,8 @@
 import { produce } from "sveltekit-sse";
 import ExtPlaneJs from "extplanejs";
 import { delay } from "$lib/utils";
+import { onDestroy } from "svelte";
+import { on } from "events";
 // Function to deep compare two objects (to detect changes)
 function deepEqual(obj1, obj2) {
   return JSON.stringify(obj1) === JSON.stringify(obj2);
@@ -12,6 +14,8 @@ const ExtPlane = new ExtPlaneJs({
   port: 51000,
   broadcast: true,
 });
+
+let connected = false;
 
 // Configuration for the radios and their respective data references
 const radioConfig = {
@@ -44,6 +48,7 @@ let data = Object.fromEntries(
 // Update the data object when ExtPlane sends data
 ExtPlane.on("loaded", () => {
   ExtPlane.client.interval(0.01);
+  connected = true;
 
   // Subscribe to the data references
   Object.values(radioConfig).forEach((radio) => {
@@ -86,7 +91,6 @@ export function POST() {
   });
 }
 
-
 // Handle PUT requests to update the radios
 export async function PUT({ request }) {
   try {
@@ -124,10 +128,22 @@ export async function PUT({ request }) {
   }
 }
 
-
-
 async function commandTrigger(command) {
   ExtPlane.client.begin(command);
   await delay(50);
   ExtPlane.client.end(command);
+}
+
+export function GET({ url }) {
+  // Access the query parameters
+  const func = url.searchParams.get("func");
+
+  console.log("Function:", func);
+  if (func === "disconnected") {
+    if (connected === true) ExtPlane.client.disconnect();
+  }
+
+  return new Response(null, {
+    headers: { "Content-Type": "application/json" },
+  });
 }

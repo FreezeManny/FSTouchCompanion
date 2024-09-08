@@ -10,7 +10,7 @@
 
 	async function checkAlive() {
 		try {
-			const response = await fetch('http://localhost:8083/#/mcdu');
+			const response = await fetch('http://192.168.0.2:8083/#/mcdu');
 			//console.log("Server There");
 			frame = true;
 		} catch (error) {
@@ -24,7 +24,7 @@
 </script>
 
 {#if frame}
-	<iframe title="MCDU" src="http://localhost:8083/#/mcdu" style="border: none;" class="w-full h-full" />
+	<iframe title="MCDU" src="http://192.168.0.2:8083/#/mcdu" style="border: none;" class="w-full h-full" />
 {:else}
 	<div class="h-full flex items-center justify-center">
 		<div class="flex flex-col items-center">
