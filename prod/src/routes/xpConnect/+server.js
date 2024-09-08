@@ -64,6 +64,7 @@ ExtPlane.on("loaded", () => {
         if (radioConfig[radio].dataRef[key] === data_ref) {
           // Update the corresponding value in the data object
           data[radio][key] = value;
+          console.log("Data:", value);
         }
       }
     }
@@ -132,18 +133,4 @@ async function commandTrigger(command) {
   ExtPlane.client.begin(command);
   await delay(50);
   ExtPlane.client.end(command);
-}
-
-export function GET({ url }) {
-  // Access the query parameters
-  const func = url.searchParams.get("func");
-
-  console.log("Function:", func);
-  if (func === "disconnected") {
-    if (connected === true) ExtPlane.client.disconnect();
-  }
-
-  return new Response(null, {
-    headers: { "Content-Type": "application/json" },
-  });
 }
