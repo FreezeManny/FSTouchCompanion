@@ -1,8 +1,6 @@
 var ExtPlaneJs = require("extplanejs");
 const { delay } = require("./utils");
 
-
-
 const radioConfig = {
   com1: {
     dataRef: {
