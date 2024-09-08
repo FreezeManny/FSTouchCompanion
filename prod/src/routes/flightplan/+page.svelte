@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
 
   let data;
-  let pdfLink = "";
+  let htmlExpression = "";
+  let customFontSize = "15px"; // Your custom font size
 
   onMount(async () => {
     console.log("Hello World");
@@ -10,21 +11,24 @@
       const response = await fetch(
         "https://www.simbrief.com/api/xml.fetcher.php?username=" +
           "aplayz" + //settings.simbriefUsername
-          "&json=1",
+          "&json=1"
       );
       data = await response.json();
-      pdfLink = data.files.directory + data.files.pdf.link;
-      console.log("Link: " + pdfLink);
+      htmlExpression = setFontSize(data.text.plan_html, customFontSize);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
   });
+
+  function setFontSize(html, fontSize) {
+    // Use regular expression to find and replace inline font-size styles
+    return html.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSize}`);
+  }
 </script>
 
-<div class="w-screen h-screen flex items-center justify-center">
-  <iframe
-    title="flightplan"
-    src={pdfLink}
-    class="w-full h-full border-none"
-  />
+
+<div class="card m-1">
+    <div class="px-1 py-5">
+        {@html htmlExpression}
+    </div>
 </div>

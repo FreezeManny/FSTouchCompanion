@@ -62,6 +62,7 @@
   }
 </script>
 
+<hr class="!border-t-8" />
 <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
   <svelte:fragment slot="lead">
     <button type="button" id="btn_COM1" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM1 </button>
