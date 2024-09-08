@@ -4,8 +4,6 @@
 
   import { getModalStore } from "@skeletonlabs/skeleton";
 
-  import { source } from "sveltekit-sse";
-  import { sendCommand, sendDataRef } from "./functions";
 
   const modalStore = getModalStore();
   const COM1_Modal = {
@@ -21,31 +19,50 @@
     response: (r) => r !== undefined && sendDataRef("com2-stby", r),
   };
 
-
   let COM1_ACT_FREQ = "---.---";
   let COM1_STBY_FREQ = "---.---";
   let COM2_ACT_FREQ = "---.---";
   let COM2_STBY_FREQ = "---.---";
 
-  // Initialize the SSE connection
-  const connection = source("/xpConnect");
-  const json = connection.select("data").json(function or({ error, raw, previous }) {
-    //console.error(`Could not parse "${raw}" as json.`, error)
-    return previous; // This will be the new value of the store
+  let ws;
+
+  // Initialize the WebSocket connection
+  onMount(() => {
+    ws = new WebSocket("ws://192.168.0.2:3000");
+
+    ws.onmessage = (event) => {
+      try {
+        const json = JSON.parse(event.data);
+        const com1 = json.com1 || {};
+        const com2 = json.com2 || {};
+
+        COM1_ACT_FREQ = formatFrequency(com1.active);
+        COM1_STBY_FREQ = formatFrequency(com1.standby);
+        COM2_ACT_FREQ = formatFrequency(com2.active);
+        COM2_STBY_FREQ = formatFrequency(com2.standby);
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
   });
 
-  // Reactive statement to update frequency variables when json data changes
-  $: {
-    if ($json) {
-      const com1 = $json.com1 || {};
-      const com2 = $json.com2 || {};
-
-      COM1_ACT_FREQ = formatFrequency(com1.active);
-      COM1_STBY_FREQ = formatFrequency(com1.standby);
-      COM2_ACT_FREQ = formatFrequency(com2.active);
-      COM2_STBY_FREQ = formatFrequency(com2.standby);
+  function sendMessage(obj) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(obj));
+    } else {
+      console.error("WebSocket is not open. Cannot send message.");
     }
   }
+
+  onDestroy(() => {
+    if (ws) {
+      ws.close();
+    }
+  });
 
   function formatFrequency(frequency) {
     if (frequency === undefined) return "---.---";
@@ -60,6 +77,23 @@
   }
   function com2SwitchButton() {
     sendCommand("switch-com2");
+  }
+
+  function sendCommand(commandPrefix) {
+    let data = {
+      command: commandPrefix,
+    };
+    sendMessage(data);
+  }
+
+  function sendDataRef(dataRefPrefix, value) {
+    let data = {
+      dataRef: {
+        dataRefPrefix: dataRefPrefix,
+        value: value,
+      },
+    };
+    sendMessage(data);
   }
 </script>
 
