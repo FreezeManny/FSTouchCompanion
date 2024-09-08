@@ -4,7 +4,6 @@
 
   import { getModalStore } from "@skeletonlabs/skeleton";
 
-
   const modalStore = getModalStore();
   const COM1_Modal = {
     type: "component",
