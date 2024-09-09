@@ -8,8 +8,9 @@ let data = null;
 
 const aircraftRef = "sim/aircraft/view/acf_ui_name";
 const fsTimeRef = "sim/time/total_running_time_sec";
-const reconnectionTime = 2000; // 2 seconds timeout for reconnection attempts
-const connectionTimeout = 5000; // 5 seconds timeout for connection attempts
+const reconnectionTime = 2000; // Time for the sim to be considered disconnected
+const connectionTimeout = 5000; // 5 seconds timeout for connection attempts to ExtPlane
+
 let updateTimeout;
 let fsConnected = false;
 let aircraftFound = false;
@@ -141,7 +142,7 @@ function connectExtPlane() {
     return; // Prevent multiple connection attempts if already connected
   }
 
-   extPlaneConnection = new ExtPlaneJs({
+  extPlaneConnection = new ExtPlaneJs({
     host: "127.0.0.1",
     port: 51000,
     broadcast: true,
@@ -244,7 +245,7 @@ wss.on("connection", function connection(ws, req) {
 
   ws.on("message", function incoming(message) {
     const obj = JSON.parse(message);
-    console.log(`Received message from IP: ${clientIP}:`, obj);
+    //console.log(`Received message from IP: ${clientIP}:`, obj);
     handleWebsocketRecieve(obj);
   });
 
