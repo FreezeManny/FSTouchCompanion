@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Cessna Skyhawk",
+    "data": {
+      "com1": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com1_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/GPS/g430n1_com_ff"
+        }
+      },
+      "com2": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com2_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/GPS/g430n2_com_ff"
+        }
+      }
+    }
+  },
+  {
+    "name": "ToLiSs A321 Hi Def",
+    "data": {
+      "com1": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com1_frequency_hz_833"
+        },
+        "command": {
+          "switch": "AirbusFBW/RMPSwapCapt"
+        }
+      },
+      "com2": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com2_frequency_hz_833"
+        },
+        "command": {
+          "switch": "AirbusFBW/RMPSwapCo"
+        }
+      }
+    }
+  },
+  {
+    "name": "Boeing 737-800X",
+    "data": {
+      "com1": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com1_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/radios/com1_standy_flip"
+        }
+      },
+      "com2": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com2_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/radios/com2_standy_flip"
+        }
+      }
+    }
+  },
+  {
+    "name": "Boeing 767-200ER XP12",
+    "data": {
+      "com1": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com1_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/radios/com1_standy_flip"
+        }
+      },
+      "com2": {
+        "dataRef": {
+          "standby": "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
+          "active": "sim/cockpit2/radios/actuators/com2_frequency_hz_833"
+        },
+        "command": {
+          "switch": "sim/radios/com2_standy_flip"
+        }
+      }
+    }
+  }
+]

@@ -1,32 +1,67 @@
 var ExtPlaneJs = require("extplanejs");
 const { delay } = require("./utils");
+const fs = require('fs/promises');
+const aircraftData = require('./aircraftData.json');
 
-const radioConfig = {
-  com1: {
-    dataRef: {
-      standby: "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
-      active: "sim/cockpit2/radios/actuators/com1_frequency_hz_833",
-    },
-    command: {
-      switch: "sim/GPS/g430n1_com_ff",
-    },
-  },
+let radioConfig = null;
+let data = null;
 
-  com2: {
-    dataRef: {
-      standby: "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
-      active: "sim/cockpit2/radios/actuators/com2_frequency_hz_833",
-    },
-    command: {
-      switch: "sim/GPS/g430n2_com_ff",
-    },
-  },
-};
+async function getAircraftByName(value) {
+  value = value.trim().replace(/\0/g, ""); // Remove null characters
 
-let data = Object.fromEntries(
-  Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef).map((key) => [key, 0]))])
-);
+  const foundAircraft = aircraftData.find((aircraft) => value === aircraft.name.trim());
+  if (foundAircraft) {
+    return foundAircraft.data;
+  } else {
+    return null; // Return null if no match is found
+  }
+}
 
+async function changeAircraft(aircraftName) {
+  console.log("Aircraft changed to:", aircraftName);
+
+  // Example usage:
+  const aircraftData = await getAircraftByName(aircraftName);
+
+  if (aircraftData) {
+    // Handle the found aircraft
+    console.log("Aircraft found:", aircraftData);
+
+    // Unsubscribe from all dataRefs
+    unsubscribeAllDataRefs();
+
+    // Update radioConfig and data
+    radioConfig = aircraftData;
+    data = Object.fromEntries(
+      Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef).map((key) => [key, 0]))])
+    );
+
+    // Subscribe to all dataRefs
+    subscribeAllDataRefs();
+  } else {
+    console.log("Aircraft not found");
+  }
+}
+
+function subscribeAllDataRefs() {
+  Object.values(radioConfig).forEach((radio) => {
+    Object.values(radio.dataRef).forEach((dataRef) => {
+      ExtPlane.client.subscribe(dataRef);
+    });
+  });
+}
+
+function unsubscribeAllDataRefs() {
+  if (radioConfig) {
+    Object.values(radioConfig).forEach((radio) => {
+      Object.values(radio.dataRef).forEach((dataRef) => {
+        ExtPlane.client.unsubscribe(dataRef);
+      });
+    });
+  }
+}
+
+const aircraftRef = "sim/aircraft/view/acf_ui_name";
 const fsTimeRef = "sim/time/total_running_time_sec";
 const reconnectionTime = 2000;
 let updateTimeout;
@@ -68,23 +103,24 @@ function connectExtPlane() {
     fsConnected = true;
 
     ExtPlane.client.subscribe(fsTimeRef);
-
-    Object.values(radioConfig).forEach((radio) => {
-      Object.values(radio.dataRef).forEach((dataRef) => {
-        ExtPlane.client.subscribe(dataRef);
-      });
-    });
+    ExtPlane.client.subscribe(aircraftRef);
 
     ExtPlane.on("data-ref", (data_ref, value) => {
       if (data_ref === fsTimeRef) {
         updateSimRunTime(value);
       }
-      for (let radio in radioConfig) {
-        for (let key in radioConfig[radio].dataRef) {
-          if (radioConfig[radio].dataRef[key] === data_ref) {
-            console.log("DataRef: " + data_ref + " Value: " + value);
-            data[radio][key] = value;
-            sendMessageToClient(JSON.stringify(data));
+      if (data_ref === aircraftRef) {
+        changeAircraft(value);
+      }
+
+      if (data) {
+        for (let radio in radioConfig) {
+          for (let key in radioConfig[radio].dataRef) {
+            if (radioConfig[radio].dataRef[key] === data_ref) {
+              console.log("DataRef: " + data_ref + " Value: " + value);
+              data[radio][key] = value;
+              sendMessageToClient(JSON.stringify(data));
+            }
           }
         }
       }
