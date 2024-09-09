@@ -9,13 +9,20 @@ let data = null;
 async function getAircraftByName(value) {
   value = value.trim().replace(/\0/g, ""); // Remove null characters
 
-  const foundAircraft = aircraftData.find((aircraft) => value === aircraft.name.trim());
+  const foundAircraft = aircraftData.find((aircraft) => {
+    if (Array.isArray(aircraft.name)) {
+      return aircraft.name.some(name => value === name.trim());
+    }
+    return value === aircraft.name.trim();
+  });
+
   if (foundAircraft) {
     return foundAircraft.data;
   } else {
     return null; // Return null if no match is found
   }
 }
+
 
 async function changeAircraft(aircraftName) {
   console.log("Aircraft changed to:", aircraftName);
