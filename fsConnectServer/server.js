@@ -17,12 +17,30 @@ async function getAircraftByName(value) {
   });
 
   if (foundAircraft) {
+    // Use default aircraft data to merge with the specific one
+    const defaultAircraft = aircraftData.find(aircraft => Array.isArray(aircraft.name) && aircraft.name.includes("default"));
+    
+    if (defaultAircraft) {
+      // Merge the specific aircraft data with the default one (deep merge)
+      return mergeDeep(defaultAircraft.data, foundAircraft.data);
+    }
+
     return foundAircraft.data;
   } else {
     return null; // Return null if no match is found
   }
 }
 
+// Helper function for deep merging objects
+function mergeDeep(target, source) {
+  for (const key in source) {
+    if (source[key] instanceof Object && key in target) {
+      Object.assign(source[key], mergeDeep(target[key], source[key]));
+    }
+  }
+  // Combine the two objects
+  return Object.assign({}, target, source);
+}
 
 async function changeAircraft(aircraftName) {
   console.log("Aircraft changed to:", aircraftName);
@@ -40,7 +58,7 @@ async function changeAircraft(aircraftName) {
     // Update radioConfig and data
     radioConfig = aircraftData;
     data = Object.fromEntries(
-      Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef).map((key) => [key, 0]))])
+      Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef || {}).map((key) => [key, 0]))])
     );
 
     // Subscribe to all dataRefs
@@ -52,7 +70,7 @@ async function changeAircraft(aircraftName) {
 
 function subscribeAllDataRefs() {
   Object.values(radioConfig).forEach((radio) => {
-    Object.values(radio.dataRef).forEach((dataRef) => {
+    Object.values(radio.dataRef || {}).forEach((dataRef) => {
       ExtPlane.client.subscribe(dataRef);
     });
   });
@@ -61,7 +79,7 @@ function subscribeAllDataRefs() {
 function unsubscribeAllDataRefs() {
   if (radioConfig) {
     Object.values(radioConfig).forEach((radio) => {
-      Object.values(radio.dataRef).forEach((dataRef) => {
+      Object.values(radio.dataRef || {}).forEach((dataRef) => {
         ExtPlane.client.unsubscribe(dataRef);
       });
     });
