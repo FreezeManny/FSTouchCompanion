@@ -6,8 +6,15 @@ const aircraftData = require("./aircraftData.json");
 let radioConfig = null;
 let data = null;
 
+const aircraftRef = "sim/aircraft/view/acf_ui_name";
+const fsTimeRef = "sim/time/total_running_time_sec";
+const reconnectionTime = 2000;
+let updateTimeout;
+let fsConnected = false;
 let aircraftFound = false;
 
+let ExtPlane;
+let retryInterval = reconnectionTime; // Time in milliseconds to wait before retrying connection
 
 async function getAircraftByName(value) {
   value = value.trim().replace(/\0/g, ""); // Remove null characters
@@ -56,13 +63,13 @@ async function changeAircraft(aircraftName) {
 
     // Unsubscribe from all dataRefs
     unsubscribeAllDataRefs();
-    
+
     // Update radioConfig and data
     radioConfig = aircraftData;
     data = Object.fromEntries(
       Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef || {}).map((key) => [key, 0]))])
     );
-    
+
     // Subscribe to all dataRefs
     subscribeAllDataRefs();
     aircraftFound = true;
@@ -92,12 +99,6 @@ function unsubscribeAllDataRefs() {
   }
 }
 
-const aircraftRef = "sim/aircraft/view/acf_ui_name";
-const fsTimeRef = "sim/time/total_running_time_sec";
-const reconnectionTime = 2000;
-let updateTimeout;
-let fsConnected = false;
-
 function onVariableStale() {
   console.log(`Sim has not been running for ${reconnectionTime} milliseconds`);
   fsConnected = false;
@@ -118,8 +119,19 @@ function updateSimRunTime(value) {
   }
 }
 
-let ExtPlane;
-let retryInterval = reconnectionTime; // Time in milliseconds to wait before retrying connection
+function handleFlightSimRecieve(data_ref, data) {
+  if (data) {
+    for (let radio in radioConfig) {
+      for (let key in radioConfig[radio].dataRef) {
+        if (radioConfig[radio].dataRef[key] === data_ref) {
+          //console.log("DataRef: " + data_ref + " Value: " + value);
+          data[radio][key] = value;
+          sendMessageToClient(JSON.stringify(data));
+        }
+      }
+    }
+  }
+}
 
 function connectExtPlane() {
   ExtPlane = new ExtPlaneJs({
@@ -144,17 +156,7 @@ function connectExtPlane() {
         changeAircraft(value);
       }
 
-      if (data) {
-        for (let radio in radioConfig) {
-          for (let key in radioConfig[radio].dataRef) {
-            if (radioConfig[radio].dataRef[key] === data_ref) {
-              //console.log("DataRef: " + data_ref + " Value: " + value);
-              data[radio][key] = value;
-              sendMessageToClient(JSON.stringify(data));
-            }
-          }
-        }
-      }
+      handleFlightSimRecieve(data_ref, data);
     });
   });
 
@@ -179,7 +181,7 @@ connectExtPlane();
 // Periodically check if we need to reconnect
 setInterval(checkConnection, 10000); // Check every 10 seconds
 
-function handleRecieve(obj) {
+function handleWebsocketRecieve(obj) {
   if (obj.hasOwnProperty("command")) {
     switch (obj.command) {
       case "switch-com1":
@@ -219,8 +221,9 @@ console.log("WebsocketStarted");
 
 let connectedClient = null;
 
-wss.on("connection", function connection(ws) {
-  console.log("Client connected");
+wss.on("connection", function connection(ws, req) {
+  const clientIP = ws._socket.remoteAddress;
+  console.log(`Client connected from IP: ${clientIP}`);
   connectedClient = ws;
 
   sendMessageToClient(JSON.stringify({ fsConnected: fsConnected }));
@@ -230,12 +233,13 @@ wss.on("connection", function connection(ws) {
   }
 
   ws.on("message", function incoming(message) {
-    obj = JSON.parse(message);
-    handleRecieve(obj);
+    const obj = JSON.parse(message);
+    console.log(`Received message from IP: ${clientIP}:`, obj);
+    handleWebsocketRecieve(obj);
   });
 
   ws.on("close", function () {
-    console.log("Client disconnected");
+    console.log(`Client from IP: ${clientIP} disconnected`);
     connectedClient = null;
   });
 });
@@ -244,6 +248,6 @@ function sendMessageToClient(message) {
   if (connectedClient) {
     connectedClient.send(message);
   } else {
-    console.log("No client connected to send message to");
+    //console.log("No client connected to send message to");
   }
 }
