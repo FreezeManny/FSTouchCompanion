@@ -5,6 +5,7 @@
   import { getModalStore } from "@skeletonlabs/skeleton";
 
   let fsConnected = false;
+  let aircraftFound = false;
   let isWebSocketOpen = false;
 
   const modalStore = getModalStore();
@@ -48,6 +49,11 @@
         if (json.hasOwnProperty("fsConnected")) {
           fsConnected = json.fsConnected;
           console.log("fsConnected set to:", fsConnected);
+        }
+        if (json.hasOwnProperty("aircraftFound")) {
+          console.log("aircraftFound set to:", aircraftFound);
+          aircraftFound = json.aircraftFound;
+          console.log("aircraftFound set to:", aircraftFound);
         }
 
         if (fsConnected) {
@@ -128,7 +134,7 @@
   }
 </script>
 
-{#if fsConnected && isWebSocketOpen}
+{#if fsConnected && isWebSocketOpen && aircraftFound}
   <hr class="!border-t-8" />
   <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
     <svelte:fragment slot="lead">
@@ -222,8 +228,10 @@
       <h3 class="h3">
         {#if !isWebSocketOpen}
           WebSocket connection failed
-        {:else}
+        {:else if !fsConnected}
           Flightsim not connected/paused
+        {:else if !aircraftFound}
+          Aircraft not found in Config
         {/if}
       </h3>
     </div>

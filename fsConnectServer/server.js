@@ -1,25 +1,27 @@
 var ExtPlaneJs = require("extplanejs");
 const { delay } = require("./utils");
-const fs = require('fs/promises');
-const aircraftData = require('./aircraftData.json');
+const fs = require("fs/promises");
+const aircraftData = require("./aircraftData.json");
 
 let radioConfig = null;
 let data = null;
+
+let aircraftFound = false;
+
 
 async function getAircraftByName(value) {
   value = value.trim().replace(/\0/g, ""); // Remove null characters
 
   const foundAircraft = aircraftData.find((aircraft) => {
     if (Array.isArray(aircraft.name)) {
-      return aircraft.name.some(name => value === name.trim());
+      return aircraft.name.some((name) => value === name.trim());
     }
     return value === aircraft.name.trim();
   });
 
   if (foundAircraft) {
     // Use default aircraft data to merge with the specific one
-    const defaultAircraft = aircraftData.find(aircraft => Array.isArray(aircraft.name) && aircraft.name.includes("default"));
-    
+    const defaultAircraft = aircraftData.find((aircraft) => Array.isArray(aircraft.name) && aircraft.name.includes("default"));
     if (defaultAircraft) {
       // Merge the specific aircraft data with the default one (deep merge)
       return mergeDeep(defaultAircraft.data, foundAircraft.data);
@@ -50,21 +52,25 @@ async function changeAircraft(aircraftName) {
 
   if (aircraftData) {
     // Handle the found aircraft
-    console.log("Aircraft found:", aircraftData);
+    console.log("Aircraft found");
 
     // Unsubscribe from all dataRefs
     unsubscribeAllDataRefs();
-
+    
     // Update radioConfig and data
     radioConfig = aircraftData;
     data = Object.fromEntries(
       Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef || {}).map((key) => [key, 0]))])
     );
-
+    
     // Subscribe to all dataRefs
     subscribeAllDataRefs();
+    aircraftFound = true;
+    sendMessageToClient(JSON.stringify({ aircraftFound: aircraftFound }));
   } else {
     console.log("Aircraft not found");
+    aircraftFound = false;
+    sendMessageToClient(JSON.stringify({ aircraftFound: aircraftFound }));
   }
 }
 
@@ -142,7 +148,7 @@ function connectExtPlane() {
         for (let radio in radioConfig) {
           for (let key in radioConfig[radio].dataRef) {
             if (radioConfig[radio].dataRef[key] === data_ref) {
-              console.log("DataRef: " + data_ref + " Value: " + value);
+              //console.log("DataRef: " + data_ref + " Value: " + value);
               data[radio][key] = value;
               sendMessageToClient(JSON.stringify(data));
             }
@@ -218,6 +224,7 @@ wss.on("connection", function connection(ws) {
   connectedClient = ws;
 
   sendMessageToClient(JSON.stringify({ fsConnected: fsConnected }));
+  sendMessageToClient(JSON.stringify({ aircraftFound: aircraftFound }));
   if (fsConnected) {
     sendMessageToClient(JSON.stringify(data));
   }
