@@ -119,7 +119,7 @@ function updateSimRunTime(value) {
   }
 }
 
-function handleFlightSimRecieve(data_ref, data) {
+function handleFlightSimRecieve(data_ref, value) {
   if (data) {
     for (let radio in radioConfig) {
       for (let key in radioConfig[radio].dataRef) {
@@ -156,7 +156,7 @@ function connectExtPlane() {
         changeAircraft(value);
       }
 
-      handleFlightSimRecieve(data_ref, data);
+      handleFlightSimRecieve(data_ref, value);
     });
   });
 
