@@ -8,12 +8,14 @@ let data = null;
 
 const aircraftRef = "sim/aircraft/view/acf_ui_name";
 const fsTimeRef = "sim/time/total_running_time_sec";
-const reconnectionTime = 2000;
+const reconnectionTime = 2000; // 2 seconds timeout for reconnection attempts
+const connectionTimeout = 5000; // 5 seconds timeout for connection attempts
 let updateTimeout;
 let fsConnected = false;
 let aircraftFound = false;
 
 let ExtPlane;
+let extPlaneConnection;
 let retryInterval = reconnectionTime; // Time in milliseconds to wait before retrying connection
 
 async function getAircraftByName(value) {
@@ -84,7 +86,7 @@ async function changeAircraft(aircraftName) {
 function subscribeAllDataRefs() {
   Object.values(radioConfig).forEach((radio) => {
     Object.values(radio.dataRef || {}).forEach((dataRef) => {
-      ExtPlane.client.subscribe(dataRef);
+      extPlaneConnection.client.subscribe(dataRef);
     });
   });
 }
@@ -93,7 +95,7 @@ function unsubscribeAllDataRefs() {
   if (radioConfig) {
     Object.values(radioConfig).forEach((radio) => {
       Object.values(radio.dataRef || {}).forEach((dataRef) => {
-        ExtPlane.client.unsubscribe(dataRef);
+        extPlaneConnection.client.unsubscribe(dataRef);
       });
     });
   }
@@ -134,21 +136,38 @@ function handleFlightSimRecieve(data_ref, value) {
 }
 
 function connectExtPlane() {
-  ExtPlane = new ExtPlaneJs({
+  if (fsConnected) {
+    console.log("Already connected to ExtPlane.");
+    return; // Prevent multiple connection attempts if already connected
+  }
+
+   extPlaneConnection = new ExtPlaneJs({
     host: "127.0.0.1",
     port: 51000,
     broadcast: true,
   });
 
-  ExtPlane.on("loaded", () => {
+  let timeoutId;
+
+  // Set a timeout for connection attempt
+  timeoutId = setTimeout(() => {
+    console.error("Failed to connect to ExtPlane: Timeout");
+    fsConnected = false;
+    sendMessageToClient(JSON.stringify({ fsConnected: false }));
+    // Attempt reconnection after a delay
+    setTimeout(connectExtPlane, retryInterval);
+  }, connectionTimeout);
+
+  extPlaneConnection.on("loaded", () => {
+    clearTimeout(timeoutId); // Clear the timeout on successful connection
     console.log("ExtPlane connected");
-    ExtPlane.client.interval(0.01);
     fsConnected = true;
 
-    ExtPlane.client.subscribe(fsTimeRef);
-    ExtPlane.client.subscribe(aircraftRef);
+    extPlaneConnection.client.interval(0.01);
+    extPlaneConnection.client.subscribe(fsTimeRef);
+    extPlaneConnection.client.subscribe(aircraftRef);
 
-    ExtPlane.on("data-ref", (data_ref, value) => {
+    extPlaneConnection.on("data-ref", (data_ref, value) => {
       if (data_ref === fsTimeRef) {
         updateSimRunTime(value);
       }
@@ -160,26 +179,17 @@ function connectExtPlane() {
     });
   });
 
-  ExtPlane.on("error", (err) => {
+  extPlaneConnection.on("error", (err) => {
     console.error("ExtPlane error:", err);
     fsConnected = false;
     sendMessageToClient(JSON.stringify({ fsConnected: false }));
-    setTimeout(connectExtPlane, retryInterval); // Retry connection after a delay
+    // Attempt reconnection after a delay
+    setTimeout(connectExtPlane, retryInterval);
   });
-}
-
-function checkConnection() {
-  if (!fsConnected) {
-    console.log("Attempting to reconnect...");
-    connectExtPlane();
-  }
 }
 
 // Initial connection attempt
 connectExtPlane();
-
-// Periodically check if we need to reconnect
-setInterval(checkConnection, 10000); // Check every 10 seconds
 
 function handleWebsocketRecieve(obj) {
   if (obj.hasOwnProperty("command")) {
@@ -209,9 +219,9 @@ function handleWebsocketRecieve(obj) {
 }
 
 async function commandTrigger(command) {
-  ExtPlane.client.begin(command);
+  extPlaneConnection.client.begin(command);
   await delay(20);
-  ExtPlane.client.end(command);
+  extPlaneConnection.client.end(command);
 }
 
 // ------------------ Websocket Server ------------------
