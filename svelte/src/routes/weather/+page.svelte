@@ -2,6 +2,15 @@
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
   import { selectedAirports, settings } from "$lib/stores";
+  import { getToastStore } from "@skeletonlabs/skeleton";
+  const toastStore = getToastStore();
+
+  const simbriefError = (message) => ({
+    message: message,
+    timeout: 5000,
+    hoverable: true,
+    background: 'variant-filled-error',
+  });
 
   // VATSIM URLs
   const VATSIMDATAURL = "https://data.vatsim.net/v3/vatsim-data.json";
@@ -30,11 +39,9 @@
         $selectedAirports.dep = data.origin.icao_code;
         $selectedAirports.arr = data.destination.icao_code;
       } else {
-        console.log("Simbrief: " + data.fetch.status);
+        toastStore.trigger(simbriefError("Simbrief: " + data.fetch.status));
       }
-    } catch (error) {
-      handleError(error);
-    }
+    } catch (error) {}
   }
 
   // Fetch airport data (ATIS and METAR)
