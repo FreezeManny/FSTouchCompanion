@@ -10,4 +10,4 @@ export const settings = persisted("settings", {
     simbriefUsername: ""
 });
 
-export const simbriefData = persisted("simbriefData", {});
+export const simbriefData = persisted("simbriefData", null);

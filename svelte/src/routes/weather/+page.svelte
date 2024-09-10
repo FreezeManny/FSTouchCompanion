@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
-  import { selectedAirports, settings } from "$lib/stores";
+  import { selectedAirports, settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   const toastStore = getToastStore();
 
@@ -9,7 +9,7 @@
     message: message,
     timeout: 5000,
     hoverable: true,
-    background: 'variant-filled-error',
+    background: "variant-filled-error",
   });
 
   // VATSIM URLs
@@ -27,22 +27,6 @@
   let arr = { atisCode: "", atisText: "", metar: "" };
 
   // Local storage for airport selections
-
-  // Fetch Simbrief route data
-  async function fetchSimbriefRoute() {
-    const fetchURL = "https://www.simbrief.com/api/xml.fetcher.php?username=" + $settings.simbriefUsername + "&json=1";
-    try {
-      const response = await fetch(fetchURL);
-      const data = await response.json();
-
-      if (data.fetch.status == "Success") {
-        $selectedAirports.dep = data.origin.icao_code;
-        $selectedAirports.arr = data.destination.icao_code;
-      } else {
-        toastStore.trigger(simbriefError("Simbrief: " + data.fetch.status));
-      }
-    } catch (error) {}
-  }
 
   // Fetch airport data (ATIS and METAR)
   async function fetchAirportData(mode) {
@@ -104,7 +88,8 @@
         setDefaultATIS(mode);
       }
     } catch (error) {
-      handleError(error);
+      console.error("Error fetching ATIS data:", error);
+      setDefaultATIS(mode);
     }
   }
 
@@ -131,14 +116,14 @@
 
   // Button handler for Simbrief
   async function simbriefButtonHandler() {
-    await fetchSimbriefRoute();
-    fetchAirportData(fetchMode.DEP);
-    fetchAirportData(fetchMode.ARR);
-  }
-
-  // Error handler
-  function handleError(error) {
-    console.error("Error fetching data:", error);
+    if ($simbriefData) {
+      $selectedAirports.dep = $simbriefData.origin.icao_code;
+      $selectedAirports.arr = $simbriefData.destination.icao_code;
+      fetchAirportData(fetchMode.DEP);
+      fetchAirportData(fetchMode.ARR);
+    } else {
+      toastStore.trigger(simbriefError("Simbrief Flightplan not Loaded"));
+    }
   }
 
   // Lifecycle methods

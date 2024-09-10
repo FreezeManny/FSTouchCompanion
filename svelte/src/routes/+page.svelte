@@ -19,7 +19,7 @@
       if (data.fetch.status == "Success") {
         $simbriefData = data;
 	} else {
-		$simbriefData = {};
+		$simbriefData = null;
         toastStore.trigger(simbriefError("Simbrief: " + data.fetch.status));
       }
     } catch (error) {}
@@ -32,3 +32,5 @@
 <h1 class="h1">Homepage</h1>
 
 <button type="button" class="btn variant-filled" on:click={getFlightPlan}>Load Flight</button>
+
+<div class="card">Basic</div>

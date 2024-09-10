@@ -1,6 +1,5 @@
 <script lang="js">
-  import { flightPlanCache, simbriefData } from "$lib/stores";
-
+  import { simbriefData } from "$lib/stores";
   let customFontSize = "15px"; // Your custom font size
 
   function processHtml(html, fontSize) {
@@ -15,7 +14,7 @@
 {#if $simbriefData}
   <div class="card m-1">
     <div class="px-1 py-5">
-      {@html processHtml($flightPlanCache, customFontSize)}
+      {@html processHtml($simbriefData.text.plan_html, customFontSize)}
     </div>
   </div>
 {:else}
