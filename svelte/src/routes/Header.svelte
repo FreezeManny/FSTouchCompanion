@@ -29,19 +29,39 @@
 </script>
 
 <header>
+  <!--
   <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end" class="justify-items-center items-center">
+    -->
+  <AppBar>
     <svelte:fragment slot="lead">
       <RadioGroup bind:group={valueSingle}>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/radio"} on:change={() => goto("/radio")}>Radio</RadioItem>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/fenix"} on:change={() => goto("/fenix")}>FenixMCDU</RadioItem>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/weather"} on:change={() => goto("/weather")}>Weather</RadioItem>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/flightplan"} on:change={() => goto("/flightplan")}>fPlan</RadioItem>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/checklist"} on:change={() => goto("/checklist")}>cList</RadioItem>
+        <RadioItem bind:group={valueSingle} name="justify" value={"/radio"} on:change={() => goto("/radio")}
+          >Radio</RadioItem
+        >
+        <RadioItem bind:group={valueSingle} name="justify" value={"/fenix"} on:change={() => goto("/fenix")}
+          >FenixMCDU</RadioItem
+        >
+        <RadioItem bind:group={valueSingle} name="justify" value={"/weather"} on:change={() => goto("/weather")}
+          >Weather</RadioItem
+        >
+        <RadioItem bind:group={valueSingle} name="justify" value={"/flightplan"} on:change={() => goto("/flightplan")}
+          >fPlan</RadioItem
+        >
+        <RadioItem bind:group={valueSingle} name="justify" value={"/checklist"} on:change={() => goto("/checklist")}
+          >cList</RadioItem
+        >
       </RadioGroup>
     </svelte:fragment>
     <svelte:fragment slot="trail">
       <button type="button" class="btn-icon variant-filled" on:click={() => modalStore.trigger(settingsModal)}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
