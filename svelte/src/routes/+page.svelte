@@ -32,5 +32,13 @@
 <h1 class="h1">Homepage</h1>
 
 <button type="button" class="btn variant-filled" on:click={getFlightPlan}>Load Flight</button>
+<h1 class="h1">
+  {#if $simbriefData}
+  Flightplan Loaded
+  {:else}
+  Flightplan not loaded
+  {/if}
+</h1>
+
 
 <div class="card">Basic</div>
