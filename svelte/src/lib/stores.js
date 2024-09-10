@@ -8,6 +8,6 @@ export const selectedAirports = persisted("selectedAirports", {
 
 export const settings = persisted("settings", {
     simbriefUsername: ""
-})
+});
 
-export const flightPlanCache = persisted("flightPlanCache", "")
+export const simbriefData = persisted("simbriefData", {});

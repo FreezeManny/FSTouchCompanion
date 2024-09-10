@@ -143,8 +143,6 @@
 
   // Lifecycle methods
   onMount(() => {
-    $selectedAirports.dep = get(selectedAirports).dep;
-    $selectedAirports.arr = get(selectedAirports).arr;
     if ($selectedAirports.dep.length === 4) fetchAirportData(fetchMode.DEP);
     if ($selectedAirports.arr.length === 4) fetchAirportData(fetchMode.ARR);
   });

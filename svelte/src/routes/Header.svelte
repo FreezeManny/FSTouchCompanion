@@ -1,7 +1,6 @@
 <script lang="js">
-  import { AppShell, AppBar } from "@skeletonlabs/skeleton";
+  import { AppBar } from "@skeletonlabs/skeleton";
   import { RadioGroup, RadioItem } from "@skeletonlabs/skeleton";
-  import { writable } from "svelte/store";
   import { page } from "$app/stores";
 
   import { goto } from "$app/navigation";
@@ -35,6 +34,9 @@
   <AppBar>
     <svelte:fragment slot="lead">
       <RadioGroup bind:group={valueSingle}>
+        <RadioItem bind:group={valueSingle} name="justify" value={"/"} on:change={() => goto("/")}
+          >Home</RadioItem
+        >
         <RadioItem bind:group={valueSingle} name="justify" value={"/radio"} on:change={() => goto("/radio")}
           >Radio</RadioItem
         >
