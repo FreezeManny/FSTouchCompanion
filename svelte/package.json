@@ -33,6 +33,7 @@
     "socio": "^1.9.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
+    "svelte-persisted-store": "^0.11.0",
     "sveltekit-io": "^1.0.11",
     "sveltekit-sse": "^0.13.5",
     "ws": "^8.18.0"

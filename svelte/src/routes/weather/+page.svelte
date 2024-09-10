@@ -1,8 +1,7 @@
 <script>
-  import { settings } from "$lib/settings.js";
   import { onMount, onDestroy } from "svelte";
-  import { localStorageStore } from "@skeletonlabs/skeleton";
   import { get } from "svelte/store";
+  import { selectedAirports, settings } from "$lib/stores";
 
   // VATSIM URLs
   const VATSIMDATAURL = "https://data.vatsim.net/v3/vatsim-data.json";
@@ -15,20 +14,24 @@
   };
 
   // Airport data stores
-  let dep = { input: "", atisCode: "", atisText: "", metar: "" };
-  let arr = { input: "", atisCode: "", atisText: "", metar: "" };
+  let dep = { atisCode: "", atisText: "", metar: "" };
+  let arr = { atisCode: "", atisText: "", metar: "" };
 
   // Local storage for airport selections
-  const depAptSave = localStorageStore("depAptSave", "EDDS");
-  const arrAptSave = localStorageStore("arrAptSave", "EDDS");
 
   // Fetch Simbrief route data
   async function fetchSimbriefRoute() {
+    const fetchURL = "https://www.simbrief.com/api/xml.fetcher.php?username=" + $settings.simbriefUsername + "&json=1";
     try {
-      const response = await fetch(`https://www.simbrief.com/api/xml.fetcher.php?username=${settings.simbriefUsername}&json=1`);
+      const response = await fetch(fetchURL);
       const data = await response.json();
-      dep.input = data.origin.icao_code;
-      arr.input = data.destination.icao_code;
+
+      if (data.fetch.status == "Success") {
+        $selectedAirports.dep = data.origin.icao_code;
+        $selectedAirports.arr = data.destination.icao_code;
+      } else {
+        console.log("Simbrief: " + data.fetch.status);
+      }
     } catch (error) {
       handleError(error);
     }
@@ -36,7 +39,7 @@
 
   // Fetch airport data (ATIS and METAR)
   async function fetchAirportData(mode) {
-    const airport = mode === fetchMode.DEP ? dep.input : arr.input;
+    const airport = mode === fetchMode.DEP ? $selectedAirports.dep : $selectedAirports.arr;
     const upperAirport = airport.toUpperCase();
 
     await Promise.all([fetchATIS(mode, upperAirport), fetchMETAR(mode, upperAirport)]);
@@ -105,16 +108,17 @@
   }
 
   // Handle airport input changes
-  function updateAirportInput(airport) {
-    airport.input = airport.input.toUpperCase();
-    if (airport.input.length === 4) {
-      if (airport === dep) {
-        // Only fetch airport data for Departure if the input is exactly 4 characters
-        fetchAirportData(fetchMode.DEP);
-      } else {
-        // For Arrival, always fetch airport data if it has 4 characters
-        fetchAirportData(fetchMode.ARR);
-      }
+  function updateDeparture() {
+    $selectedAirports.dep = $selectedAirports.dep.toUpperCase();
+    if ($selectedAirports.dep.length === 4) {
+      fetchAirportData(fetchMode.DEP);
+    }
+  }
+  // Handle airport input changes
+  function updateArrival() {
+    $selectedAirports.arr = $selectedAirports.arr.toUpperCase();
+    if ($selectedAirports.arr.length === 4) {
+      fetchAirportData(fetchMode.ARR);
     }
   }
 
@@ -132,16 +136,10 @@
 
   // Lifecycle methods
   onMount(() => {
-    dep.input = get(depAptSave);
-    arr.input = get(arrAptSave);
-    if (dep.input.length === 4) fetchAirportData(fetchMode.DEP);
-    if (arr.input.length === 4) fetchAirportData(fetchMode.ARR);
-  });
-
-  onDestroy(() => {
-    depAptSave.set(dep.input);
-    arrAptSave.set(arr.input);
-    console.log("Component is being destroyed");
+    $selectedAirports.dep = get(selectedAirports).dep;
+    $selectedAirports.arr = get(selectedAirports).arr;
+    if ($selectedAirports.dep.length === 4) fetchAirportData(fetchMode.DEP);
+    if ($selectedAirports.arr.length === 4) fetchAirportData(fetchMode.ARR);
   });
 </script>
 
@@ -149,13 +147,19 @@
   <div class="mx-3">
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <div class="input-group-shim">Dep</div>
-      <input type="text" placeholder="EDDS" bind:value={dep.input} on:input={() => updateAirportInput(dep)} maxlength="4" />
+      <input
+        type="text"
+        placeholder="EDDS"
+        bind:value={$selectedAirports.dep}
+        on:input={updateDeparture}
+        maxlength="4"
+      />
     </div>
   </div>
   <div class="mx-3">
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <div class="input-group-shim">Arr</div>
-      <input type="text" placeholder="EDDS" bind:value={arr.input} on:input={() => updateAirportInput(arr)} maxlength="4" />
+      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} on:input={updateArrival} maxlength="4" />
     </div>
   </div>
   <button type="button" class="btn variant-filled mx-3" on:click={simbriefButtonHandler}>Simbrief</button>
@@ -163,7 +167,9 @@
 
 <div class="flex flex-col p-2">
   <div class="card my-1">
-    <header class="card-header">Departure Airport: {dep.input.length === 4 ? dep.input : "Enter a valid ICAO"}</header>
+    <header class="card-header">
+      Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}
+    </header>
     <section class="p-4">
       <div class="card mb-2">
         <header class="card-header">ATIS {dep.atisCode}</header>
@@ -176,7 +182,9 @@
     </section>
   </div>
   <div class="card my-1">
-    <header class="card-header">Arrival Airport: {arr.input.length === 4 ? arr.input : "Enter a valid ICAO"}</header>
+    <header class="card-header">
+      Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}
+    </header>
     <section class="p-4">
       <div class="card mb-2">
         <header class="card-header">ATIS {arr.atisCode}</header>
