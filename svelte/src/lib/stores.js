@@ -7,7 +7,8 @@ export const selectedAirports = persisted("selectedAirports", {
 });
 
 export const settings = persisted("settings", {
-    simbriefUsername: ""
+    simbriefUsername: "",
+    flightSimAddress: "",
 });
 
 export const simbriefData = persisted("simbriefData", null);

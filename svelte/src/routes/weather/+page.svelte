@@ -163,8 +163,8 @@
     </div>
   </div>
   <div class="grid grid-cols-2">
-    <button type="button" class="btn variant-filled mx-3" on:click={simbriefButtonHandler}>Simbrief</button>
-    <button type="button" class="btn variant-filled mx-3" on:click={updateButtonHandler}>Update</button>
+    <button type="button" class="btn variant-filled mx-1" on:click={simbriefButtonHandler}>Simbrief</button>
+    <button type="button" class="btn variant-filled mx-1" on:click={updateButtonHandler}>Update</button>
   </div>
 </div>
 

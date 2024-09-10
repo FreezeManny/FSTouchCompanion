@@ -1,36 +1,45 @@
 <script>
-	import { onMount } from 'svelte';
-	import { ProgressRadial } from '@skeletonlabs/skeleton';
+  import { onMount, onDestroy } from "svelte";
+  import { ProgressRadial } from "@skeletonlabs/skeleton";
+  import { settings } from "$lib/stores";
 
-	var frame = false;
+  var mcduOnline = false;
 
-	onMount(async () => {
-		checkAlive();
-	});
+  let interval;
 
-	async function checkAlive() {
-		try {
-			const response = await fetch('http://192.168.0.2:8083/#/mcdu');
-			//console.log("Server There");
-			frame = true;
-		} catch (error) {
-			//console.log("Failed to fetch data:", error);
-		}
-	}
+  onMount(async () => {
+    checkAlive();
+    interval = setInterval(checkAlive, 2000);
+  });
+  onDestroy(async () => {
+    clearInterval(interval);
+  });
 
-	setInterval(checkAlive, 2000);
-
-	const loadingValue = 'Connecting...';
+  async function checkAlive() {
+    try {
+      const response = await fetch("http://" + $settings.flightSimAddress + ":8083/#/mcdu");
+      //console.log("Server There");
+      mcduOnline = true;
+    } catch (error) {
+      mcduOnline = false;
+      //console.log("Failed to fetch data:", error);
+    }
+  }
 </script>
 
-{#if frame}
-	<iframe title="MCDU" src="http://192.168.0.2:8083/#/mcdu" style="border: none;" class="w-full h-full" />
+{#if mcduOnline}
+  <iframe
+    title="MCDU"
+    src={"http://" + $settings.flightSimAddress + ":8083/#/mcdu"}
+    style="border: none;"
+    class="w-full h-full"
+  />
 {:else}
-	<div class="h-full flex items-center justify-center">
-		<div class="flex flex-col items-center">
-			<ProgressRadial class="w-56 pb-5" />
-			<h1 class="h1">Connecting....</h1>
+  <div class="h-full flex items-center justify-center">
+    <div class="flex flex-col items-center">
+      <ProgressRadial class="w-56 pb-5" />
+      <h1 class="h1">Connecting....</h1>
       <p>Make sure the Fenix Aircraft is running</p>
-		</div>
-	</div>
+    </div>
+  </div>
 {/if}

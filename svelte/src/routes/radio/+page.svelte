@@ -1,8 +1,8 @@
 <script lang="js">
   import { AppBar } from "@skeletonlabs/skeleton";
   import { onMount, onDestroy } from "svelte";
-
   import { getModalStore } from "@skeletonlabs/skeleton";
+  import { settings } from "$lib/stores";
 
   let fsConnected = false;
   let aircraftFound = false;
@@ -36,7 +36,8 @@
   });
 
   function webSocketFunction() {
-    ws = new WebSocket("ws://192.168.0.2:3000");
+    const WebSocketAddress = "ws://" + window.location.hostname + ":3000";
+    ws = new WebSocket(WebSocketAddress);
 
     ws.onopen = () => {
       console.log("WebSocket connection established");
@@ -149,7 +150,14 @@
       </span>
 
       <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com1SwitchButton}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -167,7 +175,14 @@
 
     <svelte:fragment slot="trail">
       <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM1_Modal)}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -193,7 +208,14 @@
       </span>
 
       <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com2SwitchButton}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -211,7 +233,14 @@
 
     <svelte:fragment slot="trail">
       <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM2_Modal)}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

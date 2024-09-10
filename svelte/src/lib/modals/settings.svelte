@@ -22,10 +22,14 @@
   <h1 class="h1">Einstellungen</h1>
 
   <div class="space-y-1">
-    <p>Simbrief</p>
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-      <div class="input-group-shim">Username:</div>
+      <div class="input-group-shim">Simbrief Username:</div>
       <input type="text" bind:value={$settings.simbriefUsername} />
+    </div>
+
+    <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+      <div class="input-group-shim">Flight Sim PC Address:</div>
+      <input type="text" bind:value={$settings.flightSimAddress} />
     </div>
   </div>
 
