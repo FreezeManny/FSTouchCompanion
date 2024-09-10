@@ -95,8 +95,13 @@
 
   // Set default ATIS message
   function setDefaultATIS(mode) {
-    if (mode === fetchMode.DEP) dep.atisText = "No ATIS Online";
-    else arr.atisText = "No ATIS Online";
+    if (mode === fetchMode.DEP) {
+      dep.atisText = "No ATIS Online";
+      dep.atisCode = null;
+    } else {
+      arr.atisText = "No ATIS Online";
+      arr.atisCode = null;
+    }
   }
 
   // Handle airport input changes
@@ -115,7 +120,7 @@
   }
 
   // Button handler for Simbrief
-  async function simbriefButtonHandler() {
+  function simbriefButtonHandler() {
     if ($simbriefData) {
       $selectedAirports.dep = $simbriefData.origin.icao_code;
       $selectedAirports.arr = $simbriefData.destination.icao_code;
@@ -124,6 +129,11 @@
     } else {
       toastStore.trigger(simbriefError("Simbrief Flightplan not Loaded"));
     }
+  }
+
+  function updateButtonHandler() {
+    fetchAirportData(fetchMode.DEP);
+    fetchAirportData(fetchMode.ARR);
   }
 
   // Lifecycle methods
@@ -152,7 +162,10 @@
       <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} on:input={updateArrival} maxlength="4" />
     </div>
   </div>
-  <button type="button" class="btn variant-filled mx-3" on:click={simbriefButtonHandler}>Simbrief</button>
+  <div class="grid grid-cols-2">
+    <button type="button" class="btn variant-filled mx-3" on:click={simbriefButtonHandler}>Simbrief</button>
+    <button type="button" class="btn variant-filled mx-3" on:click={updateButtonHandler}>Update</button>
+  </div>
 </div>
 
 <div class="flex flex-col p-2">
@@ -162,7 +175,12 @@
     </header>
     <section class="p-4">
       <div class="card mb-2">
-        <header class="card-header">ATIS {dep.atisCode}</header>
+        <header class="card-header">
+          ATIS
+          {#if dep.atisCode}
+            Code: {dep.atisCode}
+          {/if}
+        </header>
         <section class="p-4">{@html dep.atisText}</section>
       </div>
       <div class="card">
@@ -177,7 +195,12 @@
     </header>
     <section class="p-4">
       <div class="card mb-2">
-        <header class="card-header">ATIS {arr.atisCode}</header>
+        <header class="card-header">
+          ATIS
+          {#if arr.atisCode}
+            Code: {arr.atisCode}
+          {/if}
+        </header>
         <section class="p-4">{arr.atisText}</section>
       </div>
       <div class="card">
