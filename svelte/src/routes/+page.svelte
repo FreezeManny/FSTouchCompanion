@@ -25,9 +25,6 @@
       }
     } catch (error) {}
   }
-
-
-
 </script>
 
 <h1 class="h1">Homepage</h1>

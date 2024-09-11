@@ -10,6 +10,7 @@
   const modalStore = getModalStore();
 
   import { settings } from "$lib/stores";
+  import { modeUserPrefers } from "@skeletonlabs/skeleton";
 
   const settingsModal = {
     type: "component",
@@ -19,23 +20,23 @@
   let activePath;
   let valueSingle;
 
+  // Set activePath and valueSingle reactively
   $: {
     activePath = $page.route.id;
     valueSingle = activePath;
   }
-  import { modeUserPrefers } from "@skeletonlabs/skeleton";
 
   onMount(() => {
+    // Update the value of valueSingle on mount
     valueSingle = activePath;
-    // Reactively update the class based on the selected mode
-    $: {
-      if ($settings.appearance === "dark") {
-        document.documentElement.classList.add("dark");
-        modeUserPrefers.set(true);
-      } else {
-        document.documentElement.classList.remove("dark");
-        modeUserPrefers.set(false);
-      }
+
+    // Set document class based on settings appearance
+    if ($settings.appearance === "dark") {
+      document.documentElement.classList.add("dark");
+      modeUserPrefers.set(true);
+    } else {
+      document.documentElement.classList.remove("dark");
+      modeUserPrefers.set(false);
     }
   });
 </script>
