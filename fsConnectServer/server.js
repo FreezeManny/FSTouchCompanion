@@ -208,10 +208,10 @@ function handleWebsocketRecieve(obj) {
   if (obj.hasOwnProperty("dataRef")) {
     switch (obj.dataRef.dataRefPrefix) {
       case "com1-stby":
-        ExtPlane.client.set(radioConfig.com1.dataRef.standby, obj.dataRef.value);
+        extPlaneConnection.client.set(radioConfig.com1.dataRef.standby, obj.dataRef.value);
         break;
       case "com2-stby":
-        ExtPlane.client.set(radioConfig.com2.dataRef.standby, obj.dataRef.value);
+        extPlaneConnection.client.set(radioConfig.com2.dataRef.standby, obj.dataRef.value);
         break;
       default:
         break;
