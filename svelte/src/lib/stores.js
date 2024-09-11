@@ -7,6 +7,7 @@ export const selectedAirports = persisted("selectedAirports", {
 });
 
 export const settings = persisted("settings", {
+    appearance: "dark",
     simbriefUsername: "",
     flightSimAddress: "",
 });

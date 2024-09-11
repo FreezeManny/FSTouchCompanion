@@ -1,6 +1,7 @@
 <script lang="js">
   import { settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
+
   const toastStore = getToastStore();
 
   const simbriefError = (message) => ({
