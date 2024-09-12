@@ -69,10 +69,8 @@
       const atisList = data.atis.filter((element) => element.callsign.includes(airport));
 
       if (atisList.length) {
-        console.log(atisList);
-
         let atisCodeList = atisList.map((item) => item.atis_code);
-        const atisCode = atisCodeList.every((code) => code === atisCodeList[0]) ? atisCodeList : [];
+        const atisCode = atisCodeList.every((code) => code === atisCodeList[0]) ? atisCodeList[0] : [];
         const atisTexts = atisList.map((item) => item.text_atis).join("<br><br>");
 
         if (mode === fetchMode.DEP) {
@@ -107,6 +105,9 @@
     $selectedAirports.dep = $selectedAirports.dep.toUpperCase();
     if ($selectedAirports.dep.length === 4) {
       fetchAirportData(fetchMode.DEP);
+    } else {
+      setDefaultATIS(fetchMode.DEP);
+      setDefaultMetar(fetchMode.DEP);
     }
   }
   // Handle airport input changes
@@ -114,6 +115,9 @@
     $selectedAirports.arr = $selectedAirports.arr.toUpperCase();
     if ($selectedAirports.arr.length === 4) {
       fetchAirportData(fetchMode.ARR);
+    } else {
+      setDefaultATIS(fetchMode.ARR);
+      setDefaultMetar(fetchMode.ARR);
     }
   }
 
