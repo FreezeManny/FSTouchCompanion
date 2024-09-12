@@ -69,19 +69,18 @@
       const atisList = data.atis.filter((element) => element.callsign.includes(airport));
 
       if (atisList.length) {
-        const { atis_code, text_atis } =
-          atisList.length === 1
-            ? atisList[0]
-            : {
-                text_atis: atisList.map((item) => item.text_atis).join("<br><br>"),
-              };
+        console.log(atisList);
+
+        let atisCodeList = atisList.map((item) => item.atis_code);
+        const atisCode = atisCodeList.every((code) => code === atisCodeList[0]) ? atisCodeList : [];
+        const atisTexts = atisList.map((item) => item.text_atis).join("<br><br>");
 
         if (mode === fetchMode.DEP) {
-          dep.atisCode = atis_code;
-          dep.atisText = text_atis;
+          dep.atisCode = atisCode;
+          dep.atisText = atisTexts;
         } else {
-          arr.atisCode = atis_code;
-          arr.atisText = text_atis;
+          arr.atisCode = atisCode;
+          arr.atisText = atisTexts;
         }
       } else {
         setDefaultATIS(mode);
@@ -146,7 +145,13 @@
   <div class="mx-3">
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <div class="input-group-shim">Dep</div>
-      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.dep} on:input={updateDeparture} maxlength="4" />
+      <input
+        type="text"
+        placeholder="EDDS"
+        bind:value={$selectedAirports.dep}
+        on:input={updateDeparture}
+        maxlength="4"
+      />
     </div>
   </div>
   <div class="mx-3">
@@ -158,7 +163,14 @@
   <div class="grid grid-cols-2">
     <button type="button" class="btn variant-filled mx-1" on:click={simbriefButtonHandler}>Simbrief</button>
     <button type="button" class="btn variant-filled mx-1" on:click={updateButtonHandler}
-      ><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -202,7 +214,7 @@
             Code: {arr.atisCode}
           {/if}
         </header>
-        <section class="p-4">{arr.atisText}</section>
+        <section class="p-4">{@html arr.atisText}</section>
       </div>
       <div class="card">
         <header class="card-header">METAR</header>
