@@ -2,10 +2,14 @@ services:
   fsconn:
     build:
       dockerfile: Dockerfile.fsConn.prod
+    container_name: fsconn-server
+    restart: always
     ports:
       - "3000:3000"
   svelte:
     build:
       dockerfile: Dockerfile.svelte.prod
+    restart: always
+    container_name: svelte-frontend
     ports:
-      - "3030:3000"
+      - "80:80"
