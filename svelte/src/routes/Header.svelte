@@ -80,7 +80,7 @@
             />
           </svg>
         </RadioItem>
-        <RadioItem bind:group={valueSingle} name="justify" value={"/fenix"} on:change={() => goto("/fenix")}
+        <RadioItem bind:group={valueSingle} name="justify" value={"/mcdu"} on:change={() => goto("/mcdu")}
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

@@ -1,17 +1,11 @@
 <script lang="js">
-  
-  import { onMount } from "svelte";
 
-
-  let data;
-  var pdfLink;
-
-  onMount(async () => {
-    // Code to execute on page load
-    console.log("Loaded");
-  });
 
 </script>
 
-
-<h1>checklist</h1>
+<aside class="alert variant-filled-warning m-5">
+  <div class="alert-message">
+    <h3 class="h3">Checklists</h3>
+    <h3 class="h3">Work in Progress</h3>
+  </div>
+</aside>
