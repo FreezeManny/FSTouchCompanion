@@ -59,7 +59,7 @@
     </div>
 
     <!-- Flight Number -->
-    <div class="text-center text-2xl">{flightNumber}</div>
+    <div class="text-center text-2xl my-4">{flightNumber}</div>
 
     <!-- Departure / Arrival Section -->
     <div class="flex items-center justify-between mb-4">
