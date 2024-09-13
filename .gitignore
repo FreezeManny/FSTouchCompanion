@@ -128,3 +128,46 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+
+
+# Node modules
+node_modules/
+.pnp/
+.pnp.js
+
+# SvelteKit build output (useful if building locally)
+.svelte-kit/
+build/
+!.svelte-kit/types
+
+# npm package lock file
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# dotenv environment variable files
+.env
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE/editor specific files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# MacOS system files
+.DS_Store
+
+# Linux system files
+*.swo
+
+# Windows system files
+Thumbs.db
