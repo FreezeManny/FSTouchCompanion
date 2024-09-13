@@ -1,0 +1,11 @@
+services:
+  fsconn:
+    build:
+      dockerfile: Dockerfile.fsConn.prod
+    ports:
+      - "3000:3000"
+  svelte:
+    build:
+      dockerfile: Dockerfile.svelte.prod
+    ports:
+      - "3030:3000"
