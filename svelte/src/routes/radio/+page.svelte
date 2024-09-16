@@ -36,7 +36,7 @@
   });
 
   function webSocketFunction() {
-    const WebSocketAddress = "ws://" + window.location.hostname + ":3000";
+    const WebSocketAddress = "ws://" + window.location.hostname + "/fsConnect";
     ws = new WebSocket(WebSocketAddress);
 
     ws.onopen = () => {

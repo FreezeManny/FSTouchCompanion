@@ -1,5 +1,5 @@
 var ExtPlaneJs = require("extplanejs");
-const { delay } = require("./utils");
+const { delay, mergeDeep } = require("./utils");
 const fs = require("fs/promises");
 const aircraftData = require("./aircraftData.json");
 
@@ -31,7 +31,9 @@ async function getAircraftByName(value) {
 
   if (foundAircraft) {
     // Use default aircraft data to merge with the specific one
-    const defaultAircraft = aircraftData.find((aircraft) => Array.isArray(aircraft.name) && aircraft.name.includes("default"));
+    const defaultAircraft = aircraftData.find(
+      (aircraft) => Array.isArray(aircraft.name) && aircraft.name.includes("default")
+    );
     if (defaultAircraft) {
       // Merge the specific aircraft data with the default one (deep merge)
       return mergeDeep(defaultAircraft.data, foundAircraft.data);
@@ -41,17 +43,6 @@ async function getAircraftByName(value) {
   } else {
     return null; // Return null if no match is found
   }
-}
-
-// Helper function for deep merging objects
-function mergeDeep(target, source) {
-  for (const key in source) {
-    if (source[key] instanceof Object && key in target) {
-      Object.assign(source[key], mergeDeep(target[key], source[key]));
-    }
-  }
-  // Combine the two objects
-  return Object.assign({}, target, source);
 }
 
 async function changeAircraft(aircraftName) {
@@ -70,7 +61,10 @@ async function changeAircraft(aircraftName) {
     // Update radioConfig and data
     radioConfig = aircraftData;
     data = Object.fromEntries(
-      Object.keys(radioConfig).map((radio) => [radio, Object.fromEntries(Object.keys(radioConfig[radio].dataRef || {}).map((key) => [key, 0]))])
+      Object.keys(radioConfig).map((radio) => [
+        radio,
+        Object.fromEntries(Object.keys(radioConfig[radio].dataRef || {}).map((key) => [key, 0])),
+      ])
     );
 
     // Subscribe to all dataRefs
