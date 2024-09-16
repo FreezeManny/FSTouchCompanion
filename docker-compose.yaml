@@ -2,8 +2,10 @@ services:
   fsconn:
     build:
       dockerfile: Dockerfile.fsConn.prod
-    container_name: fst-fsconn-server
+    container_name: fst-fsconn
     restart: always
+    ports:
+      - "51000:51000"
     networks:
       - internal_network
 
