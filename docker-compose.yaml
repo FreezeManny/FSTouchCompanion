@@ -5,8 +5,8 @@ services:
     container_name: fst-fsconn
     restart: always
     ports:
-      - "51000:51000"
-      - "3000:3000"
+      - "51000:51000" #port for FS Connection
+      - "3000:3000" #Websocket Port
     networks:
       - internal_network
 
@@ -16,7 +16,7 @@ services:
     restart: always
     container_name: fst-frontend
     ports:
-      - "3001:3001"
+      - "3001:80" #Website Port
     networks:
       - internal_network
 

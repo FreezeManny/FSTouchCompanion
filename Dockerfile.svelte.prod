@@ -21,7 +21,7 @@ COPY ./svelte/package.json .
 
 ENV BODY_SIZE_LIMIT=Infinity
 
-EXPOSE 3001
-ENV PORT=3001
+EXPOSE 80
+ENV PORT=80
 
 CMD node build
