@@ -7,20 +7,19 @@ services:
     ports:
       - "51000:51000"
       - "3000:3000"
-#    networks:
-#      - internal_network
+    networks:
+      - internal_network
 
   svelte:
     build:
       dockerfile: Dockerfile.svelte.prod
     restart: always
     container_name: fst-frontend
-    expose:
+    ports:
       - "3001:3001"
-#    networks:
-#      - internal_network
-#
-#networks:
-#  internal_network:
-#    driver: bridge
-#
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
