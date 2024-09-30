@@ -1,5 +1,5 @@
 var ExtPlaneJs = require("extplanejs");
-const { delay, mergeDeep } = require("./utils");
+const { delay, mergeDeep, restartServer } = require("./utils");
 const fs = require("fs/promises");
 const aircraftData = require("./aircraftData.json");
 
@@ -187,6 +187,16 @@ function connectExtPlane() {
 connectExtPlane();
 
 function handleWebsocketRecieve(obj) {
+  if (obj.hasOwnProperty("function")) {
+    switch (obj.function) {
+      case "restart":
+        console.log("Restarting the server...");
+        restartServer();
+        break;
+      default:
+        break;
+  }
+}
   if (obj.hasOwnProperty("command")) {
     switch (obj.command) {
       case "switch-com1":
@@ -239,7 +249,7 @@ wss.on("connection", function connection(ws, req) {
 
   ws.on("message", function incoming(message) {
     const obj = JSON.parse(message);
-    //console.log(`Received message from IP: ${clientIP}:`, obj);
+    console.log(`Received message from IP: ${clientIP}:`, obj);
     handleWebsocketRecieve(obj);
   });
 

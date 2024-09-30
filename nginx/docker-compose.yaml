@@ -1,0 +1,8 @@
+services:
+  nginx:
+    image: nginx:1-alpine
+    container_name: dev-fst-nginx
+    restart: no
+    network_mode: host
+    volumes:
+      - ./nginx-dev.conf:/etc/nginx/nginx.conf

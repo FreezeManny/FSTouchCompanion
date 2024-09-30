@@ -1,3 +1,5 @@
+const { spawn } = require('child_process');
+
 function delay(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -13,4 +15,15 @@ function mergeDeep(target, source) {
   return Object.assign({}, target, source);
 }
 
-module.exports = { delay, mergeDeep };
+function restartServer() {
+  console.log('Restarting the script...');
+  const child = spawn(process.argv[0], process.argv.slice(1), {
+    detached: true,  // Ensure the child process is independent
+    stdio: 'inherit' // Inherit stdout/stderr so you can see the output in the console
+  });
+
+  // Exit the current process to "kill" the old instance
+  process.exit();
+}
+
+module.exports = { delay, mergeDeep, restartServer };

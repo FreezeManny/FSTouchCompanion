@@ -119,6 +119,11 @@
     sendCommand("switch-com2");
   }
 
+  function retryConnection() {
+    console.log("Restarting Backend");
+    sendMessage({ function: "restart" });
+  }
+
   function sendCommand(commandPrefix) {
     let data = {
       command: commandPrefix,
@@ -261,6 +266,8 @@
           WebSocket connection failed
         {:else if !fsConnected}
           Flightsim not connected/paused
+          <br>
+          <button type="button" class="btn variant-filled" on:click={retryConnection}>Retry</button>
         {:else if !aircraftFound}
           Aircraft not found in Config
         {/if}
