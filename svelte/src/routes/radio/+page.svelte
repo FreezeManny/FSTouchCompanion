@@ -37,8 +37,9 @@
 
   function webSocketFunction() {
     //const WebSocketAddress = "ws://" + window.location.hostname + "/fsConnect";
-    const WebSocketAddress = "ws://" + window.location.hostname + ":3000";
+    const WebSocketAddress = "ws://" + window.location.hostname + ":" + window.location.port +"/socket";
     ws = new WebSocket(WebSocketAddress);
+    console.log("WebSocket connecting to:", WebSocketAddress);
 
     ws.onopen = () => {
       console.log("WebSocket connection established");
