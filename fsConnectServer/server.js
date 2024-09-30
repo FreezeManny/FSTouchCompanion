@@ -137,7 +137,7 @@ function connectExtPlane() {
   }
 
   extPlaneConnection = new ExtPlaneJs({
-    host: "192.168.0.2",
+    host: "localhost",
     port: 51000,
     broadcast: true,
   });
