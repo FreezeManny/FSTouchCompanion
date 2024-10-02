@@ -9,7 +9,7 @@
   import { getModalStore } from "@skeletonlabs/skeleton";
   const modalStore = getModalStore();
 
-  import { settings } from "$lib/stores";
+  import { settings, selectedChecklist } from "$lib/stores";
   import { modeUserPrefers } from "@skeletonlabs/skeleton";
 
   const settingsModal = {
@@ -146,6 +146,16 @@
         </RadioItem>
       </RadioGroup>
     </svelte:fragment>
+    {#if valueSingle == "/checklist"}
+      <label class="label">
+        <select class="select" bind:value={$selectedChecklist}>
+          <option value="A320">A320</option>
+          <option value="A330">A330</option>
+          <option value="B737">B737</option>
+        </select>
+      </label>
+    {/if}
+
     <svelte:fragment slot="trail">
       <button type="button" class="btn-icon variant-filled" on:click={() => modalStore.trigger(settingsModal)}>
         <svg

@@ -6,6 +6,8 @@ export const selectedAirports = persisted("selectedAirports", {
     arr: "XXXX"
 });
 
+export const selectedChecklist = persisted("selectedChecklist", null);
+
 export const settings = persisted("settings", {
     appearance: "dark",
     simbriefUsername: "",
