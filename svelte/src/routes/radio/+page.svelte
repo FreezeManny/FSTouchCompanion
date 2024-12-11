@@ -97,13 +97,37 @@
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === "dataref_update_values") {
-          handleDataRefUpdates(message.data);
-        } else if (message.type === "result") {
+        console.log("Received message:", message);
+
+        if (message.hasOwnProperty("data")) {
+          let data = message.data;
+
+          if (message.type === "dataref_update_values") {
+            console.log("DataRef updates:", data);
+            if (data[COM1_ACT_ID]) {
+              COM1_ACT_FREQ = formatFrequency(data[COM1_ACT_ID]);
+              console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
+            }
+            if (data[COM1_STBY_ID]) {
+              COM1_STBY_FREQ = formatFrequency(data[COM1_STBY_ID]);
+              console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
+            }
+            if (data[COM2_ACT_ID]) {
+              COM2_ACT_FREQ = formatFrequency(data[COM2_ACT_ID]);
+              console.log("COM2 Active Frequency:", COM2_ACT_FREQ);
+            }
+            if (data[COM2_STBY_ID]) {
+              COM2_STBY_FREQ = formatFrequency(data[COM2_STBY_ID]);
+              console.log("COM2 Standby Frequency:", COM2_STBY_FREQ);
+            }
+          }
+        } else if (message && message.type === "result") {
           console.log("Result message:", message);
+        } else {
+          console.warn("Message does not contain expected data or type:", message);
         }
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+        console.error("Error parsing WebSocket message:", error, "Event data:", event.data);
       }
     };
 
@@ -129,34 +153,12 @@
     ws.send(JSON.stringify(message));
   }
 
-  function handleDataRefUpdates(data) {
-    console.log("DataRef updates:", data);
-    if (data[COM1_ACT_ID]) {
-      COM1_ACT_FREQ = formatFrequency(data[COM1_ACT_ID]);
-      console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
-    }
-    if (data[COM1_STBY_ID]) {
-      COM1_STBY_FREQ = formatFrequency(data[COM1_STBY_ID]);
-      console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
-    }
-    if (data[COM2_ACT_ID]) {
-      COM2_ACT_FREQ = formatFrequency(data[COM2_ACT_ID]);
-      console.log("COM2 Active Frequency:", COM2_ACT_FREQ);
-    }
-    if (data[COM2_STBY_ID]) {
-      COM2_STBY_FREQ = formatFrequency(data[COM2_STBY_ID]);
-      console.log("COM2 Standby Frequency:", COM2_STBY_FREQ);
-    }
-
-  }
-
   function formatFrequency(freqHz) {
     console.log("Frequency Hz:", freqHz);
-    return freqHz;
-    /*
-    const freq = (freqHz / 1e6).toFixed(3);
-    return freq.padStart(7, "0");
-    */
+    const freqStr = freqHz.toString();
+    const middleIndex = Math.floor(freqStr.length / 2);
+    const formattedFreq = freqStr.slice(0, middleIndex) + "." + freqStr.slice(middleIndex);
+    return formattedFreq;
   }
 
   function setDataRefValue(datarefId, value) {
@@ -170,6 +172,13 @@
     ws.send(JSON.stringify(message));
   }
 
+  function com1SwitchButton() {
+    console.log("COM1 Switch Button clicked");
+  }
+  function com2SwitchButton() {
+    console.log("COM2 Switch Button clicked");
+  }
+
   onDestroy(() => {
     if (ws) {
       ws.close();
@@ -177,122 +186,121 @@
   });
 </script>
 
-{#if isWebSocketOpen && aircraftFound}
-  <hr class="!border-t-8" />
-  <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
-    <svelte:fragment slot="lead">
-      <button type="button" id="btn_COM1" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM1 </button>
-    </svelte:fragment>
+<hr class="!border-t-8" />
+<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
+  <svelte:fragment slot="lead">
+    <button type="button" id="btn_COM1" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM1 </button>
+  </svelte:fragment>
 
-    <div class="flex justify-center">
-      <span class="badge variant-filled p-4">
-        <h1 class="h1">
-          {COM1_ACT_FREQ}
-        </h1>
-      </span>
+  <div class="flex justify-center">
+    <span class="badge variant-filled p-4">
+      <h1 class="h1">
+        {COM1_ACT_FREQ}
+      </h1>
+    </span>
 
-      <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com1SwitchButton}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-          />
-        </svg>
-      </button>
+    <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com1SwitchButton}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+        />
+      </svg>
+    </button>
 
-      <span class="badge variant-filled p-4">
-        <h1 class="h1">
-          {COM1_STBY_FREQ}
-        </h1>
-      </span>
-    </div>
+    <span class="badge variant-filled p-4">
+      <h1 class="h1">
+        {COM1_STBY_FREQ}
+      </h1>
+    </span>
+  </div>
 
-    <svelte:fragment slot="trail">
-      <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM1_Modal)}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-          />
-        </svg>
-      </button>
-    </svelte:fragment>
-  </AppBar>
+  <svelte:fragment slot="trail">
+    <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM1_Modal)}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+        />
+      </svg>
+    </button>
+  </svelte:fragment>
+</AppBar>
 
-  <hr class="!border-t-8" />
+<hr class="!border-t-8" />
 
-  <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
-    <svelte:fragment slot="lead">
-      <button type="button" id="btn_COM2" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM2 </button>
-    </svelte:fragment>
+<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
+  <svelte:fragment slot="lead">
+    <button type="button" id="btn_COM2" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM2 </button>
+  </svelte:fragment>
 
-    <div class="flex justify-center">
-      <span class="badge variant-filled p-4">
-        <h1 class="h1">
-          {COM2_ACT_FREQ}
-        </h1>
-      </span>
+  <div class="flex justify-center">
+    <span class="badge variant-filled p-4">
+      <h1 class="h1">
+        {COM2_ACT_FREQ}
+      </h1>
+    </span>
 
-      <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com2SwitchButton}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-          />
-        </svg>
-      </button>
+    <button type="button" class="btn btn-lg variant-filled-primary mx-1" on:click={com2SwitchButton}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+        />
+      </svg>
+    </button>
 
-      <span class="badge variant-filled p-4">
-        <h1 class="h1">
-          {COM2_STBY_FREQ}
-        </h1>
-      </span>
-    </div>
+    <span class="badge variant-filled p-4">
+      <h1 class="h1">
+        {COM2_STBY_FREQ}
+      </h1>
+    </span>
+  </div>
 
-    <svelte:fragment slot="trail">
-      <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM2_Modal)}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-          />
-        </svg>
-      </button>
-    </svelte:fragment>
-  </AppBar>
-{:else}
+  <svelte:fragment slot="trail">
+    <button type="button" class="btn btn-lg variant-filled-primary" on:click={() => modalStore.trigger(COM2_Modal)}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+        />
+      </svg>
+    </button>
+  </svelte:fragment>
+</AppBar>
+{#if isWebSocketOpen && aircraftFound}<p>XXX</p>{:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
     <div class="alert-message">
