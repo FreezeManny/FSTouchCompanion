@@ -97,8 +97,6 @@
     AIRCRAFT_NAME = await getSingleDataRef(AIRCRAFT_NAME_ID);
   }
 
-  function loadRadioID() {}
-
   async function getDatarefID(datarefName) {
     const url = `${httpAddress}/datarefs?filter[name]=${datarefName}`;
     console.log("Fetching dataref ID:", url);
@@ -413,7 +411,7 @@
       </button>
     </svelte:fragment>
   </AppBar>
-  <a class="block card card-hover m-4 p-4 text-lg" >Selected Aircraft: {AIRCRAFT_NAME}</a>
+  <a class="block card card-hover m-4 p-4 text-lg">Selected Aircraft: {AIRCRAFT_NAME}</a>
 {:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
