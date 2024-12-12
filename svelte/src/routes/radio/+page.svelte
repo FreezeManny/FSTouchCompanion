@@ -26,7 +26,9 @@
   let COM1_STBY_FREQ = "------";
   let COM2_ACT_FREQ = "------";
   let COM2_STBY_FREQ = "------";
+  let AIRCRAFT_NAME;
 
+  let AIRCRAFT_NAME_ID;
   let COM1_ACT_ID, COM1_STBY_ID;
   let COM2_ACT_ID, COM2_STBY_ID;
 
@@ -124,6 +126,10 @@
               COM1_ACT_FREQ = data[COM1_ACT_ID];
               console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
             }
+            if (data[COM1_ACT_ID]) {
+              COM1_ACT_FREQ = data[COM1_ACT_ID];
+              console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
+            }
             if (data[COM1_STBY_ID]) {
               COM1_STBY_FREQ = data[COM1_STBY_ID];
               console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
@@ -179,13 +185,43 @@
         throw new Error("Failed to fetch dataref ID");
       }
       const result = await response.json();
+      console.log(result);
       if (result.data && result.data.length > 0) {
-        console.log(result.data);
+        console.log("Dataref value:", result.data);
+        console.log(processData(result.data));
       } else {
         throw new Error(`Dataref ${datarefName} not found`);
       }
     } catch (error) {
       console.error("Error fetching dataref ID:", error);
+    }
+  }
+
+  function processData(data) {
+    if (Array.isArray(data)) {
+      return data.map((item) => {
+        if (typeof item === "string" && isBase64(item)) {
+          return atob(item).replace(/\0/g, "");
+        } else if (typeof item === "number") {
+          return item;
+        } else {
+          throw new Error(`Unexpected data type: ${typeof item}`);
+        }
+      });
+    } else if (typeof data === "string" && isBase64(data)) {
+      return atob(data).replace(/\0/g, "");
+    } else if (typeof data === "number") {
+      return data;
+    } else {
+      throw new Error(`Unexpected data type: ${typeof data}`);
+    }
+  }
+
+  function isBase64(str) {
+    try {
+      return btoa(atob(str)) === str;
+    } catch (err) {
+      return false;
     }
   }
 
