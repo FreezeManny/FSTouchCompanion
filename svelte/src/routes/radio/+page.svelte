@@ -46,7 +46,27 @@
   onMount(async () => {
     await getAircraftName();
 
-    const aircraft = aircraftData.find((a) => a.name.includes(AIRCRAFT_NAME)) || aircraftData[0];
+    const defaultAircraft = aircraftData.find((a) => a.name.includes("default"));
+    const selectedAircraft = aircraftData.find((a) => a.name.includes(AIRCRAFT_NAME)) || defaultAircraft;
+
+    const aircraft = {
+      ...defaultAircraft,
+      ...selectedAircraft,
+      data: {
+        ...defaultAircraft.data,
+        ...selectedAircraft.data,
+        com1: {
+          ...defaultAircraft.data.com1,
+          ...selectedAircraft.data.com1,
+        },
+        com2: {
+          ...defaultAircraft.data.com2,
+          ...selectedAircraft.data.com2,
+        },
+      },
+    };
+
+    console.log("Aircraft Config:", aircraft);
     aircraftFound = !!aircraft;
 
     if (!aircraftFound) {
@@ -60,12 +80,12 @@
       COM1_ACT_ID = await getDatarefID(COM1_DataRefs.active);
       COM1_STBY_ID = await getDatarefID(COM1_DataRefs.standby);
 
-      //// Get dataref IDs for COM2
+      // Get dataref IDs for COM2
       COM2_ACT_ID = await getDatarefID(COM2_DataRefs.active);
       COM2_STBY_ID = await getDatarefID(COM2_DataRefs.standby);
 
       if (COM1_ACT_ID || COM1_STBY_ID || COM2_ACT_ID || COM2_STBY_ID) {
-        // Initialize WebSocket connection if all IDss loaded
+        // Initialize WebSocket connection if all IDs loaded
         webSocketFunction();
       }
     }
@@ -75,7 +95,6 @@
     // Datarefs from aircraftData.json
     AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
     AIRCRAFT_NAME = await getSingleDataRef(AIRCRAFT_NAME_ID);
-    console.log("Aircraft Name:", AIRCRAFT_NAME);
   }
 
   function loadRadioID() {}
@@ -394,6 +413,7 @@
       </button>
     </svelte:fragment>
   </AppBar>
+  <a class="block card card-hover m-4 p-4 text-lg" >Selected Aircraft: {AIRCRAFT_NAME}</a>
 {:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
