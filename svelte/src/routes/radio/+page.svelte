@@ -4,6 +4,7 @@
   import { getModalStore } from "@skeletonlabs/skeleton";
 
   import { settings } from "$lib/stores";
+  import aircraftData from "./aircraftData.json";
 
   let aircraftFound = true;
   let isWebSocketOpen = false;
@@ -33,51 +34,49 @@
   let COM2_ACT_ID, COM2_STBY_ID;
 
   //const wsAddress = "ws://localhost:8086/api/v1";
-  const ipAddress = "10.0.0.2";
   const wsPort = "8080";
   const httpPort = "8081";
-  const wsAddress = `ws://${ipAddress}:${wsPort}`;
-  const httpAddress = `http://${ipAddress}:${httpPort}/api/v1`;
+  const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}`;
+  const httpAddress = `http://${$settings.flightSimAddress}:${httpPort}/api/v1`;
 
   let ws;
   const RECONNECT_INTERVAL = 5000; // 5 seconds
   let req_id = 1;
 
   onMount(async () => {
+    await getAircraftName();
+
+    const aircraft = aircraftData.find((a) => a.name.includes(AIRCRAFT_NAME)) || aircraftData[0];
+    aircraftFound = !!aircraft;
+
+    if (!aircraftFound) {
+      console.error("Aircraft not found in Config");
+      return;
+    } else {
+      const COM1_DataRefs = aircraft.data.com1.dataRef;
+      const COM2_DataRefs = aircraft.data.com2.dataRef;
+
+      // Get dataref IDs for COM1
+      COM1_ACT_ID = await getDatarefID(COM1_DataRefs.active);
+      COM1_STBY_ID = await getDatarefID(COM1_DataRefs.standby);
+
+      //// Get dataref IDs for COM2
+      COM2_ACT_ID = await getDatarefID(COM2_DataRefs.active);
+      COM2_STBY_ID = await getDatarefID(COM2_DataRefs.standby);
+
+      if (COM1_ACT_ID || COM1_STBY_ID || COM2_ACT_ID || COM2_STBY_ID) {
+        // Initialize WebSocket connection if all IDss loaded
+        webSocketFunction();
+      }
+    }
+  });
+
+  async function getAircraftName() {
     // Datarefs from aircraftData.json
     AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
     AIRCRAFT_NAME = await getSingleDataRef(AIRCRAFT_NAME_ID);
     console.log("Aircraft Name:", AIRCRAFT_NAME);
-
-    const COM1_DataRefs = {
-      standby: "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
-      active: "sim/cockpit2/radios/actuators/com1_frequency_hz_833",
-    };
-    const COM2_DataRefs = {
-      standby: "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833",
-      active: "sim/cockpit2/radios/actuators/com2_frequency_hz_833",
-    };
-
-    // Get dataref IDs for COM1
-    COM1_ACT_ID = await getDatarefID(COM1_DataRefs.active);
-    COM1_STBY_ID = await getDatarefID(COM1_DataRefs.standby);
-
-    //// Get dataref IDs for COM2
-    COM2_ACT_ID = await getDatarefID(COM2_DataRefs.active);
-    COM2_STBY_ID = await getDatarefID(COM2_DataRefs.standby);
-
-    if (COM1_ACT_FREQ || COM1_STBY_FREQ || COM2_ACT_FREQ || COM2_STBY_FREQ) {
-      // Log the dataref IDs
-      console.log("COM1 Active DataRef ID:", COM1_ACT_ID);
-      console.log("COM1 Standby DataRef ID:", COM1_STBY_ID);
-      console.log("COM2 Active DataRef ID:", COM2_ACT_ID);
-      console.log("COM2 Standby DataRef ID:", COM2_STBY_ID);
-
-      // Initialize WebSocket connection
-      webSocketFunction();
-    } else {
-    }
-  });
+  }
 
   function loadRadioID() {}
 
