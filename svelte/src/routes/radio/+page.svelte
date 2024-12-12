@@ -22,21 +22,32 @@
     response: (r) => r !== undefined && setDataRefValue(COM2_STBY_ID, r),
   };
 
-  let COM1_ACT_FREQ = "---.---";
-  let COM1_STBY_FREQ = "---.---";
-  let COM2_ACT_FREQ = "---.---";
-  let COM2_STBY_FREQ = "---.---";
+  let COM1_ACT_FREQ = "------";
+  let COM1_STBY_FREQ = "------";
+  let COM2_ACT_FREQ = "------";
+  let COM2_STBY_FREQ = "------";
 
   let COM1_ACT_ID, COM1_STBY_ID;
   let COM2_ACT_ID, COM2_STBY_ID;
 
-  const wsAddress = "ws://localhost:8086/api/v1";
+  //const wsAddress = "ws://localhost:8086/api/v1";
+  const ipAddress = "10.0.0.2";
+  const wsPort = "8080";
+  const httpPort = "8081";
+  const wsAddress = `ws://${ipAddress}:${wsPort}`;
+  const httpAddress = `http://${ipAddress}:${httpPort}/api/v1`;
+
   let ws;
   const RECONNECT_INTERVAL = 5000; // 5 seconds
   let req_id = 1;
 
   onMount(async () => {
     // Datarefs from aircraftData.json
+    const aircraftNameID = await getDatarefID("sim/aircraft/view/acf_ui_name");
+    console.log("Aircraft Name ID:", aircraftNameID);
+    getSingleDataRef(aircraftNameID);
+
+    /* 
     const COM1_DataRefs = {
       standby: "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
       active: "sim/cockpit2/radios/actuators/com1_frequency_hz_833",
@@ -50,22 +61,27 @@
     COM1_ACT_ID = await getDatarefID(COM1_DataRefs.active);
     COM1_STBY_ID = await getDatarefID(COM1_DataRefs.standby);
 
-    // Get dataref IDs for COM2
+    //// Get dataref IDs for COM2
     COM2_ACT_ID = await getDatarefID(COM2_DataRefs.active);
     COM2_STBY_ID = await getDatarefID(COM2_DataRefs.standby);
 
-    // Log the dataref IDs
-    console.log("COM1 Active DataRef ID:", COM1_ACT_ID);
-    console.log("COM1 Standby DataRef ID:", COM1_STBY_ID);
-    console.log("COM2 Active DataRef ID:", COM2_ACT_ID);
-    console.log("COM2 Standby DataRef ID:", COM2_STBY_ID);
+    if (COM1_ACT_FREQ || COM1_STBY_FREQ || COM2_ACT_FREQ || COM2_STBY_FREQ) {
+      // Log the dataref IDs
+      console.log("COM1 Active DataRef ID:", COM1_ACT_ID);
+      console.log("COM1 Standby DataRef ID:", COM1_STBY_ID);
+      console.log("COM2 Active DataRef ID:", COM2_ACT_ID);
+      console.log("COM2 Standby DataRef ID:", COM2_STBY_ID);
 
-    // Initialize WebSocket connection
-    webSocketFunction();
+      // Initialize WebSocket connection
+      webSocketFunction();
+    } else {
+    }
+    */
   });
 
   async function getDatarefID(datarefName) {
-    const url = `http://localhost:8086/api/v1/datarefs?filter[name]=${encodeURIComponent(datarefName)}`;
+    const url = `${httpAddress}/datarefs?filter[name]=${datarefName}`;
+    console.log("Fetching dataref ID:", url);
     try {
       const response = await fetch(url, {
         headers: { Accept: "application/json" },
@@ -151,6 +167,26 @@
     };
     console.log("Subscribing to datarefs:", datarefs);
     ws.send(JSON.stringify(message));
+  }
+
+  async function getSingleDataRef(id) {
+    const url = `${httpAddress}/datarefs/${id}/value`;
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch dataref ID");
+      }
+      const result = await response.json();
+      if (result.data && result.data.length > 0) {
+        console.log(result.data);
+      } else {
+        throw new Error(`Dataref ${datarefName} not found`);
+      }
+    } catch (error) {
+      console.error("Error fetching dataref ID:", error);
+    }
   }
 
   function formatFrequency(freqHz) {
