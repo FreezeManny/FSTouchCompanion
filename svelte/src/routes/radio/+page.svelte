@@ -45,11 +45,10 @@
 
   onMount(async () => {
     // Datarefs from aircraftData.json
-    const aircraftNameID = await getDatarefID("sim/aircraft/view/acf_ui_name");
-    console.log("Aircraft Name ID:", aircraftNameID);
-    getSingleDataRef(aircraftNameID);
+    AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
+    AIRCRAFT_NAME = await getSingleDataRef(AIRCRAFT_NAME_ID);
+    console.log("Aircraft Name:", AIRCRAFT_NAME);
 
-    /* 
     const COM1_DataRefs = {
       standby: "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833",
       active: "sim/cockpit2/radios/actuators/com1_frequency_hz_833",
@@ -78,8 +77,9 @@
       webSocketFunction();
     } else {
     }
-    */
   });
+
+  function loadRadioID() {}
 
   async function getDatarefID(datarefName) {
     const url = `${httpAddress}/datarefs?filter[name]=${datarefName}`;
@@ -114,42 +114,44 @@
 
     ws.onmessage = (event) => {
       try {
-        const message = JSON.parse(event.data);
-        console.log("Received message:", message);
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const message = JSON.parse(reader.result);
+            console.log("Received message:", message);
 
-        if (message.hasOwnProperty("data")) {
-          let data = message.data;
+            // Your existing code to handle the message
 
-          if (message.type === "dataref_update_values") {
-            console.log("DataRef updates:", data);
-            if (data[COM1_ACT_ID]) {
-              COM1_ACT_FREQ = data[COM1_ACT_ID];
-              console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
+            if (message.hasOwnProperty("data")) {
+              let data = message.data;
+
+              if (message.type === "dataref_update_values") {
+                console.log("DataRef updates:", data);
+                if (data[COM1_ACT_ID]) {
+                  COM1_ACT_FREQ = data[COM1_ACT_ID];
+                  console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
+                }
+                if (data[COM1_STBY_ID]) {
+                  COM1_STBY_FREQ = data[COM1_STBY_ID];
+                  console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
+                }
+                if (data[COM2_ACT_ID]) {
+                  COM2_ACT_FREQ = data[COM2_ACT_ID];
+                  console.log("COM2 Active Frequency:", COM2_ACT_FREQ);
+                }
+                if (data[COM2_STBY_ID]) {
+                  COM2_STBY_FREQ = data[COM2_STBY_ID];
+                  console.log("COM2 Standby Frequency:", COM2_STBY_FREQ);
+                }
+              }
             }
-            if (data[COM1_ACT_ID]) {
-              COM1_ACT_FREQ = data[COM1_ACT_ID];
-              console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
-            }
-            if (data[COM1_STBY_ID]) {
-              COM1_STBY_FREQ = data[COM1_STBY_ID];
-              console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
-            }
-            if (data[COM2_ACT_ID]) {
-              COM2_ACT_FREQ = data[COM2_ACT_ID];
-              console.log("COM2 Active Frequency:", COM2_ACT_FREQ);
-            }
-            if (data[COM2_STBY_ID]) {
-              COM2_STBY_FREQ = data[COM2_STBY_ID];
-              console.log("COM2 Standby Frequency:", COM2_STBY_FREQ);
-            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
           }
-        } else if (message && message.type === "result") {
-          console.log("Result message:", message);
-        } else {
-          console.warn("Message does not contain expected data or type:", message);
-        }
+        };
+        reader.readAsText(event.data);
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error, "Event data:", event.data);
+        console.error("Error processing WebSocket message:", error);
       }
     };
 
@@ -185,10 +187,8 @@
         throw new Error("Failed to fetch dataref ID");
       }
       const result = await response.json();
-      console.log(result);
       if (result.data && result.data.length > 0) {
-        console.log("Dataref value:", result.data);
-        console.log(processData(result.data));
+        return processData(result.data);
       } else {
         throw new Error(`Dataref ${datarefName} not found`);
       }
