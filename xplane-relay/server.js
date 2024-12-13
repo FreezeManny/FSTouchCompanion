@@ -37,7 +37,7 @@ const httpServer = http.createServer((req, res) => {
   // Extract and log the `filter[name]` query parameter if present
   const filterName = reqUrl.searchParams.get("filter[name]");
   if (filterName) {
-    httpLog(`Received filter[name]: ${filterName}`);
+    //httpLog(`Received filter[name]: ${filterName}`);
   }
 
   // Options to forward the request to the local API
@@ -56,7 +56,7 @@ const httpServer = http.createServer((req, res) => {
 
     // Pipe the data from the local API response to the client
     localRes.pipe(res);
-    httpLog(`Proxied response with status: ${localRes.statusCode}`);
+    //httpLog(`Proxied response with status: ${localRes.statusCode}`);
   });
 
   // Handle errors during proxying
@@ -91,12 +91,12 @@ const connectedClients = new Set();
 
 // Handle new client connections to the WebSocket server
 server.on("connection", (ws) => {
-  websocketLog(`New client connected`);
   connectedClients.add(ws);
+  websocketLog(`New client connected (${connectedClients.size} total)`);
 
   // Handle messages from clients
   ws.on("message", (message) => {
-    websocketLog(`Message from client: ${message}`);
+    //websocketLog(`Message from client: ${message}`);
 
     // Parse the incoming message to add req_id
     let parsedMessage;
@@ -124,8 +124,8 @@ server.on("connection", (ws) => {
 
   // Handle client disconnections
   ws.on("close", () => {
-    websocketLog(`Client disconnected`);
     connectedClients.delete(ws);
+    websocketLog(`Client disconnected (${connectedClients.size} total)`);
   });
 
   // Handle errors on the client connection

@@ -6,6 +6,8 @@
   import { settings } from "$lib/stores";
   import aircraftData from "./aircraftData.json";
 
+  import { formatFrequency, isBase64, processData } from "./utils";
+
   let aircraftFound = true;
   let isWebSocketOpen = false;
 
@@ -44,8 +46,45 @@
   let req_id = 1;
 
   onMount(async () => {
-    await getAircraftName();
+    // Datarefs from aircraftData.json
+    AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
+    AIRCRAFT_NAME = await getDatarefValue(AIRCRAFT_NAME_ID);
+    await updateAircraftData(true);
+  });
 
+  // Function to update aircraft data when aircraft name changes
+  async function updateAircraftData(initLoad = false) {
+    let aircraft = loadAircraftData();
+
+    console.log("Aircraft Config:", aircraft);
+    aircraftFound = !!aircraft;
+
+    if (!aircraftFound) {
+      console.error("Aircraft not found in Config");
+      return;
+    } else {
+      const COM1_DataRefs = aircraft.data.com1.dataRef;
+      const COM2_DataRefs = aircraft.data.com2.dataRef;
+
+      // Get new dataref IDs for COM frequencies
+      await Promise.all([
+        getDatarefID(COM1_DataRefs.active).then((id) => (COM1_ACT_ID = id)),
+        getDatarefID(COM1_DataRefs.standby).then((id) => (COM1_STBY_ID = id)),
+        getDatarefID(COM2_DataRefs.active).then((id) => (COM2_ACT_ID = id)),
+        getDatarefID(COM2_DataRefs.standby).then((id) => (COM2_STBY_ID = id)),
+      ]).then(() => {
+        // Resubscribe to datarefs with new IDs
+        if (!initLoad) {
+          unsubscribeDataRefs(); // Unsubscribe from old datarefs
+          subscribeDataRefs(); // Subscribe to new datarefs
+        } else {
+          webSocketFunction();
+        }
+      });
+    }
+  }
+
+  function loadAircraftData() {
     const defaultAircraft = aircraftData.find((a) => a.name.includes("default"));
     const selectedAircraft = aircraftData.find((a) => a.name.includes(AIRCRAFT_NAME)) || defaultAircraft;
 
@@ -65,36 +104,111 @@
         },
       },
     };
+    return aircraft;
+  }
 
-    console.log("Aircraft Config:", aircraft);
-    aircraftFound = !!aircraft;
-
-    if (!aircraftFound) {
-      console.error("Aircraft not found in Config");
-      return;
-    } else {
-      const COM1_DataRefs = aircraft.data.com1.dataRef;
-      const COM2_DataRefs = aircraft.data.com2.dataRef;
-
-      // Get dataref IDs for COM1
-      COM1_ACT_ID = await getDatarefID(COM1_DataRefs.active);
-      COM1_STBY_ID = await getDatarefID(COM1_DataRefs.standby);
-
-      // Get dataref IDs for COM2
-      COM2_ACT_ID = await getDatarefID(COM2_DataRefs.active);
-      COM2_STBY_ID = await getDatarefID(COM2_DataRefs.standby);
-
-      if (COM1_ACT_ID || COM1_STBY_ID || COM2_ACT_ID || COM2_STBY_ID) {
-        // Initialize WebSocket connection if all IDs loaded
-        webSocketFunction();
-      }
+  function unsubscribeDataRefs() {
+    console.log("Unsubscribing from datarefs");
+    if (ws) {
+      // Unsubscribe from all datarefs
+      const unsubscribeMessage = {
+        req_id: req_id++,
+        type: "dataref_unsubscribe_values",
+        params: {
+          datarefs: "all",
+        },
+      };
+      ws.send(JSON.stringify(unsubscribeMessage));
     }
-  });
+  }
 
-  async function getAircraftName() {
-    // Datarefs from aircraftData.json
-    AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
-    AIRCRAFT_NAME = await getSingleDataRef(AIRCRAFT_NAME_ID);
+  function webSocketFunction() {
+    ws = new WebSocket(wsAddress);
+    console.log("WebSocket connecting to:", wsAddress);
+
+    ws.onopen = () => {
+      console.log("WebSocket connection established");
+      isWebSocketOpen = true;
+      subscribeDataRefs();
+    };
+
+    // Update the WebSocket message handler to process aircraft name and check for new COM data
+    ws.onmessage = (event) => {
+      try {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const message = JSON.parse(reader.result);
+
+            if (message.hasOwnProperty("data")) {
+              let data = message.data;
+              if (message.type === "dataref_update_values") {
+                console.log("DataRef updates:", data);
+                if (data[COM1_ACT_ID]) {
+                  COM1_ACT_FREQ = data[COM1_ACT_ID];
+                }
+                if (data[COM1_STBY_ID]) {
+                  COM1_STBY_FREQ = data[COM1_STBY_ID];
+                }
+                if (data[COM2_ACT_ID]) {
+                  COM2_ACT_FREQ = data[COM2_ACT_ID];
+                }
+                if (data[COM2_STBY_ID]) {
+                  COM2_STBY_FREQ = data[COM2_STBY_ID];
+                }
+                if (data[AIRCRAFT_NAME_ID]) {
+                  const newAircraftName = processData(data[AIRCRAFT_NAME_ID]);
+                  if (AIRCRAFT_NAME !== newAircraftName) {
+                    AIRCRAFT_NAME = newAircraftName;
+                    console.log("Aircraft Name changed to:", AIRCRAFT_NAME);
+                    updateAircraftData();
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
+          }
+        };
+        reader.readAsText(event.data);
+      } catch (error) {
+        console.error("Error processing WebSocket message:", error);
+      }
+    };
+
+    ws.onclose = () => {
+      //console.log("WebSocket connection closed. Reconnecting in", RECONNECT_INTERVAL, "ms");
+      isWebSocketOpen = false;
+      //setTimeout(webSocketFunction, RECONNECT_INTERVAL);
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+  }
+
+  async function loadInitialData() {
+    COM1_ACT_FREQ = await getDatarefValue(COM1_ACT_ID);
+    COM1_STBY_FREQ = await getDatarefValue(COM1_STBY_ID);
+    COM2_ACT_FREQ = await getDatarefValue(COM2_ACT_ID);
+    COM2_STBY_FREQ = await getDatarefValue(COM2_STBY_ID);
+  }
+
+  async function subscribeDataRefs() {
+    const datarefs = [
+      { id: COM1_ACT_ID },
+      { id: COM1_STBY_ID },
+      { id: COM2_ACT_ID },
+      { id: COM2_STBY_ID },
+      { id: AIRCRAFT_NAME_ID },
+    ];
+    const message = {
+      req_id: req_id++,
+      type: "dataref_subscribe_values",
+      params: { datarefs },
+    };
+    console.log("Subscribing to datarefs:", datarefs);
+    ws.send(JSON.stringify(message));
   }
 
   async function getDatarefID(datarefName) {
@@ -118,82 +232,7 @@
     }
   }
 
-  function webSocketFunction() {
-    ws = new WebSocket(wsAddress);
-    console.log("WebSocket connecting to:", wsAddress);
-
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-      isWebSocketOpen = true;
-      subscribeDataRefs();
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const message = JSON.parse(reader.result);
-            console.log("Received message:", message);
-
-            // Your existing code to handle the message
-
-            if (message.hasOwnProperty("data")) {
-              let data = message.data;
-
-              if (message.type === "dataref_update_values") {
-                console.log("DataRef updates:", data);
-                if (data[COM1_ACT_ID]) {
-                  COM1_ACT_FREQ = data[COM1_ACT_ID];
-                  console.log("COM1 Active Frequency:", COM1_ACT_FREQ);
-                }
-                if (data[COM1_STBY_ID]) {
-                  COM1_STBY_FREQ = data[COM1_STBY_ID];
-                  console.log("COM1 Standby Frequency:", COM1_STBY_FREQ);
-                }
-                if (data[COM2_ACT_ID]) {
-                  COM2_ACT_FREQ = data[COM2_ACT_ID];
-                  console.log("COM2 Active Frequency:", COM2_ACT_FREQ);
-                }
-                if (data[COM2_STBY_ID]) {
-                  COM2_STBY_FREQ = data[COM2_STBY_ID];
-                  console.log("COM2 Standby Frequency:", COM2_STBY_FREQ);
-                }
-              }
-            }
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
-          }
-        };
-        reader.readAsText(event.data);
-      } catch (error) {
-        console.error("Error processing WebSocket message:", error);
-      }
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed. Reconnecting in", RECONNECT_INTERVAL, "ms");
-      isWebSocketOpen = false;
-      setTimeout(webSocketFunction, RECONNECT_INTERVAL);
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-  }
-
-  async function subscribeDataRefs() {
-    const datarefs = [{ id: COM1_ACT_ID }, { id: COM1_STBY_ID }, { id: COM2_ACT_ID }, { id: COM2_STBY_ID }];
-    const message = {
-      req_id: req_id++,
-      type: "dataref_subscribe_values",
-      params: { datarefs },
-    };
-    console.log("Subscribing to datarefs:", datarefs);
-    ws.send(JSON.stringify(message));
-  }
-
-  async function getSingleDataRef(id) {
+  async function getDatarefValue(id) {
     const url = `${httpAddress}/datarefs/${id}/value`;
     try {
       const response = await fetch(url, {
@@ -206,61 +245,20 @@
       if (result.data && result.data.length > 0) {
         return processData(result.data);
       } else {
-        throw new Error(`Dataref ${datarefName} not found`);
+        throw new Error(`Dataref ${id} not found`);
       }
     } catch (error) {
       console.error("Error fetching dataref ID:", error);
     }
   }
 
-  function processData(data) {
-    if (Array.isArray(data)) {
-      return data.map((item) => {
-        if (typeof item === "string" && isBase64(item)) {
-          return atob(item).replace(/\0/g, "");
-        } else if (typeof item === "number") {
-          return item;
-        } else {
-          throw new Error(`Unexpected data type: ${typeof item}`);
-        }
-      });
-    } else if (typeof data === "string" && isBase64(data)) {
-      return atob(data).replace(/\0/g, "");
-    } else if (typeof data === "number") {
-      return data;
+  function setDataRefValue(datarefIdOrDatarefs, value) {
+    let datarefs;
+    if (Array.isArray(datarefIdOrDatarefs)) {
+      datarefs = datarefIdOrDatarefs;
     } else {
-      throw new Error(`Unexpected data type: ${typeof data}`);
+      datarefs = [{ id: datarefIdOrDatarefs, value }];
     }
-  }
-
-  function isBase64(str) {
-    try {
-      return btoa(atob(str)) === str;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  function formatFrequency(freqHz) {
-    console.log("Frequency Hz:", freqHz);
-    const freqStr = freqHz.toString();
-    const middleIndex = Math.floor(freqStr.length / 2);
-    const formattedFreq = freqStr.slice(0, middleIndex) + "." + freqStr.slice(middleIndex);
-    return formattedFreq;
-  }
-
-  function setDataRefValue(datarefId, value) {
-    const message = {
-      req_id: req_id++,
-      type: "dataref_set_values",
-      params: {
-        datarefs: [{ id: datarefId, value }],
-      },
-    };
-    ws.send(JSON.stringify(message));
-  }
-
-  function setMultipleDataRefValues(datarefs) {
     const message = {
       req_id: req_id++,
       type: "dataref_set_values",
@@ -274,7 +272,7 @@
   function com1SwitchButton() {
     let tmpAct = COM1_ACT_FREQ;
     let tmpStby = COM1_STBY_FREQ;
-    setMultipleDataRefValues([
+    setDataRefValue([
       { id: COM1_ACT_ID, value: tmpStby },
       { id: COM1_STBY_ID, value: tmpAct },
     ]);
@@ -283,7 +281,7 @@
   function com2SwitchButton() {
     let tmpAct = COM2_ACT_FREQ;
     let tmpStby = COM2_STBY_FREQ;
-    setMultipleDataRefValues([
+    setDataRefValue([
       { id: COM2_ACT_ID, value: tmpStby },
       { id: COM2_STBY_ID, value: tmpAct },
     ]);
@@ -291,6 +289,7 @@
 
   onDestroy(() => {
     if (ws) {
+      unsubscribeDataRefs();
       ws.close();
     }
   });
