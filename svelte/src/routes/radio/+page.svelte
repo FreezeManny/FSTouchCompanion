@@ -423,7 +423,7 @@
       </button>
     </svelte:fragment>
   </AppBar>
-  <a class="block card card-hover m-4 p-4 text-lg">Selected Aircraft: {AIRCRAFT_NAME}</a>
+  <div class="block card card-hover m-4 p-4 text-lg">Selected Aircraft: {AIRCRAFT_NAME}</div>
 {:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
