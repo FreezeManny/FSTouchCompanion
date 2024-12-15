@@ -48,6 +48,11 @@
     // Datarefs from aircraftData.json
     AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
     AIRCRAFT_NAME = await getDatarefValue(AIRCRAFT_NAME_ID);
+
+    if (!AIRCRAFT_NAME) {
+      console.error("Aircraft Name not found");
+      return;
+    }
     await updateAircraftData(true);
     await loadInitialData(); // Fetch initial values for frequencies
   });
