@@ -1,7 +1,17 @@
 {
+  "name": "xplane-relay",
+  "version": "1.0.0",
+  "description": "Relay data from X-Plane to a WebSocket",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
   "dependencies": {
     "base-64": "^1.0.0",
-    "nodemon": "^3.1.7",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
