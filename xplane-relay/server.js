@@ -24,7 +24,7 @@ function websocketLog(name) {
 
 // Configuration
 const PORT = 8081; // Port for this server
-const LOCAL_API_HOST = "localhost"; // Host of the local API
+const LOCAL_API_HOST = "http://localhost"; // Host of the local API
 const LOCAL_API_PORT = 8086; // Port of the local API
 const HTTP_LOG = "[HTTP LOG]"; // Log prefix
 

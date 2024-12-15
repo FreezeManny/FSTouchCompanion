@@ -37,12 +37,11 @@
 
   //const wsAddress = "ws://localhost:8086/api/v1";
   const wsPort = "8080";
-  const httpPort = "8081";
+  const httpPort = "8086";
   const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}`;
   const httpAddress = `http://${$settings.flightSimAddress}:${httpPort}/api/v1`;
 
   let ws;
-  const RECONNECT_INTERVAL = 5000; // 5 seconds
   let req_id = 1;
 
   onMount(async () => {
@@ -50,7 +49,19 @@
     AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
     AIRCRAFT_NAME = await getDatarefValue(AIRCRAFT_NAME_ID);
     await updateAircraftData(true);
+    await loadInitialData(); // Fetch initial values for frequencies
   });
+
+  async function loadInitialData() {
+    try {
+      COM1_ACT_FREQ = (await getDatarefValue(COM1_ACT_ID)) || "------";
+      COM1_STBY_FREQ = (await getDatarefValue(COM1_STBY_ID)) || "------";
+      COM2_ACT_FREQ = (await getDatarefValue(COM2_ACT_ID)) || "------";
+      COM2_STBY_FREQ = (await getDatarefValue(COM2_STBY_ID)) || "------";
+    } catch (error) {
+      console.error("Error loading initial frequency values:", error);
+    }
+  }
 
   // Function to update aircraft data when aircraft name changes
   async function updateAircraftData(initLoad = false) {
@@ -143,7 +154,6 @@
             if (message.hasOwnProperty("data")) {
               let data = message.data;
               if (message.type === "dataref_update_values") {
-                console.log("DataRef updates:", data);
                 if (data[COM1_ACT_ID]) {
                   COM1_ACT_FREQ = data[COM1_ACT_ID];
                 }
@@ -187,13 +197,6 @@
     };
   }
 
-  async function loadInitialData() {
-    COM1_ACT_FREQ = await getDatarefValue(COM1_ACT_ID);
-    COM1_STBY_FREQ = await getDatarefValue(COM1_STBY_ID);
-    COM2_ACT_FREQ = await getDatarefValue(COM2_ACT_ID);
-    COM2_STBY_FREQ = await getDatarefValue(COM2_STBY_ID);
-  }
-
   async function subscribeDataRefs() {
     const datarefs = [
       { id: COM1_ACT_ID },
@@ -233,16 +236,21 @@
   }
 
   async function getDatarefValue(id) {
-    const url = `${httpAddress}/datarefs/${id}/value`;
     try {
+      const url = `${httpAddress}/datarefs/${id}/value`;
+      console.log("Fetching dataref value:", url);
       const response = await fetch(url, {
-        headers: { Accept: "application/json" },
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch dataref ID");
-      }
       const result = await response.json();
-      if (result.data && result.data.length > 0) {
+      if (!response.ok) {
+        throw new Error(`${result.error_message} (Code: ${result.error_code})`);
+      }
+      if (result.data !== undefined) {
         return processData(result.data);
       } else {
         throw new Error(`Dataref ${id} not found`);
@@ -295,8 +303,8 @@
   });
 </script>
 
+<hr class="!border-t-8" />
 {#if isWebSocketOpen && aircraftFound}
-  <hr class="!border-t-8" />
   <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
     <svelte:fragment slot="lead">
       <button type="button" id="btn_COM1" class="btn btn-lg variant-filled-primary px-2 font-bold"> COM1 </button>
