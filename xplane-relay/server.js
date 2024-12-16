@@ -1,19 +1,18 @@
-// Import WebSocket module
+// Import WebSocket and HTTP modules
 const WebSocket = require("ws");
+const http = require("http");
+const httpProxy = require("http-proxy");
 
 // Configurations
-const SERVER_PORT = 8080; // Port for the WebSocket server
-const RELAY_URL = "ws://localhost:8086/api/v1"; // URL of the relay WebSocket server
-const SERVER_IP = "10.0.0.2";
+const SERVER_PORT = 8080; // WebSocket server port
+const RELAY_URL = "ws://localhost:8086/api/v1"; // WebSocket relay server URL
+const HTTP_TARGET = "http://localhost:8086"; // HTTP server on port 8086
+const SERVER_IP = "10.0.0.2"; // Server IP
 const WEBSOCKET_LOG = "[WEBSOCKET LOG]"; // Log prefix
-
-// Import required modules
-const http = require("http");
-const { request } = require("http");
-const { URL } = require("url");
 
 let globalID = 0;
 
+// Logging functions
 function httpLog(name) {
   console.log(`[HTTP LOG] ${name}`);
 }
@@ -22,7 +21,7 @@ function websocketLog(name) {
   console.log(`[WEBSOCKET LOG] ${name}`);
 }
 
-//WEBSOCKET ----------------------------------------------------------------
+// WEBSOCKET SERVER ----------------------------------------------------------------
 // Set up the WebSocket server
 const server = new WebSocket.Server({ port: SERVER_PORT });
 websocketLog(`WebSocket server is running on ws://${SERVER_IP}:${SERVER_PORT}`);
@@ -39,11 +38,8 @@ server.on("connection", (ws) => {
   connectedClients.add(ws);
   websocketLog(`New client connected (${connectedClients.size} total)`);
 
-  // Handle messages from clients
   ws.on("message", (message) => {
-    //websocketLog(`Message from client: ${message}`);
-
-    // Parse the incoming message to add req_id
+    // Parse the incoming message and replace req_id
     let parsedMessage;
     try {
       parsedMessage = JSON.parse(message);
@@ -52,13 +48,10 @@ server.on("connection", (ws) => {
       return;
     }
 
-    // Increment globalID to generate a unique req_id for each message
-    globalID++;
+    globalID++; // Increment globalID
+    parsedMessage.req_id = globalID; // Replace req_id with globalID
 
-    // Assign the req_id to the message
-    parsedMessage.req_id = globalID;
-
-    // Forward the message to the relay server
+    // Forward the message to the relay WebSocket server
     if (xplaneSocket.readyState === WebSocket.OPEN) {
       websocketLog(`Forwarding message to X-Plane server: ${JSON.stringify(parsedMessage)}`);
       xplaneSocket.send(JSON.stringify(parsedMessage));
@@ -67,13 +60,11 @@ server.on("connection", (ws) => {
     }
   });
 
-  // Handle client disconnections
   ws.on("close", () => {
     connectedClients.delete(ws);
     websocketLog(`Client disconnected (${connectedClients.size} total)`);
   });
 
-  // Handle errors on the client connection
   ws.on("error", (error) => {
     console.error(`${WEBSOCKET_LOG} Client WebSocket error: ${error}`);
   });
@@ -81,7 +72,6 @@ server.on("connection", (ws) => {
 
 xplaneSocket.on("message", (message) => {
   websocketLog(`Message from X-Plane server: ${message}`);
-
   connectedClients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(message);
@@ -89,20 +79,83 @@ xplaneSocket.on("message", (message) => {
   });
 });
 
-// Handle connection to the relay server
 xplaneSocket.on("open", () => {
   websocketLog(`Connected to X-Plane WebSocket server`);
 });
 
-// Handle errors on the relay WebSocket connection
 xplaneSocket.on("error", (error) => {
   console.error(`${WEBSOCKET_LOG} X-Plane WebSocket error: ${error}`);
 });
 
-// Handle relay WebSocket server disconnection
 xplaneSocket.on("close", () => {
   websocketLog(`X-Plane WebSocket server disconnected`);
 });
 
-// Provide instructions for accessing the server
-websocketLog(`To test, connect to ws://${SERVER_IP}:${SERVER_PORT} from a client on the same network.`);
+// HTTP RELAY SERVER ----------------------------------------------------------------
+const HTTP_SERVER_PORT = 8081;
+
+// Create an HTTP proxy server
+const proxy = httpProxy.createProxyServer({
+  target: HTTP_TARGET, // Forward to HTTP server on port 8086
+  ws: true, // Enable WebSocket proxying
+});
+
+// Middleware to inject globalID into HTTP requests
+proxy.on("proxyReq", (proxyReq, req, res, options) => {
+  if (req.method === "POST") {
+    let body = [];
+
+    // Collect the request data
+    req.on("data", (chunk) => {
+      body.push(chunk);
+    });
+
+    req.on("end", () => {
+      body = Buffer.concat(body).toString();
+
+      try {
+        const parsedMessage = JSON.parse(body);
+
+        globalID++; // Increment globalID
+        parsedMessage.req_id = globalID; // Replace req_id with globalID
+
+        const updatedBody = JSON.stringify(parsedMessage);
+        proxyReq.setHeader("Content-Length", Buffer.byteLength(updatedBody));
+        proxyReq.write(updatedBody);
+        proxyReq.end();
+      } catch (error) {
+        console.error(`[HTTP LOG] Error processing HTTP request body: ${error}`);
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
+      }
+    });
+
+    req.on("error", (error) => {
+      console.error(`[HTTP LOG] Error in HTTP request: ${error}`);
+    });
+  }
+});
+
+// Create the HTTP server
+const httpServer = http.createServer((req, res) => {
+  httpLog(`Received HTTP request for ${req.url}`);
+  proxy.web(req, res, (err) => {
+    console.error(`[HTTP LOG] Proxy error:`, err);
+    res.writeHead(502, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Bad Gateway" }));
+  });
+});
+
+// Handle WebSocket upgrades
+httpServer.on("upgrade", (req, socket, head) => {
+  websocketLog(`WebSocket upgrade request for ${req.url}`);
+  proxy.ws(req, socket, head, (err) => {
+    console.error(`[WEBSOCKET LOG] Proxy WebSocket error:`, err);
+    socket.destroy();
+  });
+});
+
+// Start the HTTP server
+httpServer.listen(HTTP_SERVER_PORT, SERVER_IP, () => {
+  httpLog(`HTTP proxy server is running on http://${SERVER_IP}:${HTTP_SERVER_PORT}, forwarding to ${HTTP_TARGET}`);
+});
