@@ -37,7 +37,7 @@
 
   //const wsAddress = "ws://localhost:8086/api/v1";
   const wsPort = "8080";
-  const httpPort = "8086";
+  const httpPort = "8081";
   const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}`;
   const httpAddress = `http://${$settings.flightSimAddress}:${httpPort}/api/v1`;
 
