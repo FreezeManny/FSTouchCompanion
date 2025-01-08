@@ -42,6 +42,7 @@ const modalRegistry = {
 <Modal components="{modalRegistry}"></Modal>
 <Toast></Toast>
 
+
 <AppShell>
   <svelte:fragment slot="header"><Header></Header></svelte:fragment>
   <!-- (sidebarLeft) -->
