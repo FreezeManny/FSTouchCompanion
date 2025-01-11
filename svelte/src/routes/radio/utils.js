@@ -32,3 +32,4 @@ export function processData(data) {
     throw new Error(`Unexpected data type: ${typeof data}`);
   }
 }
+
