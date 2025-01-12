@@ -47,7 +47,16 @@
     </div>
   </div>
 
+  <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+    <div class="input-group-shim">ATC-Platform:</div>
+    <select class="select" bind:value={$settings.atcPlatform}>
+      <option value="VATSIM">Vatsim</option>
+      <option value="IVAO">Ivao</option>
+    </select>
+  </div>
+
   <div class="space-y-8 flex flex-col items-center">
     <button type="button" class="btn variant-filled-tertiary" on:click={() => modalStore.clear()}>Close</button>
   </div>
+
 </div>

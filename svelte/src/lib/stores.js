@@ -12,6 +12,7 @@ export const settings = persisted("settings", {
     appearance: "dark",
     simbriefUsername: "",
     flightSimAddress: "",
+    atcPlatform: "VATSIM",
 });
 
 export const simbriefData = persisted("simbriefData", null);

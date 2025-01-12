@@ -2,10 +2,11 @@
   import { TabGroup, Tab } from "@skeletonlabs/skeleton";
   import { onMount } from "svelte";
   import { loadAtc, AtcType } from "./vatsimFreqFunctions";
+  import { settings } from "$lib/stores";
 
-  let tabSet = "All";
+  let tabSet = "all";
 
-  let atcControllers;
+  let atcControllers = [];
 
   const atcDisplay = {
     all: {
@@ -23,7 +24,7 @@
     },
     atis: {
       name: "ATIS",
-      atcTypes: [AtcType.APPROACH],
+      atcTypes: [AtcType.ATIS],
     },
     delivery: {
       name: "Delivery",
@@ -43,12 +44,11 @@
     },
   };
 
-  onMount(() => {
-    const currentLatitude = 52.370569; // Example latitude
-    const currentLongitude = 9.680992; // Example longitude
-    const atisSource = "VATSIM"; // Example source
+  export let long;
+  export let lat;
 
-    loadAtc(currentLatitude, currentLongitude, atisSource)
+  onMount(() => {
+    loadAtc(lat, long, $settings.atcPlatform)
       .then((controllers) => {
         atcControllers = controllers;
         console.log("Filtered ATC controllers:", controllers);
@@ -65,17 +65,31 @@
   {/each}
   <!-- Tab Panels --->
   <svelte:fragment slot="panel">
-    <p>{tabSet}</p>
-    <p>{JSON.stringify(atcControllers)}</p>
+    <div>
+      {#if atcControllers.some( (controller) => atcDisplay[tabSet].atcTypes.includes(controller.type), )}
+        {#each atcControllers as controller}
+          {#if atcDisplay[tabSet].atcTypes.includes(controller.type)}
+            <div class="card p-4 m-4 flex justify-between items-center">
+              <div class="flex flex-col items-start">
+                <h3 class="h3 text-left">{controller.callsign}</h3>
+                <p class="text-left">
+                  {Object.keys(AtcType).find(
+                    (key) => AtcType[key] === controller.type,
+                  )}
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <h3 class="h3 text-right">{controller.frequency}</h3>
+                <button type="button" class="btn variant-filled">Set</button>
+              </div>
+            </div>
+          {/if}
+        {/each}
+      {:else}
+        <div class="card p-4 m-4 flex justify-center items-center">
+          <p>No Station in range</p>
+        </div>
+      {/if}
+    </div>
   </svelte:fragment>
 </TabGroup>
-
-<div class="card p-4 m-4 flex justify-between items-start">
-  <div>
-    <h1 class="text-left">Station</h1>
-    <p class="text-left">ATC Type</p>
-    <p class="text-left">Frequency</p>
-  </div>
-
-  <button type="button" class="btn variant-filled">Set</button>
-</div>
