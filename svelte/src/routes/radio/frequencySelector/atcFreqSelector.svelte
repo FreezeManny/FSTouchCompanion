@@ -1,7 +1,7 @@
 <script lang="js">
   import { TabGroup, Tab } from "@skeletonlabs/skeleton";
   import { onMount } from "svelte";
-  import { loadAtc, AtcType } from "./vatsimFreqFunctions";
+  import { loadAtc, AtcType } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
 
   let tabSet = "all";
