@@ -2,7 +2,7 @@
   import { AppBar } from "@skeletonlabs/skeleton";
   import { onMount, onDestroy } from "svelte";
   import { getModalStore } from "@skeletonlabs/skeleton";
-  import { formatFrequency, isBase64, processData } from "./utils";
+  import { formatFrequency, isBase64, processData } from "../utils";
 
   const modalStore = getModalStore();
   const COM1_Modal = {

@@ -27,7 +27,6 @@ class ATC {
       }
       const data = await response.json();
       this.atcData = data;
-      console.log(data);
       return data;
     } catch (error) {
       console.error("Error fetching ATC data:", error);

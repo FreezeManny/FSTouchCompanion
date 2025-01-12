@@ -1,8 +1,18 @@
 <script lang="js">
   import { TabGroup, Tab } from "@skeletonlabs/skeleton";
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { loadAtc, AtcType } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
+  import { popup } from "@skeletonlabs/skeleton";
+
+  const popupFeatured = {
+    // Represents the type of event that opens/closed the popup
+    event: "click",
+    // Matches the data-popup value on your popup element
+    target: "popupFeatured",
+    // Defines which side of your trigger the popup will appear
+    placement: "bottom",
+  };
 
   let tabSet = "all";
 
@@ -34,6 +44,10 @@
       name: "Ground",
       atcTypes: [AtcType.GROUND],
     },
+    ground: {
+      name: "Tower",
+      atcTypes: [AtcType.TOWER],
+    },
     depArr: {
       name: "Departure/Arrival",
       atcTypes: [AtcType.DEPARTURE, AtcType.APPROACH],
@@ -47,19 +61,33 @@
   export let long;
   export let lat;
 
-  onMount(() => {
+  export let setCom1Callback;
+  export let setCom2Callback;
+
+  const loadControllers = () => {
     loadAtc(lat, long, $settings.atcPlatform)
       .then((controllers) => {
         atcControllers = controllers;
-        console.log("Filtered ATC controllers:", controllers);
       })
       .catch((err) => {
         console.error("Error loading ATC data:", err);
       });
+  };
+
+  onMount(() => {
+    loadControllers();
   });
+
+  $: if (lat && long && $settings.atcPlatform) {
+    loadControllers();
+  }
+
+  function formatFrequency(frequency) {
+    return Number(frequency.replace(".", ""));
+  }
 </script>
 
-<TabGroup justify="justify-center">
+<TabGroup justify="justify-center" class="pt-4">
   {#each Object.entries(atcDisplay) as [key, display]}
     <Tab bind:group={tabSet} name={key} value={key}>{display.name}</Tab>
   {/each}
@@ -80,7 +108,34 @@
               </div>
               <div class="flex items-center gap-2">
                 <h3 class="h3 text-right">{controller.frequency}</h3>
-                <button type="button" class="btn variant-filled">Set</button>
+
+                <button
+                  class="btn variant-filled"
+                  use:popup={{
+                    ...popupFeatured,
+                    target: `popupFeatured-${controller.callsign}`,
+                  }}>Set</button
+                >
+
+                <div
+                  class="card p-4 shadow-xl"
+                  data-popup={`popupFeatured-${controller.callsign}`}
+                >
+                  <button
+                    type="button"
+                    class="btn variant-filled"
+                    on:click={() =>
+                      setCom1Callback(formatFrequency(controller.frequency))}
+                    >COM1</button
+                  >
+                  <button
+                    type="button"
+                    class="btn variant-filled"
+                    on:click={() =>
+                      setCom2Callback(formatFrequency(controller.frequency))}
+                    >COM2</button
+                  >
+                </div>
               </div>
             </div>
           {/if}
