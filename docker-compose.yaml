@@ -4,6 +4,9 @@ services:
       dockerfile: Dockerfile.svelte.prod
     container_name: fst-frontend
     restart: always
+    ports:
+      - "5001:5001" # Expose Svelte on HTTP port
+
     # Remove external port exposure, only accessible via internal network
     expose:
       - "80"      # Website Port
