@@ -44,7 +44,7 @@
       name: "Ground",
       atcTypes: [AtcType.GROUND],
     },
-    ground: {
+    tower: {
       name: "Tower",
       atcTypes: [AtcType.TOWER],
     },
