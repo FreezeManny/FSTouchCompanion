@@ -6,27 +6,26 @@ services:
     restart: always
     ports:
       - "5001:5001" # Expose Svelte on HTTP port
-
     # Remove external port exposure, only accessible via internal network
-    expose:
-      - "80"      # Website Port
-    networks:
-      - internal_network
+    #expose:
+    #  - "80"      # Website Port
+    #networks:
+    #  - internal_network
 
-  #nginx:
-  #  image: nginx:1-alpine
-  #  container_name: fst-nginx
-  #  restart: no
-  #  ports:
-  #    - "5000:80"    # Expose NGINX on HTTP port
-  #  volumes:
-  #    - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf
-  #  depends_on:
-  #    - fsconn
-  #    - svelte
-  #  networks:
-  #    - internal_network
+    #nginx:
+    #  image: nginx:1-alpine
+    #  container_name: fst-nginx
+    #  restart: no
+    #  ports:
+    #    - "5000:80"    # Expose NGINX on HTTP port
+    #  volumes:
+    #    - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf
+    #  depends_on:
+    #    - fsconn
+    #    - svelte
+    #  networks:
+    #    - internal_network
 
-networks:
-  internal_network:
-    driver: bridge
+    #networks:
+    #  internal_network:
+    #    driver: bridge
