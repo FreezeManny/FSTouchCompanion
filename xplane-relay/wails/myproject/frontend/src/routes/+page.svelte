@@ -1,22 +1,39 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { Events } from '@wailsapp/runtime';
+	import { onMount, onDestroy } from 'svelte';
+	import { writable } from 'svelte/store'; // Import writable store
+	import runtime from '@wailsapp/runtime';
+
+	import { GetConnectionCount } from '../../wailsjs/go/main/App';
 
 	let selectedAircraft: string = 'Cessna 172';
-	let connectedClients: number = 0;
+	const connectedClients = writable(0); // Use writable store
 	let logOpen: boolean = false;
 
+	let interval: NodeJS.Timeout;
+
 	onMount(() => {
-		Events.On('connectionCountChanged', (data: number) => {
-			console.log('connectionCountChanged', data);
-			connectedClients = data;
-		});
+		// Poll GetConnectionNumber every 500ms
+		interval = setInterval(async () => {
+			try {
+				const count = await GetConnectionCount();
+				connectedClients.set(count); // Set value using store
+				console.log('Connected Clients:', count);
+			} catch (error) {
+				console.error('Error fetching connection number:', error);
+			}
+		}, 1000);
+	});
+
+	// Cleanup interval on component destroy
+	onDestroy(() => {
+		clearInterval(interval);
 	});
 </script>
 
 <div class="card p-4 m-2 d-flex justify-content-between">
 	<div>Selected Aircraft: {selectedAircraft}</div>
-	<div>Connected Clients: {connectedClients}</div>
+	<div>Connected Clients: {$connectedClients}</div>
+	<!-- Access value from store -->
 </div>
 
 <div class="card p-4 m-2">
