@@ -1,9 +1,17 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { Events } from '@wailsapp/runtime';
 
 	let selectedAircraft: string = 'Cessna 172';
-	let connectedClients: number = 3;
-
+	let connectedClients: number = 0;
 	let logOpen: boolean = false;
+
+	onMount(() => {
+		Events.On('connectionCountChanged', (data: number) => {
+			console.log('connectionCountChanged', data);
+			connectedClients = data;
+		});
+	});
 </script>
 
 <div class="card p-4 m-2 d-flex justify-content-between">
@@ -12,8 +20,8 @@
 </div>
 
 <div class="card p-4 m-2">
-	<button type="button" class="btn variant-filled" on:click={() => (logOpen = !logOpen)}
-		>{#if logOpen}
+	<button type="button" class="btn variant-filled" on:click={() => (logOpen = !logOpen)}>
+		{#if logOpen}
 			<span>Close Log</span>
 		{:else}
 			<span>Open Log</span>

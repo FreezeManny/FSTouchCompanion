@@ -1,15 +1,24 @@
 package newEfbConnector
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type EfbConnector struct {
-	ConnectionNumber int32 // Use int32 for atomic operations
+	ctx              context.Context // Add a context to emit events
+	ConnectionNumber int32           // Use int32 for atomic operations
+}
+
+// Allows the app to pass Wails' context to the connector
+func (e *EfbConnector) SetContext(ctx context.Context) {
+	e.ctx = ctx
 }
 
 func NewEfbConnector() (*EfbConnector, error) {
@@ -38,12 +47,20 @@ func (e *EfbConnector) StartWebSocketServer() {
 		defer ws.Close()
 
 		atomic.AddInt32(&e.ConnectionNumber, 1)
-		defer atomic.AddInt32(&e.ConnectionNumber, -1)
+		// Emit new connection count
+		fmt.Println("Connection Number: ", e.ConnectionNumber)
+		runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
+
+		defer e.HandleWebSocketDisconnect()
 
 		for {
 			msgType, msg, err := ws.ReadMessage()
 			if err != nil {
-				log.Println("Read error:", err)
+				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					log.Printf("Unexpected close error: %v", err)
+				} else {
+					log.Printf("Read error: %v", err)
+				}
 				break
 			}
 
@@ -60,6 +77,13 @@ func (e *EfbConnector) StartWebSocketServer() {
 			log.Println("ListenAndServe error:", err)
 		}
 	}()
+}
+
+func (e *EfbConnector) HandleWebSocketDisconnect() {
+	atomic.AddInt32(&e.ConnectionNumber, -1)
+	fmt.Println("Connection Number: ", e.ConnectionNumber)
+	// Emit updated count on disconnect
+	runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
 }
 
 func (e *EfbConnector) StopWebSocketServer() {

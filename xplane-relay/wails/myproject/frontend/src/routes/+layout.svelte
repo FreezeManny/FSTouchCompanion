@@ -40,7 +40,7 @@
 						<option>X-Plane 12</option>
 						<option>MSFS 2020</option>
 					</select>
-                    <a style="background-color: {fsConnected ? 'green' : 'red'};"></a>
+                    <div style="background-color: {fsConnected ? 'green' : 'red'}"></div>
 				</div>
 				<button type="button" class="btn variant-filled flex items-center" on:click={() => fsConnected = !fsConnected}>
 					{#if fsConnected}

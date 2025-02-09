@@ -31,6 +31,9 @@ func (a *App) startup(ctx context.Context) {
 		fmt.Println("Error creating EfbConnector:", err)
 		return
 	}
+
+	// Pass the Wails context to the connector
+	connector.SetContext(a.ctx)
 	a.efbConnector = *connector
 
 	go func() {
