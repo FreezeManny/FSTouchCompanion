@@ -43,6 +43,16 @@ func (e *EfbConnector) GetConnectionNumber() int {
 	return int(atomic.LoadInt32(&e.ConnectionNumber))
 }
 
+func (e *EfbConnector) handleWebSocketMessage(msgType int, msg []byte) {
+	// Process the WebSocket message
+	/*
+	*/
+	fmt.Printf("Received message of type %d: %s\n", msgType, string(msg))
+
+	// Example: Emit an event with the received message
+	//runtime.EventsEmit(e.ctx, "webSocketMessageReceived", string(msg))
+}
+
 func (e *EfbConnector) StartWebSocketServer() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ws, err := upgrader.Upgrade(w, r, nil)
@@ -72,6 +82,9 @@ func (e *EfbConnector) StartWebSocketServer() {
 				}
 				break
 			}
+
+			// Call the new handleWebSocketMessage function
+			e.handleWebSocketMessage(msgType, msg)
 
 			if err = ws.WriteMessage(msgType, msg); err != nil {
 				log.Println("Write error:", err)
