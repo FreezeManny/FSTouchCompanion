@@ -1,11 +1,10 @@
 package fsConnector
 
-import (
-	fsData "fsConnector/backend/Types"
-)
-
 type FsDataInterface interface {
-	SetFsData(data fsData.FsData)
+	SetCom1ActData(frequency string)
+	SetCom1StbData(frequency string)
+	SetCom2ActData(frequency string)
+	SetCom2StbData(frequency string)
 }
 
 type FsConnector interface {

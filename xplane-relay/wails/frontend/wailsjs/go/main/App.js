@@ -18,8 +18,24 @@ export function ReconnectFlightSim() {
   return window['go']['main']['App']['ReconnectFlightSim']();
 }
 
+export function SetCom1ActData(arg1) {
+  return window['go']['main']['App']['SetCom1ActData'](arg1);
+}
+
+export function SetCom1StbData(arg1) {
+  return window['go']['main']['App']['SetCom1StbData'](arg1);
+}
+
 export function SetCom1Stby(arg1) {
   return window['go']['main']['App']['SetCom1Stby'](arg1);
+}
+
+export function SetCom2ActData(arg1) {
+  return window['go']['main']['App']['SetCom2ActData'](arg1);
+}
+
+export function SetCom2StbData(arg1) {
+  return window['go']['main']['App']['SetCom2StbData'](arg1);
 }
 
 export function SetCom2Stby(arg1) {

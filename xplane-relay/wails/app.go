@@ -84,7 +84,8 @@ func (a *App) ChangeFlightSim(sim string) error {
 }
 
 func (a *App) GetConnectionStatus() bool {
-	return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
+	return false
+	//return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
 }
 func (a *App) ReconnectFlightSim() error {
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
@@ -114,4 +115,25 @@ func (a *App) SetCom1Stby(frequency string) {
 
 func (a *App) SetCom2Stby(frequency string) {
 	a.fsConnector.SetCom2Stby(frequency) // Call the SetCom2Stby method on the fsConnector
+}
+
+// ---------------- Flightsim Call  methods ----------------
+func (a *App) SetCom1StbData(frequency string) {
+	a.fsData.Com1Stby = frequency
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+func (a *App) SetCom2StbData(frequency string) {
+	a.fsData.Com2Stby = frequency
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+func (a *App) SetCom1ActData(frequency string) {
+	a.fsData.Com1Act = frequency
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+func (a *App) SetCom2ActData(frequency string) {
+	a.fsData.Com2Act = frequency
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }

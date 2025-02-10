@@ -10,7 +10,15 @@ export function GetConnectionStatus():Promise<boolean>;
 
 export function ReconnectFlightSim():Promise<void>;
 
+export function SetCom1ActData(arg1:string):Promise<void>;
+
+export function SetCom1StbData(arg1:string):Promise<void>;
+
 export function SetCom1Stby(arg1:string):Promise<void>;
+
+export function SetCom2ActData(arg1:string):Promise<void>;
+
+export function SetCom2StbData(arg1:string):Promise<void>;
 
 export function SetCom2Stby(arg1:string):Promise<void>;
 

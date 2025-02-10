@@ -107,6 +107,16 @@ func (e *EfbConnector) StartWebSocketServer() {
 		fmt.Println("Connection Number: ", e.ConnectionNumber)
 		runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
 
+		// Send the current fsData to the new client
+		fsDataJSON, err := json.Marshal(e.currData)
+		if err != nil {
+			log.Println("Error marshalling fsData to JSON:", err)
+		} else {
+			if err := e.sendWebSocketMessage(websocket.TextMessage, fsDataJSON); err != nil {
+				log.Println("Error sending WebSocket message:", err)
+			}
+		}
+
 		defer e.handleWebSocketDisconnect()
 
 		for {
