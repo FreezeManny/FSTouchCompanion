@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:         "fsConnector",
+		Title:         "fsConnect",
 		Width:         700,
 		Height:        500,
 		DisableResize: true,

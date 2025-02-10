@@ -2,18 +2,24 @@ package newEfbConnector
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+
+	fsData "fsConnector/backend/Types"
 )
 
 type EfbConnector struct {
 	ctx              context.Context // Add a context to emit events
 	ConnectionNumber int32           // Use int32 for atomic operations
+	currData         fsData.FsData
+	wsConn           *websocket.Conn // Add WebSocket connection field
 }
 
 // Allows the app to pass Wails' context to the connector
@@ -46,15 +52,18 @@ func (e *EfbConnector) StartWebSocketServer() {
 		}
 		defer ws.Close()
 
+		e.wsConn = ws // Store the WebSocket connection
+
 		atomic.AddInt32(&e.ConnectionNumber, 1)
 		// Emit new connection count
 		fmt.Println("Connection Number: ", e.ConnectionNumber)
 		runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
 
-		defer e.HandleWebSocketDisconnect()
+		defer e.handleWebSocketDisconnect()
 
 		for {
 			msgType, msg, err := ws.ReadMessage()
+			fmt.Println(msgType, msg, err)
 			if err != nil {
 				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 					log.Printf("Unexpected close error: %v", err)
@@ -79,11 +88,58 @@ func (e *EfbConnector) StartWebSocketServer() {
 	}()
 }
 
-func (e *EfbConnector) HandleWebSocketDisconnect() {
+func (e *EfbConnector) handleWebSocketDisconnect() {
 	atomic.AddInt32(&e.ConnectionNumber, -1)
 	fmt.Println("Connection Number: ", e.ConnectionNumber)
 	// Emit updated count on disconnect
 	runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
+}
+
+func (e *EfbConnector) sendWebSocketMessage(messageType int, data []byte) error {
+	if e.wsConn != nil {
+		return e.wsConn.WriteMessage(messageType, data)
+	}
+	return fmt.Errorf("WebSocket connection is not established")
+}
+
+func (e *EfbConnector) UpdateFrontendData(data fsData.FsData) {
+	// Use reflection to compare fields
+	oldValue := reflect.ValueOf(e.currData)
+	newValue := reflect.ValueOf(data)
+
+	// Ensure both are structs
+	if oldValue.Kind() == reflect.Struct && newValue.Kind() == reflect.Struct {
+		changes := map[string]interface{}{}
+		for i := 0; i < oldValue.NumField(); i++ {
+			oldField := oldValue.Field(i)
+			newField := newValue.Field(i)
+			if !reflect.DeepEqual(oldField.Interface(), newField.Interface()) {
+				fieldName := oldValue.Type().Field(i).Name
+				changes[fieldName] = newField.Interface()
+			}
+		}
+
+		if len(changes) > 0 {
+			changesJSON, err := json.Marshal(changes)
+			if err != nil {
+				fmt.Println("Error marshalling changes to JSON:", err)
+				return
+			}
+			fmt.Println("Updating frontend data with changes:", string(changesJSON))
+
+			// Send changes via WebSocket
+			if err := e.sendWebSocketMessage(websocket.TextMessage, changesJSON); err != nil {
+				fmt.Println("Error sending WebSocket message:", err)
+			}
+		} else {
+			fmt.Println("No changes in frontend data")
+		}
+
+		// Update the current data with the new data
+		e.currData = data
+	} else {
+		fmt.Println("No changes in frontend data")
+	}
 }
 
 func (e *EfbConnector) StopWebSocketServer() {

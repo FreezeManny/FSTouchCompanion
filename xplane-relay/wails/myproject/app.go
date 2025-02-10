@@ -46,3 +46,12 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) GetConnectionCount() int {
 	return a.efbConnector.GetConnectionNumber() // Call the GetConnectionNumber function on the instance
 }
+
+// UpdateAircraftNameAndNotify updates the aircraft name by appending an "a" and notifies the frontend
+func (a *App) UpdateAircraftNameAndNotify() {
+	// Append "a" to the aircraft name
+	a.fsData.Aircraft += "a"
+
+	// Call updateFrontendData with the modified fsData
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}

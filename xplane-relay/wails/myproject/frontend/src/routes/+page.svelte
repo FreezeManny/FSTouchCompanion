@@ -3,7 +3,7 @@
 	import { writable } from 'svelte/store'; // Import writable store
 	import runtime from '@wailsapp/runtime';
 
-	import { GetConnectionCount } from '../../wailsjs/go/main/App';
+	import { GetConnectionCount, UpdateAircraftNameAndNotify } from '../../wailsjs/go/main/App';
 
 	let selectedAircraft: string = 'Cessna 172';
 	const connectedClients = writable(0); // Use writable store
@@ -29,6 +29,9 @@
 		clearInterval(interval);
 	});
 </script>
+
+<button type="button" class="btn variant-filled" on:click={() => UpdateAircraftNameAndNotify()} > Debug </button>	
+
 
 <div class="card p-4 m-2 d-flex justify-content-between">
 	<div>Selected Aircraft: {selectedAircraft}</div>

@@ -5,3 +5,7 @@
 export function GetConnectionCount() {
   return window['go']['main']['App']['GetConnectionCount']();
 }
+
+export function UpdateAircraftNameAndNotify() {
+  return window['go']['main']['App']['UpdateAircraftNameAndNotify']();
+}
