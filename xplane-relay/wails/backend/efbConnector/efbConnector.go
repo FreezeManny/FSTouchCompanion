@@ -65,7 +65,7 @@ func (e *EfbConnector) handleWebSocketMessage(msgType int, msg []byte) {
 		"com2Stby": "123.450",
 		}
 	*/
-	fmt.Printf("Received message of type %d: %s\n", msgType, string(msg))
+	fmt.Println("Received message of type: ", string(msg))
 
 	// Parse JSON
 	var data map[string]interface{}
@@ -111,7 +111,6 @@ func (e *EfbConnector) StartWebSocketServer() {
 
 		for {
 			msgType, msg, err := ws.ReadMessage()
-			fmt.Println(msgType, msg, err)
 			if err != nil {
 				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 					log.Printf("Unexpected close error: %v", err)

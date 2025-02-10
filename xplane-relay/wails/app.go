@@ -15,8 +15,9 @@ type App struct {
 
 	efbConnector efbConnector.EfbConnector // Changed to a pointer
 	fsData       fsData.FsData
+	fsConnector  fsConnector.FsConnector
 
-	fsConnector fsConnector.FsConnector
+	flightSim string
 }
 
 // NewApp creates a new App application struct
@@ -66,6 +67,35 @@ func (a *App) GetConnectionCount() int {
 func (a *App) SetFsData(data fsData.FsData) {
 	a.fsData = data
 	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+// ChangeFlightSim changes the flight simulator and updates the fsConnector
+func (a *App) ChangeFlightSim(sim string) error {
+	a.flightSim = sim
+	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
+	if err != nil {
+		fmt.Println("Error changing FsConnector:", err)
+		return err
+	}
+
+	a.fsConnector = fsConn
+	fmt.Println("Flight simulator changed to", a.flightSim)
+	return nil
+}
+
+func (a *App) GetConnectionStatus() bool {
+	return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
+}
+func (a *App) ReconnectFlightSim() error {
+	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
+	if err != nil {
+		fmt.Println("Error changing FsConnector:", err)
+		return err
+	}
+
+	a.fsConnector = fsConn
+	fmt.Println("Reconnection Attempt to ", a.flightSim)
+	return nil
 }
 
 //---------------- COM Frontend Call methods ----------------

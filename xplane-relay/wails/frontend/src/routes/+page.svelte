@@ -3,11 +3,11 @@
 	import { writable } from 'svelte/store'; // Import writable store
 	import runtime from '@wailsapp/runtime';
 
-	import { GetConnectionCount, UpdateAircraftNameAndNotify } from '../../wailsjs/go/main/App';
+	import { GetConnectionCount, ChangeFlightSim } from '../../wailsjs/go/main/App';
 
 	let selectedAircraft: string = 'Cessna 172';
 	const connectedClients = writable(0); // Use writable store
-	let logOpen: boolean = false;
+	//let logOpen: boolean = false
 
 	let interval: NodeJS.Timeout;
 
@@ -28,9 +28,10 @@
 	onDestroy(() => {
 		clearInterval(interval);
 	});
+
 </script>
 
-<button type="button" class="btn variant-filled" on:click={() => UpdateAircraftNameAndNotify()} > Debug </button>	
+<button type="button" class="btn variant-filled" on:click={() => console.log("Test")} > Debug </button>	
 
 
 <div class="card p-4 m-2 d-flex justify-content-between">
@@ -39,6 +40,7 @@
 	<!-- Access value from store -->
 </div>
 
+<!-- 
 <div class="card p-4 m-2">
 	<button type="button" class="btn variant-filled" on:click={() => (logOpen = !logOpen)}>
 		{#if logOpen}
@@ -51,3 +53,6 @@
 		<div class="card p-2 m-2">a;lsdkfj;aldskfj;saldkfj;asldkfj;asdlkfj;sadlkfja;sdlkfj</div>
 	{/if}
 </div>
+-->
+
+

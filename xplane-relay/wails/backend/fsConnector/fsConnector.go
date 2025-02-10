@@ -14,4 +14,6 @@ type FsConnector interface {
 
 	SetCom1Stby(frequency string) error
 	SetCom2Stby(frequency string) error
+
+	GetConnectionStatus() bool
 }
