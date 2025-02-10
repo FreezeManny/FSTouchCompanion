@@ -34,6 +34,10 @@ func (a *App) startup(ctx context.Context) {
 
 	// Pass the Wails context to the connector
 	connector.SetContext(a.ctx)
+
+	// Pass App (which has the COM methods) to the connector
+	connector.SetComInterface(a)
+
 	a.efbConnector = *connector
 
 	go func() {
@@ -54,4 +58,20 @@ func (a *App) UpdateAircraftNameAndNotify() {
 
 	// Call updateFrontendData with the modified fsData
 	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+func (a *App) SwitchCom1() {
+	fmt.Println("Switching COM1 to")
+}
+
+func (a *App) SwitchCom2() {
+	fmt.Println("Switching COM1 to")
+}
+
+func (a *App) SetCom1Stby(frequency string) {
+	fmt.Println("Setting COM1 standby to", frequency)
+}
+
+func (a *App) SetCom2Stby(frequency string) {
+	fmt.Println("Setting COM2 standby to", frequency)
 }

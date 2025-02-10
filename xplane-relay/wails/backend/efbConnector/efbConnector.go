@@ -15,16 +15,28 @@ import (
 	fsData "fsConnector/backend/Types"
 )
 
+type ComInterface interface {
+	SwitchCom1()
+	SwitchCom2()
+	SetCom1Stby(frequency string)
+	SetCom2Stby(frequency string)
+}
+
 type EfbConnector struct {
 	ctx              context.Context // Add a context to emit events
 	ConnectionNumber int32           // Use int32 for atomic operations
 	currData         fsData.FsData
 	wsConn           *websocket.Conn // Add WebSocket connection field
+	comInt           ComInterface
 }
 
 // Allows the app to pass Wails' context to the connector
 func (e *EfbConnector) SetContext(ctx context.Context) {
 	e.ctx = ctx
+}
+
+func (e *EfbConnector) SetComInterface(ci ComInterface) {
+	e.comInt = ci
 }
 
 func NewEfbConnector() (*EfbConnector, error) {
@@ -46,6 +58,12 @@ func (e *EfbConnector) GetConnectionNumber() int {
 func (e *EfbConnector) handleWebSocketMessage(msgType int, msg []byte) {
 	// Process the WebSocket message
 	/*
+		{
+		"com1Switch": true,
+		"com2Switch": true,
+		"com1Stby": "123.450",
+		"com2Stby": "123.450",
+		}
 	*/
 	fmt.Printf("Received message of type %d: %s\n", msgType, string(msg))
 
