@@ -6,6 +6,7 @@ import (
 	efbConnector "fsConnector/backend/efbConnector"
 
 	fsData "fsConnector/backend/Types"
+	fsConnector "fsConnector/backend/fsConnector"
 )
 
 // App struct
@@ -14,6 +15,8 @@ type App struct {
 
 	efbConnector efbConnector.EfbConnector // Changed to a pointer
 	fsData       fsData.FsData
+
+	fsConnector fsConnector.FsConnector
 }
 
 // NewApp creates a new App application struct
@@ -40,6 +43,15 @@ func (a *App) startup(ctx context.Context) {
 
 	a.efbConnector = *connector
 
+	// Create the FsConnector
+	fsConn, err := fsConnector.NewFsConnector("xplane12", a)
+	if err != nil {
+		fmt.Println("Error creating FsConnector:", err)
+		return
+	}
+
+	a.fsConnector = fsConn
+
 	go func() {
 		fmt.Println("Starting WebSocket server...")
 		a.efbConnector.StartWebSocketServer() // Start the server here
@@ -51,13 +63,11 @@ func (a *App) GetConnectionCount() int {
 	return a.efbConnector.GetConnectionNumber() // Call the GetConnectionNumber function on the instance
 }
 
-// UpdateAircraftNameAndNotify updates the aircraft name by appending an "a" and notifies the frontend
-func (a *App) UpdateAircraftNameAndNotify() {
-	// Append "a" to the aircraft name
-
-	// Call updateFrontendData with the modified fsData
-	a.efbConnector.UpdateFrontendData(a.fsData)
+func (a *App) SetFsData(data fsData.FsData) {
+	a.fsData = data
 }
+
+//---------------- COM Frontend Call methods ----------------
 
 func (a *App) SwitchCom1() {
 	fmt.Println("Switching COM1 to")
