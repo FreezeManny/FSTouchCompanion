@@ -54,7 +54,6 @@ func (a *App) GetConnectionCount() int {
 // UpdateAircraftNameAndNotify updates the aircraft name by appending an "a" and notifies the frontend
 func (a *App) UpdateAircraftNameAndNotify() {
 	// Append "a" to the aircraft name
-	a.fsData.Aircraft += "a"
 
 	// Call updateFrontendData with the modified fsData
 	a.efbConnector.UpdateFrontendData(a.fsData)
@@ -62,16 +61,24 @@ func (a *App) UpdateAircraftNameAndNotify() {
 
 func (a *App) SwitchCom1() {
 	fmt.Println("Switching COM1 to")
+	tmp := a.fsData.Com1Act
+	a.fsData.Com1Act = a.fsData.Com1Stby
+	a.fsData.Com1Stby = tmp
 }
 
 func (a *App) SwitchCom2() {
 	fmt.Println("Switching COM1 to")
+	tmp := a.fsData.Com2Act
+	a.fsData.Com2Act = a.fsData.Com2Stby
+	a.fsData.Com2Stby = tmp
 }
 
 func (a *App) SetCom1Stby(frequency string) {
 	fmt.Println("Setting COM1 standby to", frequency)
+	a.fsData.Com1Stby = frequency
 }
 
 func (a *App) SetCom2Stby(frequency string) {
 	fmt.Println("Setting COM2 standby to", frequency)
+	a.fsData.Com2Stby = frequency
 }
