@@ -6,6 +6,22 @@ export function GetConnectionCount() {
   return window['go']['main']['App']['GetConnectionCount']();
 }
 
+export function SetCom1Stby(arg1) {
+  return window['go']['main']['App']['SetCom1Stby'](arg1);
+}
+
+export function SetCom2Stby(arg1) {
+  return window['go']['main']['App']['SetCom2Stby'](arg1);
+}
+
+export function SwitchCom1() {
+  return window['go']['main']['App']['SwitchCom1']();
+}
+
+export function SwitchCom2() {
+  return window['go']['main']['App']['SwitchCom2']();
+}
+
 export function UpdateAircraftNameAndNotify() {
   return window['go']['main']['App']['UpdateAircraftNameAndNotify']();
 }

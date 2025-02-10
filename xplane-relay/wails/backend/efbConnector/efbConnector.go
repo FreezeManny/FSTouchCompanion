@@ -123,11 +123,6 @@ func (e *EfbConnector) StartWebSocketServer() {
 
 			// Call the new handleWebSocketMessage function
 			e.handleWebSocketMessage(msgType, msg)
-
-			if err = ws.WriteMessage(msgType, msg); err != nil {
-				log.Println("Write error:", err)
-				break
-			}
 		}
 	})
 
