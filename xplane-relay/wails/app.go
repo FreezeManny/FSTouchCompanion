@@ -65,38 +65,23 @@ func (a *App) GetConnectionCount() int {
 
 func (a *App) SetFsData(data fsData.FsData) {
 	a.fsData = data
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }
 
 //---------------- COM Frontend Call methods ----------------
 
 func (a *App) SwitchCom1() {
-	fmt.Println("Switching COM1 to")
-	tmp := a.fsData.Com1Act
-	a.fsData.Com1Act = a.fsData.Com1Stby
-	a.fsData.Com1Stby = tmp
-
-	a.efbConnector.UpdateFrontendData(a.fsData)
+	a.fsConnector.SwitchCom1() // Call the SwitchCom1 method on the fsConnector
 }
 
 func (a *App) SwitchCom2() {
-	fmt.Println("Switching COM1 to")
-	tmp := a.fsData.Com2Act
-	a.fsData.Com2Act = a.fsData.Com2Stby
-	a.fsData.Com2Stby = tmp
-
-	a.efbConnector.UpdateFrontendData(a.fsData)
+	a.fsConnector.SwitchCom2() // Call the SwitchCom1 method on the fsConnector
 }
 
 func (a *App) SetCom1Stby(frequency string) {
-	fmt.Println("Setting COM1 standby to", frequency)
-	a.fsData.Com1Stby = frequency
-
-	a.efbConnector.UpdateFrontendData(a.fsData)
+	a.fsConnector.SetCom1Stby(frequency) // Call the SetCom1Stby method on the fsConnector
 }
 
 func (a *App) SetCom2Stby(frequency string) {
-	fmt.Println("Setting COM2 standby to", frequency)
-	a.fsData.Com2Stby = frequency
-
-	a.efbConnector.UpdateFrontendData(a.fsData)
+	a.fsConnector.SetCom2Stby(frequency) // Call the SetCom2Stby method on the fsConnector
 }

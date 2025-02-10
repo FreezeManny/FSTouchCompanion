@@ -2,7 +2,6 @@ package fsConnector
 
 import (
 	"fmt"
-	fsData "fsConnector/backend/Types"
 )
 
 type Xp12Connector struct {
@@ -27,12 +26,12 @@ func (x *Xp12Connector) SwitchCom2() error {
 
 func (x *Xp12Connector) SetCom1Stby(frequency string) error {
 	fmt.Println("Setting COM1 standby to", frequency)
-	x.app.SetFsData(fsData.FsData{Com1Stby: frequency})
+	//x.app.SetFsData(fsData.FsData{Com1Stby: frequency})
 	return nil
 }
 
 func (x *Xp12Connector) SetCom2Stby(frequency string) error {
 	fmt.Println("Setting COM2 standby to", frequency)
-	x.app.SetFsData(fsData.FsData{Com2Stby: frequency})
+	//x.app.SetFsData(fsData.FsData{Com2Stby: frequency})
 	return nil
 }
