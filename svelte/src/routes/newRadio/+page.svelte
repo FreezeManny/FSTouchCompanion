@@ -41,41 +41,32 @@
     // Update the WebSocket message handler to process aircraft name and check for new COM data
     ws.onmessage = (event) => {
       try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            console.log("WebSocket message received:", reader.result);
-            const message = JSON.parse(reader.result);
-            console.log("Message:", message);
+        console.log("WebSocket message received:", event.data);
+        const message = JSON.parse(event.data);
 
-            if (message.Position) {
-              FsData.Position = {
-                ...FsData.Position,
-                ...message.Position,
-              };
-            }
-            if (message.Aircraft) {
-              FsData.Aircraft = message.Aircraft || "------";
-            }
-            if (message.Com1Stby) {
-              FsData.Com1Stby = message.Com1Stby || "------";
-            }
-            if (message.Com1Act) {
-              FsData.Com1Act = message.Com1Act || "------";
-            }
-            if (message.Com2Stby) {
-              FsData.Com2Stby = message.Com2Stby || "------";
-            }
-            if (message.Com2Act) {
-              FsData.Com2Act = message.Com2Act || "------";
-            }
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
-          }
-        };
-        reader.readAsText(event.data);
+        if (message.Position) {
+          FsData.Position = {
+            ...FsData.Position,
+            ...message.Position,
+          };
+        }
+        if (message.Aircraft) {
+          FsData.Aircraft = message.Aircraft || "------";
+        }
+        if (message.Com1Stby) {
+          FsData.Com1Stby = message.Com1Stby || "------";
+        }
+        if (message.Com1Act) {
+          FsData.Com1Act = message.Com1Act || "------";
+        }
+        if (message.Com2Stby) {
+          FsData.Com2Stby = message.Com2Stby || "------";
+        }
+        if (message.Com2Act) {
+          FsData.Com2Act = message.Com2Act || "------";
+        }
       } catch (error) {
-        console.error("Error processing WebSocket message:", error);
+        console.error("Error parsing WebSocket message:", error);
       }
     };
 
@@ -108,7 +99,7 @@
   function com1Entry(frequency) {
     console.log("COM1 Frequency Changed to: " + frequency);
     let tmp = {
-      com1Stby: frequency,
+      com1Stby: String(frequency),
     };
     ws.send(JSON.stringify(tmp));
   }
@@ -116,7 +107,7 @@
   function com2Entry(frequency) {
     console.log("COM2 Frequency Changed to: " + frequency);
     let tmp = {
-      com2Stby: frequency,
+      com2Stby: String(frequency),
     };
     ws.send(JSON.stringify(tmp));
   }
@@ -131,9 +122,9 @@
 {#if isWebSocketOpen}
   <RadioDisplay
     COM1_ACT_FREQ={FsData.Com1Act}
-    COM1_ACT_STBY={FsData.Com1Stby}
+    COM1_STBY_FREQ={FsData.Com1Stby}
     COM2_ACT_FREQ={FsData.Com2Act}
-    COM2_ACT_STBY={FsData.Com2Stby}
+    COM2_STBY_FREQ={FsData.Com2Stby}
     com1SwitchCallback={com1Switch}
     com2SwitchCallback={com2Switch}
     com1EntryCallback={com1Entry}

@@ -64,6 +64,8 @@ func (a *App) SwitchCom1() {
 	tmp := a.fsData.Com1Act
 	a.fsData.Com1Act = a.fsData.Com1Stby
 	a.fsData.Com1Stby = tmp
+
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }
 
 func (a *App) SwitchCom2() {
@@ -71,14 +73,20 @@ func (a *App) SwitchCom2() {
 	tmp := a.fsData.Com2Act
 	a.fsData.Com2Act = a.fsData.Com2Stby
 	a.fsData.Com2Stby = tmp
+
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }
 
 func (a *App) SetCom1Stby(frequency string) {
 	fmt.Println("Setting COM1 standby to", frequency)
 	a.fsData.Com1Stby = frequency
+
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }
 
 func (a *App) SetCom2Stby(frequency string) {
 	fmt.Println("Setting COM2 standby to", frequency)
 	a.fsData.Com2Stby = frequency
+
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }

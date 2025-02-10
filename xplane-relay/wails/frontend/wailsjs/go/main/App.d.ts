@@ -3,4 +3,12 @@
 
 export function GetConnectionCount():Promise<number>;
 
+export function SetCom1Stby(arg1:string):Promise<void>;
+
+export function SetCom2Stby(arg1:string):Promise<void>;
+
+export function SwitchCom1():Promise<void>;
+
+export function SwitchCom2():Promise<void>;
+
 export function UpdateAircraftNameAndNotify():Promise<void>;
