@@ -1,24 +1,23 @@
 <script lang="js">
-  import { AppBar } from "@skeletonlabs/skeleton";
   import { onMount, onDestroy } from "svelte";
 
   import { settings } from "$lib/stores";
-  import aircraftData from "./aircraftData.json";
 
-  import { formatFrequency, isBase64, processData } from "./utils";
   import RadioDisplay from "./radio/RadioDisplay.svelte";
 
   import VatsimFreqSelector from "./frequencySelector/atcFreqSelector.svelte";
 
-  let currentLatitude = 0; // Example latitude
-  let currentLongitude = 0; // Example longitude
-
   let isWebSocketOpen = false;
 
-  let COM1_ACT_FREQ = "------";
-  let COM1_STBY_FREQ = "------";
-  let COM2_ACT_FREQ = "------";
-  let COM2_STBY_FREQ = "------";
+  // FsData struct
+  let FsData = {
+    Position: { Lon: 0.0, Lat: 0.0 },
+    Aircraft: "------",
+    Com1Stby: "------",
+    Com1Act: "------",
+    Com2Stby: "------",
+    Com2Act: "------",
+  };
 
   //const wsAddress = "ws://localhost:8086/api/v1";
   const wsPort = "8080";
@@ -37,7 +36,6 @@
     ws.onopen = () => {
       console.log("WebSocket connection established");
       isWebSocketOpen = true;
-      subscribeDataRefs();
     };
 
     // Update the WebSocket message handler to process aircraft name and check for new COM data
@@ -49,6 +47,28 @@
             console.log("WebSocket message received:", reader.result);
             const message = JSON.parse(reader.result);
             console.log("Message:", message);
+
+            if (message.Position) {
+              FsData.Position = {
+                ...FsData.Position,
+                ...message.Position,
+              };
+            }
+            if (message.Aircraft) {
+              FsData.Aircraft = message.Aircraft || "------";
+            }
+            if (message.Com1Stby) {
+              FsData.Com1Stby = message.Com1Stby || "------";
+            }
+            if (message.Com1Act) {
+              FsData.Com1Act = message.Com1Act || "------";
+            }
+            if (message.Com2Stby) {
+              FsData.Com2Stby = message.Com2Stby || "------";
+            }
+            if (message.Com2Act) {
+              FsData.Com2Act = message.Com2Act || "------";
+            }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
           }
@@ -60,11 +80,7 @@
     };
 
     ws.onclose = () => {
-      console.log(
-        "WebSocket connection closed. Reconnecting in",
-        RECONNECT_INTERVAL,
-        "ms",
-      );
+      console.log("WebSocket connection closed");
       isWebSocketOpen = false;
     };
 
@@ -107,21 +123,17 @@
 
   onDestroy(() => {
     if (ws) {
-      unsubscribeDataRefs();
       ws.close();
-    }
-    if (LongLatIntervalID) {
-      clearInterval(LongLatIntervalID);
     }
   });
 </script>
 
 {#if isWebSocketOpen}
   <RadioDisplay
-    {COM1_ACT_FREQ}
-    {COM1_STBY_FREQ}
-    {COM2_ACT_FREQ}
-    {COM2_STBY_FREQ}
+    COM1_ACT_FREQ={FsData.Com1Act}
+    COM1_ACT_STBY={FsData.Com1Stby}
+    COM2_ACT_FREQ={FsData.Com2Act}
+    COM2_ACT_STBY={FsData.Com2Stby}
     com1SwitchCallback={com1Switch}
     com2SwitchCallback={com2Switch}
     com1EntryCallback={com1Entry}
@@ -135,8 +147,8 @@
   <hr class="!border-t-8" />
 
   <VatsimFreqSelector
-    lat={currentLatitude}
-    long={currentLongitude}
+    lat={FsData.Position.Lat}
+    long={FsData.Position.Lon}
     setCom1Callback={com1Entry}
     setCom2Callback={com2Entry}
   />
@@ -144,11 +156,7 @@
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
     <div class="alert-message">
-      <h3 class="h3">
-        {#if !isWebSocketOpen}
-          WebSocket connection failed
-        {/if}
-      </h3>
+      <h3 class="h3">WebSocket connection failed</h3>
     </div>
   </aside>
 {/if}
