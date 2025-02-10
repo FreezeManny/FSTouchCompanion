@@ -13,14 +13,12 @@
   let currentLatitude = 0; // Example latitude
   let currentLongitude = 0; // Example longitude
 
-  let aircraftFound = true;
   let isWebSocketOpen = false;
 
   let COM1_ACT_FREQ = "------";
   let COM1_STBY_FREQ = "------";
   let COM2_ACT_FREQ = "------";
   let COM2_STBY_FREQ = "------";
-  let AIRCRAFT_NAME;
 
   //const wsAddress = "ws://localhost:8086/api/v1";
   const wsPort = "8080";
@@ -50,6 +48,7 @@
           try {
             console.log("WebSocket message received:", reader.result);
             const message = JSON.parse(reader.result);
+            console.log("Message:", message);
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);
           }
@@ -117,7 +116,7 @@
   });
 </script>
 
-{#if isWebSocketOpen && aircraftFound}
+{#if isWebSocketOpen}
   <RadioDisplay
     {COM1_ACT_FREQ}
     {COM1_STBY_FREQ}
@@ -148,8 +147,6 @@
       <h3 class="h3">
         {#if !isWebSocketOpen}
           WebSocket connection failed
-        {:else if !aircraftFound}
-          Aircraft not found in Config
         {/if}
       </h3>
     </div>

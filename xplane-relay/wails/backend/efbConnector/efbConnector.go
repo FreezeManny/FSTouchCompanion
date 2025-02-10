@@ -67,8 +67,28 @@ func (e *EfbConnector) handleWebSocketMessage(msgType int, msg []byte) {
 	*/
 	fmt.Printf("Received message of type %d: %s\n", msgType, string(msg))
 
-	// Example: Emit an event with the received message
-	//runtime.EventsEmit(e.ctx, "webSocketMessageReceived", string(msg))
+	// Parse JSON
+	var data map[string]interface{}
+	if err := json.Unmarshal(msg, &data); err != nil {
+		log.Println("Failed to parse JSON:", err)
+		return
+	}
+
+	if val, ok := data["com1Switch"].(bool); ok && val {
+		e.comInt.SwitchCom1()
+	}
+
+	if val, ok := data["com2Switch"].(bool); ok && val {
+		e.comInt.SwitchCom2()
+	}
+
+	if val, ok := data["com1Stby"].(string); ok && val != "" {
+		e.comInt.SetCom1Stby(val)
+	}
+
+	if val, ok := data["com2Stby"].(string); ok && val != "" {
+		e.comInt.SetCom2Stby(val)
+	}
 }
 
 func (e *EfbConnector) StartWebSocketServer() {
