@@ -23,6 +23,8 @@ type Xp12Connector struct {
 	connectionStatus bool
 	wsConn           *websocket.Conn
 
+	reqIdCounter int
+
 	xplaneData []XPlaneData
 
 	selectedAircraftData XPlaneData
@@ -390,8 +392,9 @@ func (x *Xp12Connector) SubscribeAllDatarefs() error {
 	}
 
 	// Build subscription message
+	x.reqIdCounter++
 	msg := map[string]interface{}{
-		"req_id": 2000, // or any unique ID
+		"req_id": x.reqIdCounter, // or any unique ID
 		"type":   "dataref_subscribe_values",
 		"params": map[string]interface{}{
 			"datarefs": datarefs,
@@ -505,8 +508,9 @@ func (x *Xp12Connector) setDataref(datarefId string, value string) error {
 	}
 
 	// Build message to set dataref value
+	x.reqIdCounter++
 	msg := map[string]interface{}{
-		"req_id": 2001, // or any unique ID
+		"req_id": x.reqIdCounter, // or any unique ID
 		"type":   "dataref_set_value",
 		"params": map[string]interface{}{
 			"id":    parsedID,
@@ -531,8 +535,9 @@ func (x *Xp12Connector) triggerCommand(commandId string) error {
 	}
 
 	// Build message to set dataref value
+	x.reqIdCounter++
 	msg := map[string]interface{}{
-		"req_id": 2001, // or any unique ID
+		"req_id": x.reqIdCounter, // or any unique ID
 		"type":   "dataref_set_value",
 		"params": map[string]interface{}{
 			"id":        parsedID,
