@@ -159,25 +159,23 @@ func (x *Xp12Connector) GetAircraftName() string {
 func (x *Xp12Connector) SwitchCom1() error {
 	// Implement the logic for SwitchCom1
 	fmt.Println("X-Plane: SwitchCom1")
-	return nil
+	return x.triggerCommand(x.IdData.Com1Switch)
 }
 
 func (x *Xp12Connector) SwitchCom2() error {
 	// Implement the logic for SwitchCom2
 	fmt.Println("X-Plane: SwitchCom2")
-	return nil
+	return x.triggerCommand(x.IdData.Com2Switch)
 }
 
 func (x *Xp12Connector) SetCom1Stby(frequency string) error {
 	fmt.Println("X-Plane: Setting COM1 standby to", frequency)
-	//x.app.SetFsData(fsData.FsData{Com1Stby: frequency})
-	return nil
+	return x.setDataref(x.IdData.Com1stby, frequency)
 }
 
 func (x *Xp12Connector) SetCom2Stby(frequency string) error {
 	fmt.Println("X-Plane: Setting COM2 standby to", frequency)
-	//x.app.SetFsData(fsData.FsData{Com2Stby: frequency})
-	return nil
+	return x.setDataref(x.IdData.Com2stby, frequency)
 }
 
 // ----------------- X-Plane 12 specific methods -----------------
@@ -493,4 +491,56 @@ func (x *Xp12Connector) UpdatePosition() {
 
 		time.Sleep(120 * time.Second)
 	}
+}
+
+func (x *Xp12Connector) setDataref(datarefId string, value string) error {
+	if x.wsConn == nil {
+		return fmt.Errorf("WebSocket connection not initialized")
+	}
+
+	parsedID, err := strconv.ParseInt(datarefId, 10, 64)
+	if err != nil {
+		log.Printf("Failed to parse ID %s as integer: %v", datarefId, err)
+		return err
+	}
+
+	// Build message to set dataref value
+	msg := map[string]interface{}{
+		"req_id": 2001, // or any unique ID
+		"type":   "dataref_set_value",
+		"params": map[string]interface{}{
+			"id":    parsedID,
+			"value": value,
+		},
+	}
+
+	// Send message over WebSocket
+	return x.wsConn.WriteJSON(msg)
+}
+
+func (x *Xp12Connector) triggerCommand(commandId string) error {
+
+	if x.wsConn == nil {
+		return fmt.Errorf("WebSocket connection not initialized")
+	}
+
+	parsedID, err := strconv.ParseInt(commandId, 10, 64)
+	if err != nil {
+		log.Printf("Failed to parse ID %s as integer: %v", commandId, err)
+		return err
+	}
+
+	// Build message to set dataref value
+	msg := map[string]interface{}{
+		"req_id": 2001, // or any unique ID
+		"type":   "dataref_set_value",
+		"params": map[string]interface{}{
+			"id":        parsedID,
+			"is_active": true,
+			"duration":  0,
+		},
+	}
+
+	// Send message over WebSocket
+	return x.wsConn.WriteJSON(msg)
 }
