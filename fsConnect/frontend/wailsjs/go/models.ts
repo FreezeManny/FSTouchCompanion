@@ -15,6 +15,8 @@ export namespace structs {
 	    }
 	}
 	export class FsData {
+	    Connected: boolean;
+	    AircraftName: string;
 	    Position: Position;
 	    Com1Stby: string;
 	    Com1Act: string;
@@ -27,6 +29,8 @@ export namespace structs {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Connected = source["Connected"];
+	        this.AircraftName = source["AircraftName"];
 	        this.Position = this.convertValues(source["Position"], Position);
 	        this.Com1Stby = source["Com1Stby"];
 	        this.Com1Act = source["Com1Act"];

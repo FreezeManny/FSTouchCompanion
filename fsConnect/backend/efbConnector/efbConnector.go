@@ -136,7 +136,7 @@ func (e *EfbConnector) StartWebSocketServer() {
 
 			// Call the new handleWebSocketMessage function
 			if msgType == websocket.TextMessage {
-				log.Println("Received non-text message")
+				log.Println("Received text message")
 				e.handleWebSocketMessage(msg)
 			}
 		}
@@ -202,7 +202,6 @@ func (e *EfbConnector) UpdateFrontendData(data dataTypes.FsData) {
 				fmt.Println("Error marshalling changes to JSON:", err)
 				return
 			}
-			fmt.Println("Updating frontend data with changes:", string(changesJSON))
 
 			// Send changes via WebSocket
 			if err := e.sendWebSocketMessage(websocket.TextMessage, changesJSON); err != nil {
@@ -212,7 +211,6 @@ func (e *EfbConnector) UpdateFrontendData(data dataTypes.FsData) {
 			fmt.Println("No changes in frontend data")
 		}
 
-		fmt.Println(e.currData, data)
 		// Update the current data with the new data
 		e.currData = data
 	} else {

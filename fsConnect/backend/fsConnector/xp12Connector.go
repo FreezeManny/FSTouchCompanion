@@ -165,44 +165,69 @@ func (x *Xp12Connector) GetAircraftName() string {
 
 func (x *Xp12Connector) SwitchCom1() error {
 	// Implement the logic for SwitchCom1
-	fmt.Println("X-Plane: SwitchCom1")
 	return x.triggerCommand(x.IdData.Com1Switch)
 }
 
 func (x *Xp12Connector) SwitchCom2() error {
 	// Implement the logic for SwitchCom2
-	fmt.Println("X-Plane: SwitchCom2")
 	return x.triggerCommand(x.IdData.Com2Switch)
 }
 
 func (x *Xp12Connector) SetCom1Stby(frequency string) error {
-	fmt.Println("X-Plane: Setting COM1 standby to", frequency)
-	return x.setDataref(x.IdData.Com1stby, frequency)
+	freqFloat, err := strconv.ParseFloat(frequency, 64)
+	if err != nil {
+		return fmt.Errorf("invalid frequency format: %v", err)
+	}
+	return x.setDataref(x.IdData.Com1stby, freqFloat)
 }
 
 func (x *Xp12Connector) SetCom2Stby(frequency string) error {
-	fmt.Println("X-Plane: Setting COM2 standby to", frequency)
-	return x.setDataref(x.IdData.Com2stby, frequency)
+	freqFloat, err := strconv.ParseFloat(frequency, 64)
+	if err != nil {
+		return fmt.Errorf("invalid frequency format: %v", err)
+	}
+	return x.setDataref(x.IdData.Com2stby, freqFloat)
 }
 
 // ----------------- X-Plane 12 specific methods -----------------
 
 func (x *Xp12Connector) changeAircraft() error {
 	// Implement the logic for changing the aircraft
-	fmt.Println("X-Plane: Change aircraft")
 
 	x.selectedAircraftData = x.LoadAircraftData(x.FsData.AircraftName)
 
-	fmt.Println("X-Plane: Selected aircraft data:", x.selectedAircraftData)
+	fmt.Println("X-Plane: Changed Aircraft")
 
 	// Get IDs for all datarefs
-	x.IdData.Com1act, _ = x.getDatarefID(x.selectedAircraftData.Data.Com1.DataRef.Active)
-	x.IdData.Com1stby, _ = x.getDatarefID(x.selectedAircraftData.Data.Com1.DataRef.Standby)
-	x.IdData.Com2act, _ = x.getDatarefID(x.selectedAircraftData.Data.Com2.DataRef.Active)
-	x.IdData.Com2stby, _ = x.getDatarefID(x.selectedAircraftData.Data.Com2.DataRef.Standby)
+	var err error
+	x.IdData.Com1act, err = x.getDatarefID(x.selectedAircraftData.Data.Com1.DataRef.Active)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com1 active dataref ID: %v", err)
+	}
+	x.IdData.Com1stby, err = x.getDatarefID(x.selectedAircraftData.Data.Com1.DataRef.Standby)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com1 standby dataref ID: %v", err)
+	}
+	x.IdData.Com2act, err = x.getDatarefID(x.selectedAircraftData.Data.Com2.DataRef.Active)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com2 active dataref ID: %v", err)
+	}
+	x.IdData.Com2stby, err = x.getDatarefID(x.selectedAircraftData.Data.Com2.DataRef.Standby)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com2 standby dataref ID: %v", err)
+	}
 
-	x.IdData.Com1Switch, _ = x.getDatarefID(x.selectedAircraftData.Data.Com1.Command.Switch)
-	x.IdData.Com2Switch, _ = x.getDatarefID(x.selectedAircraftData.Data.Com2.Command.Switch)
+	x.IdData.Com1Switch, err = x.getCommandID(x.selectedAircraftData.Data.Com1.Command.Switch)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com1 switch command ID: %v", err)
+	}
+
+	x.IdData.Com2Switch, err = x.getCommandID(x.selectedAircraftData.Data.Com2.Command.Switch)
+	if err != nil {
+		log.Printf("X-Plane: Error fetching Com2 switch command ID: %v", err)
+	}
+
+	// Log the IDs to verify they are set correctly
 
 	return nil
 }
@@ -268,7 +293,7 @@ func (x *Xp12Connector) listenForMessages() {
 			return
 		}
 
-		log.Printf("X-Plane: Received message: %s", message)
+		//log.Printf("X-Plane: Received message: %s", message)
 		x.ProcessXPlaneRecieve(string(message))
 	}
 }
@@ -276,7 +301,6 @@ func (x *Xp12Connector) listenForMessages() {
 func (x *Xp12Connector) getDatarefID(datarefName string) (string, error) {
 	httpAddress := "http://localhost:8086/api/v2" // Replace with your actual HTTP server address
 	url := fmt.Sprintf("%s/datarefs?filter[name]=%s", httpAddress, datarefName)
-	fmt.Println("Fetching dataref ID:", url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -294,8 +318,6 @@ func (x *Xp12Connector) getDatarefID(datarefName string) (string, error) {
 		log.Printf("X-Plane: Failed to read response body: %v", err)
 		return "", err
 	}
-
-	//fmt.Println("Response body:", string(body))
 
 	var result struct {
 		Data []struct {
@@ -318,7 +340,6 @@ func (x *Xp12Connector) getDatarefID(datarefName string) (string, error) {
 func (x *Xp12Connector) getDatarefValue(id string) (interface{}, error) {
 	httpAddress := "http://localhost:8086/api/v2"
 	url := fmt.Sprintf("%s/datarefs/%s/value", httpAddress, id)
-	fmt.Println("Fetching dataref value:", url)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -336,8 +357,6 @@ func (x *Xp12Connector) getDatarefValue(id string) (interface{}, error) {
 		log.Printf("X-Plane: Failed to read response body: %v", err)
 		return nil, err
 	}
-
-	//fmt.Println("Response body:", string(body))
 
 	var raw map[string]interface{}
 	err = json.Unmarshal(body, &raw)
@@ -441,6 +460,45 @@ func (x *Xp12Connector) SetInitialData() {
 	x.app.SetFsData(x.FsData)
 }
 
+func (x *Xp12Connector) getCommandID(datarefName string) (string, error) {
+	httpAddress := "http://localhost:8086/api/v2" // Replace with your actual HTTP server address
+	url := fmt.Sprintf("%s/commands?filter[name]=%s", httpAddress, datarefName)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("X-Plane: Failed to fetch command ID: %v", err)
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to fetch command ID, status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("X-Plane: Failed to read response body: %v", err)
+		return "", err
+	}
+
+	var result struct {
+		Data []struct {
+			ID int64 `json:"id"`
+		} `json:"data"`
+	}
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		log.Printf("X-Plane: Failed to parse JSON response: %v", err)
+		return "", err
+	}
+
+	if len(result.Data) > 0 {
+		return fmt.Sprintf("%d", result.Data[0].ID), nil // Convert int64 to string
+	}
+
+	return "", fmt.Errorf("command %s not found", datarefName)
+}
+
 func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 	var message struct {
 		Data map[string]interface{} `json:"data"`
@@ -477,7 +535,6 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 				x.FsData.Com2Stby = strValue
 			}
 		}
-		fmt.Printf("Type: %s, ID: %s (%s), Value: %v\n", message.Type, id, name, value)
 	}
 
 	x.app.SetFsData(x.FsData)
@@ -499,7 +556,6 @@ func (x *Xp12Connector) UpdatePosition() {
 			continue
 		}
 
-		log.Printf("X-Plane: Updated Lon: %v, Lat: %v", lon, lat)
 		x.FsData.Position.Lon = lon.(float64)
 		x.FsData.Position.Lat = lat.(float64)
 
@@ -509,7 +565,7 @@ func (x *Xp12Connector) UpdatePosition() {
 	}
 }
 
-func (x *Xp12Connector) setDataref(datarefId string, value string) error {
+func (x *Xp12Connector) setDataref(datarefId string, value interface{}) error {
 	if x.wsConn == nil {
 		return fmt.Errorf("WebSocket connection not initialized")
 	}
@@ -524,41 +580,53 @@ func (x *Xp12Connector) setDataref(datarefId string, value string) error {
 	x.reqIdCounter++
 	msg := map[string]interface{}{
 		"req_id": x.reqIdCounter, // or any unique ID
-		"type":   "dataref_set_value",
+		"type":   "dataref_set_values",
 		"params": map[string]interface{}{
-			"id":    parsedID,
-			"value": value,
+			"datarefs": []map[string]interface{}{
+				{
+					"id":    parsedID, //1924248661648,
+					"value": value,
+				},
+			},
 		},
 	}
 
+	fmt.Println("Setting dataref value:", msg)
 	// Send message over WebSocket
 	return x.wsConn.WriteJSON(msg)
 }
 
 func (x *Xp12Connector) triggerCommand(commandId string) error {
-
-	if x.wsConn == nil {
-		return fmt.Errorf("WebSocket connection not initialized")
-	}
-
+	// Parse the command ID
 	parsedID, err := strconv.ParseInt(commandId, 10, 64)
 	if err != nil {
 		log.Printf("Failed to parse ID %s as integer: %v", commandId, err)
 		return err
 	}
 
-	// Build message to set dataref value
-	x.reqIdCounter++
-	msg := map[string]interface{}{
-		"req_id": x.reqIdCounter, // or any unique ID
-		"type":   "dataref_set_value",
-		"params": map[string]interface{}{
-			"id":        parsedID,
-			"is_active": true,
-			"duration":  0,
-		},
+	// Build the URL for the POST request
+	url := fmt.Sprintf("http://localhost:8086/api/v2/command/%d/activate", parsedID)
+
+	// Create the request body
+	requestBody := map[string]interface{}{
+		"duration": 0,
+	}
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
-	// Send message over WebSocket
-	return x.wsConn.WriteJSON(msg)
+	// Send the POST request
+	resp, err := http.Post(url, "application/json", strings.NewReader(string(jsonBody)))
+	if err != nil {
+		return fmt.Errorf("failed to send POST request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to activate command, status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }
