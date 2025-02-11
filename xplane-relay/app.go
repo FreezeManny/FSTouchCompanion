@@ -122,6 +122,11 @@ func (a *App) SetCom2Stby(frequency string) {
 }
 
 // ---------------- Flightsim Call  methods ----------------
+
+func (a *App) GetFsDataReference() *fsData.FsData {
+    return &a.fsData
+}
+
 func (a *App) SetCom1StbData(frequency string) {
 	a.fsData.Com1Stby = frequency
 	a.efbConnector.UpdateFrontendData(a.fsData)

@@ -75,7 +75,7 @@ type XPlaneData struct {
 
 func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector := &Xp12Connector{app: app}
-	connector.app.SetConnection(false)
+	connector.app.GetFsDataReference().Connected = false
 
 	// Parse embedded X-Plane data
 	var xplaneData []XPlaneData
@@ -120,7 +120,8 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		return nil, err
 	}
 	connector.wsConn = conn
-	connector.app.SetConnection(true)
+	connector.app.GetFsDataReference().Connected = true
+
 	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
 
 	connector.SubscribeAllDatarefs()
@@ -259,7 +260,7 @@ func (x *Xp12Connector) listenForMessages() {
 		_, message, err := x.wsConn.ReadMessage()
 		if err != nil {
 			log.Printf("X-Plane: WebSocket read error: %v", err)
-			x.app.SetConnection(false)
+			x.app.GetFsDataReference().Connected = false
 			return
 		}
 		log.Printf("X-Plane: Received message: %s", message)
@@ -411,26 +412,26 @@ func (x *Xp12Connector) SetInitialData() {
 		log.Printf("X-Plane: Failed to get COM1 active dataref value: %v", err)
 		return
 	}
-	x.app.SetCom1ActData(fmt.Sprintf("%v", val))
+	x.app.GetFsDataReference().Com1Act = fmt.Sprintf("%v", val)
 
 	val, err = x.getDatarefValue(x.IdData.Com1stby)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM1 standby dataref value: %v", err)
 		return
 	}
-	x.app.SetCom1StbData(fmt.Sprintf("%v", val))
+	x.app.GetFsDataReference().Com1Stby = fmt.Sprintf("%v", val)
 	val, err = x.getDatarefValue(x.IdData.Com2act)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM2 active dataref value: %v", err)
 		return
 	}
-	x.app.SetCom2ActData(fmt.Sprintf("%v", val))
+	x.app.GetFsDataReference().Com2Act = fmt.Sprintf("%v", val)
 	val, err = x.getDatarefValue(x.IdData.Com2stby)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM2 standby dataref value: %v", err)
 		return
 	}
-	x.app.SetCom2StbData(fmt.Sprintf("%v", val))
+	x.app.GetFsDataReference().Com2Stby = fmt.Sprintf("%v", val)
 }
 
 func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
@@ -460,13 +461,13 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 			strValue := fmt.Sprintf("%v", value)
 			switch name {
 			case "Com1 Active":
-				x.app.SetCom1ActData(strValue)
+				x.app.GetFsDataReference().Com1Act = strValue
 			case "Com1 Standby":
-				x.app.SetCom1StbData(strValue)
+				x.app.GetFsDataReference().Com1Stby = strValue
 			case "Com2 Active":
-				x.app.SetCom2ActData(strValue)
+				x.app.GetFsDataReference().Com2Act = strValue
 			case "Com2 Standby":
-				x.app.SetCom2StbData(strValue)
+				x.app.GetFsDataReference().Com2Stby = strValue
 			}
 		}
 		fmt.Printf("Type: %s, ID: %s (%s), Value: %v\n", message.Type, id, name, value)
@@ -490,7 +491,8 @@ func (x *Xp12Connector) UpdatePosition() {
 		}
 
 		log.Printf("X-Plane: Updated Lon: %v, Lat: %v", lon, lat)
-		x.app.SetPosition(lon.(float64), lat.(float64))
+		x.app.GetFsDataReference().Position.Lon = lon.(float64)
+		x.app.GetFsDataReference().Position.Lat = lat.(float64)
 
 		time.Sleep(120 * time.Second)
 	}
