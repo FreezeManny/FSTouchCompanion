@@ -137,12 +137,14 @@
   -->
   <hr class="!border-t-8" />
 
-  <VatsimFreqSelector
-    lat={FsData.Position.Lat}
-    long={FsData.Position.Lon}
-    setCom1Callback={com1Entry}
-    setCom2Callback={com2Entry}
-  />
+  {#if FsData.Position.Lat != 0.0 && FsData.Position.Lon != 0.0}
+    <VatsimFreqSelector
+      lat={FsData.Position.Lat}
+      long={FsData.Position.Lon}
+      setCom1Callback={com1Entry}
+      setCom2Callback={com2Entry}
+    />
+  {/if}
 {:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
