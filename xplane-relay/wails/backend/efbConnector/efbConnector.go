@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"sync"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
@@ -26,8 +27,9 @@ type EfbConnector struct {
 	ctx              context.Context // Add a context to emit events
 	ConnectionNumber int32           // Use int32 for atomic operations
 	currData         fsData.FsData
-	wsConn           *websocket.Conn // Add WebSocket connection field
+	wsConns          []*websocket.Conn // Store multiple WebSocket connections
 	comInt           ComInterface
+	mu               sync.Mutex // Mutex to protect wsConns slice
 }
 
 // Allows the app to pass Wails' context to the connector
@@ -100,7 +102,9 @@ func (e *EfbConnector) StartWebSocketServer() {
 		}
 		defer ws.Close()
 
-		e.wsConn = ws // Store the WebSocket connection
+		e.mu.Lock()
+		e.wsConns = append(e.wsConns, ws) // Add the WebSocket connection to the slice
+		e.mu.Unlock()
 
 		atomic.AddInt32(&e.ConnectionNumber, 1)
 		// Emit new connection count
@@ -117,7 +121,7 @@ func (e *EfbConnector) StartWebSocketServer() {
 			}
 		}
 
-		defer e.handleWebSocketDisconnect()
+		defer e.handleWebSocketDisconnect(ws)
 
 		for {
 			msgType, msg, err := ws.ReadMessage()
@@ -143,18 +147,33 @@ func (e *EfbConnector) StartWebSocketServer() {
 	}()
 }
 
-func (e *EfbConnector) handleWebSocketDisconnect() {
+func (e *EfbConnector) handleWebSocketDisconnect(ws *websocket.Conn) {
 	atomic.AddInt32(&e.ConnectionNumber, -1)
 	fmt.Println("Connection Number: ", e.ConnectionNumber)
 	// Emit updated count on disconnect
 	runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
+
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	for i, conn := range e.wsConns {
+		if conn == ws {
+			e.wsConns = append(e.wsConns[:i], e.wsConns[i+1:]...)
+			break
+		}
+	}
 }
 
 func (e *EfbConnector) sendWebSocketMessage(messageType int, data []byte) error {
-	if e.wsConn != nil {
-		return e.wsConn.WriteMessage(messageType, data)
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	for _, ws := range e.wsConns {
+		if ws != nil {
+			if err := ws.WriteMessage(messageType, data); err != nil {
+				log.Println("Error sending WebSocket message:", err)
+			}
+		}
 	}
-	return fmt.Errorf("WebSocket connection is not established")
+	return nil
 }
 
 func (e *EfbConnector) UpdateFrontendData(data fsData.FsData) {
