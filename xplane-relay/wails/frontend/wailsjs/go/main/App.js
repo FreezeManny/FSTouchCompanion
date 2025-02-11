@@ -6,6 +6,10 @@ export function ChangeFlightSim(arg1) {
   return window['go']['main']['App']['ChangeFlightSim'](arg1);
 }
 
+export function GetAircraftName() {
+  return window['go']['main']['App']['GetAircraftName']();
+}
+
 export function GetConnectionCount() {
   return window['go']['main']['App']['GetConnectionCount']();
 }

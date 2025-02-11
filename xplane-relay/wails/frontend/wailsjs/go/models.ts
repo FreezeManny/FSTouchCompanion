@@ -16,7 +16,6 @@ export namespace structs {
 	}
 	export class FsData {
 	    Position: Position;
-	    Aircraft: string;
 	    Com1Stby: string;
 	    Com1Act: string;
 	    Com2Stby: string;
@@ -29,7 +28,6 @@ export namespace structs {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Position = this.convertValues(source["Position"], Position);
-	        this.Aircraft = source["Aircraft"];
 	        this.Com1Stby = source["Com1Stby"];
 	        this.Com1Act = source["Com1Act"];
 	        this.Com2Stby = source["Com2Stby"];

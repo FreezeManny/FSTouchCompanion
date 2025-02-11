@@ -87,6 +87,11 @@ func (a *App) GetConnectionStatus() bool {
 	//return false
 	return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
 }
+
+func (a *App) GetAircraftName() string {
+	return a.fsConnector.GetAircraftName() // Call the GetAircraftName method on the fsConnector
+}
+
 func (a *App) ReconnectFlightSim() error {
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {

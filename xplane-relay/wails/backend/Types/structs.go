@@ -7,7 +7,6 @@ type Position struct {
 
 type FsData struct {
 	Position Position
-	Aircraft string
 	Com1Stby string
 	Com1Act  string
 	Com2Stby string

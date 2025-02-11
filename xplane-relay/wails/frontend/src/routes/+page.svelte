@@ -3,9 +3,9 @@
 	import { writable } from 'svelte/store'; // Import writable store
 	import runtime from '@wailsapp/runtime';
 
-	import { GetConnectionCount, ChangeFlightSim } from '../../wailsjs/go/main/App';
+	import { GetConnectionCount, GetAircraftName } from '../../wailsjs/go/main/App';
 
-	let selectedAircraft: string = 'Cessna 172';
+	const selectedAircraft = writable('-----'); // Use writable store
 	const connectedClients = writable(0); // Use writable store
 	//let logOpen: boolean = false
 
@@ -17,6 +17,9 @@
 			try {
 				const count = await GetConnectionCount();
 				connectedClients.set(count); // Set value using store
+				const name = await GetAircraftName();
+				console.log('Aircraft Name:', name);
+				selectedAircraft.set(name); // Set value using store
 				console.log('Connected Clients:', count);
 			} catch (error) {
 				console.error('Error fetching connection number:', error);
@@ -32,7 +35,7 @@
 </script>
 
 <div class="card p-4 m-2 d-flex justify-content-between">
-	<div>Selected Aircraft: {selectedAircraft}</div>
+	<div>Selected Aircraft: {$selectedAircraft}</div>
 	<div>Connected Clients: {$connectedClients}</div>
 	<!-- Access value from store -->
 </div>

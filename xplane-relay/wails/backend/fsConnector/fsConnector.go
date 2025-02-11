@@ -17,4 +17,6 @@ type FsConnector interface {
 	SetCom2Stby(frequency string) error
 
 	GetConnectionStatus() bool
+
+	GetAircraftName() string
 }

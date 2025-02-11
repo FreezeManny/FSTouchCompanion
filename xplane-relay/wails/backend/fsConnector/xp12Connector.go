@@ -142,6 +142,20 @@ func (x *Xp12Connector) GetConnectionStatus() bool {
 	return x.connectionStatus
 }
 
+func (x *Xp12Connector) GetAircraftName() string {
+	// Trim leading and trailing whitespace
+	aircraftName := strings.TrimSpace(x.AircraftName)
+
+	// Remove non-printable characters
+	cleanedAircraftName := ""
+	for _, r := range aircraftName {
+		if r >= 32 && r <= 126 {
+			cleanedAircraftName += string(r)
+		}
+	}
+	return cleanedAircraftName
+}
+
 func (x *Xp12Connector) SwitchCom1() error {
 	// Implement the logic for SwitchCom1
 	fmt.Println("X-Plane: SwitchCom1")
@@ -462,7 +476,7 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 
 func (x *Xp12Connector) UpdatePosition() {
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(120 * time.Second)
 
 		lon, err := x.getDatarefValue(x.IdData.Lon)
 		if err != nil {

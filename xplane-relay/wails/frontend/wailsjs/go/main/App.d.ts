@@ -4,6 +4,8 @@ import {structs} from '../models';
 
 export function ChangeFlightSim(arg1:string):Promise<void>;
 
+export function GetAircraftName():Promise<string>;
+
 export function GetConnectionCount():Promise<number>;
 
 export function GetConnectionStatus():Promise<boolean>;

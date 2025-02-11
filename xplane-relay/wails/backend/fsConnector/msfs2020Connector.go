@@ -19,6 +19,10 @@ func (m *Msfs2020Connector) GetConnectionStatus() bool {
 	return m.connectionStatus
 }
 
+func (m *Msfs2020Connector) GetAircraftName() string {
+	return "MSFS2020 - C172"
+}
+
 func (m *Msfs2020Connector) SwitchCom1() error {
 	// Implement the logic for SwitchCom1
 	fmt.Println("MSFS2020: SwitchCom1")
