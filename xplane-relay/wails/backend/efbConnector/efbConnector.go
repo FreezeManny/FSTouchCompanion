@@ -209,6 +209,7 @@ func (e *EfbConnector) UpdateFrontendData(data fsData.FsData) {
 			fmt.Println("No changes in frontend data")
 		}
 
+		fmt.Println(e.currData, data)
 		// Update the current data with the new data
 		e.currData = data
 	} else {

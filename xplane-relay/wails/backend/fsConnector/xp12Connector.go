@@ -476,7 +476,6 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 
 func (x *Xp12Connector) UpdatePosition() {
 	for {
-		time.Sleep(120 * time.Second)
 
 		lon, err := x.getDatarefValue(x.IdData.Lon)
 		if err != nil {
@@ -491,5 +490,7 @@ func (x *Xp12Connector) UpdatePosition() {
 
 		log.Printf("X-Plane: Updated Lon: %v, Lat: %v", lon, lat)
 		x.app.SetPosition(lon.(float64), lat.(float64))
+
+		time.Sleep(120 * time.Second)
 	}
 }
