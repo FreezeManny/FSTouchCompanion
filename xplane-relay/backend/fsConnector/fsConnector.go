@@ -7,6 +7,8 @@ type FsDataInterface interface {
 	SetCom2StbData(frequency string)
 
 	SetPosition(lon float64, lat float64)
+
+	SetConnection(status bool)
 }
 
 type FsConnector interface {

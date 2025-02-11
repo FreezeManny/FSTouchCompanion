@@ -1,149 +1,32 @@
 <script lang="js">
-  import { AppBar } from "@skeletonlabs/skeleton";
   import { onMount, onDestroy } from "svelte";
 
   import { settings } from "$lib/stores";
-  import aircraftData from "./aircraftData.json";
 
-  import { formatFrequency, isBase64, processData } from "./utils";
   import RadioDisplay from "./radio/RadioDisplay.svelte";
 
   import VatsimFreqSelector from "./frequencySelector/atcFreqSelector.svelte";
 
-  let currentLatitude = 0; // Example latitude
-  let currentLongitude = 0; // Example longitude
-
-  let aircraftFound = true;
   let isWebSocketOpen = false;
 
-  let COM1_ACT_FREQ = "------";
-  let COM1_STBY_FREQ = "------";
-  let COM2_ACT_FREQ = "------";
-  let COM2_STBY_FREQ = "------";
-  let AIRCRAFT_NAME;
+  // FsData struct
+  let FsData = {
+    Connected: false,
+    Position: { Lon: 0.0, Lat: 0.0 },
+    Com1Stby: "------",
+    Com1Act: "------",
+    Com2Stby: "------",
+    Com2Act: "------",
+  };
 
-  let LONGITUDE_DATAREF = "sim/flightmodel/position/longitude";
-  let LATITUDE_DATAREF = "sim/flightmodel/position/latitude";
-  let LONGITUDE_ID, LATITUDE_ID;
-
-  let AIRCRAFT_NAME_ID;
-  let COM1_ACT_ID, COM1_STBY_ID;
-  let COM2_ACT_ID, COM2_STBY_ID;
-
-  //const wsAddress = "ws://localhost:8086/api/v1";
   const wsPort = "8080";
-  const httpPort = "8081";
-  const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}`;
-  const httpAddress = `http://${$settings.flightSimAddress}:${httpPort}/api/v1`;
+  const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
 
   let ws;
-  let req_id = 1;
-  let LongLatIntervalID;
 
-  onMount(async () => {
-    // Datarefs from aircraftData.json
-    AIRCRAFT_NAME_ID = await getDatarefID("sim/aircraft/view/acf_ui_name");
-    AIRCRAFT_NAME = await getDatarefValue(AIRCRAFT_NAME_ID);
-
-    LONGITUDE_ID = await getDatarefID(LONGITUDE_DATAREF);
-    LATITUDE_ID = await getDatarefID(LATITUDE_DATAREF);
-
-    if (!AIRCRAFT_NAME) {
-      console.error("Aircraft Name not found");
-      return;
-    }
-    await updateAircraftData(true);
-    await loadInitialData(); // Fetch initial values for frequencies
-
-    // update Coordinates every 60 seconds
-    updateCoordinates();
-    updateCoordinatesInterval(60000);
+  onMount(() => {
+    webSocketFunction();
   });
-
-  async function loadInitialData() {
-    try {
-      COM1_ACT_FREQ = (await getDatarefValue(COM1_ACT_ID)) || "------";
-      COM1_STBY_FREQ = (await getDatarefValue(COM1_STBY_ID)) || "------";
-      COM2_ACT_FREQ = (await getDatarefValue(COM2_ACT_ID)) || "------";
-      COM2_STBY_FREQ = (await getDatarefValue(COM2_STBY_ID)) || "------";
-    } catch (error) {
-      console.error("Error loading initial frequency values:", error);
-    }
-  }
-
-  // Function to update aircraft data when aircraft name changes
-  async function updateAircraftData(initLoad = false) {
-    let aircraft = loadAircraftData();
-
-    console.log("Aircraft Config:", aircraft);
-    aircraftFound = !!aircraft;
-
-    if (!aircraftFound) {
-      console.error("Aircraft not found in Config");
-      return;
-    } else {
-      const COM1_DataRefs = aircraft.data.com1.dataRef;
-      const COM2_DataRefs = aircraft.data.com2.dataRef;
-
-      // Get new dataref IDs for COM frequencies
-      await Promise.all([
-        getDatarefID(COM1_DataRefs.active).then((id) => (COM1_ACT_ID = id)),
-        getDatarefID(COM1_DataRefs.standby).then((id) => (COM1_STBY_ID = id)),
-        getDatarefID(COM2_DataRefs.active).then((id) => (COM2_ACT_ID = id)),
-        getDatarefID(COM2_DataRefs.standby).then((id) => (COM2_STBY_ID = id)),
-      ]).then(() => {
-        // Resubscribe to datarefs with new IDs
-        if (!initLoad) {
-          unsubscribeDataRefs(); // Unsubscribe from old datarefs
-          subscribeDataRefs(); // Subscribe to new datarefs
-        } else {
-          webSocketFunction();
-        }
-      });
-    }
-  }
-
-  function loadAircraftData() {
-    const defaultAircraft = aircraftData.find((a) =>
-      a.name.includes("default"),
-    );
-    const selectedAircraft =
-      aircraftData.find((a) => a.name.includes(AIRCRAFT_NAME)) ||
-      defaultAircraft;
-
-    const aircraft = {
-      ...defaultAircraft,
-      ...selectedAircraft,
-      data: {
-        ...defaultAircraft.data,
-        ...selectedAircraft.data,
-        com1: {
-          ...defaultAircraft.data.com1,
-          ...selectedAircraft.data.com1,
-        },
-        com2: {
-          ...defaultAircraft.data.com2,
-          ...selectedAircraft.data.com2,
-        },
-      },
-    };
-    return aircraft;
-  }
-
-  function unsubscribeDataRefs() {
-    console.log("Unsubscribing from datarefs");
-    if (ws) {
-      // Unsubscribe from all datarefs
-      const unsubscribeMessage = {
-        req_id: req_id++,
-        type: "dataref_unsubscribe_values",
-        params: {
-          datarefs: "all",
-        },
-      };
-      ws.send(JSON.stringify(unsubscribeMessage));
-    }
-  }
 
   function webSocketFunction() {
     ws = new WebSocket(wsAddress);
@@ -152,56 +35,43 @@
     ws.onopen = () => {
       console.log("WebSocket connection established");
       isWebSocketOpen = true;
-      subscribeDataRefs();
     };
 
     // Update the WebSocket message handler to process aircraft name and check for new COM data
     ws.onmessage = (event) => {
       try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const message = JSON.parse(reader.result);
+        console.log("WebSocket message received:", event.data);
+        const message = JSON.parse(event.data);
 
-            if (message.hasOwnProperty("data")) {
-              let data = message.data;
-              if (message.type === "dataref_update_values") {
-                if (data[COM1_ACT_ID]) {
-                  COM1_ACT_FREQ = data[COM1_ACT_ID];
-                }
-                if (data[COM1_STBY_ID]) {
-                  COM1_STBY_FREQ = data[COM1_STBY_ID];
-                }
-                if (data[COM2_ACT_ID]) {
-                  COM2_ACT_FREQ = data[COM2_ACT_ID];
-                }
-                if (data[COM2_STBY_ID]) {
-                  COM2_STBY_FREQ = data[COM2_STBY_ID];
-                }
-                if (data[AIRCRAFT_NAME_ID]) {
-                  const newAircraftName = processData(data[AIRCRAFT_NAME_ID]);
-                  if (AIRCRAFT_NAME !== newAircraftName) {
-                    AIRCRAFT_NAME = newAircraftName;
-                    console.log("Aircraft Name changed to:", AIRCRAFT_NAME);
-                    updateAircraftData();
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            console.error("Error parsing WebSocket message:", error);
-          }
-        };
-        reader.readAsText(event.data);
+        if (message.Connected) {
+          FsData.Connected = message.Connected || false;
+        }
+        if (message.Position) {
+          FsData.Position = {
+            ...FsData.Position,
+            ...message.Position,
+          };
+        }
+        if (message.Com1Stby) {
+          FsData.Com1Stby = message.Com1Stby || "------";
+        }
+        if (message.Com1Act) {
+          FsData.Com1Act = message.Com1Act || "------";
+        }
+        if (message.Com2Stby) {
+          FsData.Com2Stby = message.Com2Stby || "------";
+        }
+        if (message.Com2Act) {
+          FsData.Com2Act = message.Com2Act || "------";
+        }
       } catch (error) {
-        console.error("Error processing WebSocket message:", error);
+        console.error("Error parsing WebSocket message:", error);
       }
     };
 
     ws.onclose = () => {
-      //console.log("WebSocket connection closed. Reconnecting in", RECONNECT_INTERVAL, "ms");
+      console.log("WebSocket connection closed");
       isWebSocketOpen = false;
-      //setTimeout(webSocketFunction, RECONNECT_INTERVAL);
     };
 
     ws.onerror = (error) => {
@@ -209,169 +79,81 @@
     };
   }
 
-  async function subscribeDataRefs() {
-    const datarefs = [
-      { id: COM1_ACT_ID },
-      { id: COM1_STBY_ID },
-      { id: COM2_ACT_ID },
-      { id: COM2_STBY_ID },
-      { id: AIRCRAFT_NAME_ID },
-    ];
-    const message = {
-      req_id: req_id++,
-      type: "dataref_subscribe_values",
-      params: { datarefs },
-    };
-    console.log("Subscribing to datarefs:", datarefs);
-    ws.send(JSON.stringify(message));
-  }
-
-  async function getDatarefID(datarefName) {
-    const url = `${httpAddress}/datarefs?filter[name]=${datarefName}`;
-    console.log("Fetching dataref ID:", url);
-    try {
-      const response = await fetch(url, {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch dataref ID");
-      }
-      const result = await response.json();
-      if (result.data && result.data.length > 0) {
-        return result.data[0].id;
-      } else {
-        throw new Error(`Dataref ${datarefName} not found`);
-      }
-    } catch (error) {
-      console.error("Error fetching dataref ID:", error);
-    }
-  }
-
-  async function getDatarefValue(id) {
-    try {
-      const url = `${httpAddress}/datarefs/${id}/value`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(`${result.error_message} (Code: ${result.error_code})`);
-      }
-      if (result.data !== undefined) {
-        return processData(result.data);
-      } else {
-        throw new Error(`Dataref ${id} not found`);
-      }
-    } catch (error) {
-      console.error("Error fetching dataref ID:", error);
-    }
-  }
-
-  function setDataRefValue(datarefIdOrDatarefs, value) {
-    let datarefs;
-    if (Array.isArray(datarefIdOrDatarefs)) {
-      datarefs = datarefIdOrDatarefs;
-    } else {
-      datarefs = [{ id: datarefIdOrDatarefs, value }];
-    }
-    const message = {
-      req_id: req_id++,
-      type: "dataref_set_values",
-      params: {
-        datarefs,
-      },
-    };
-    ws.send(JSON.stringify(message));
-  }
-
   function com1Switch() {
-    let tmpAct = COM1_ACT_FREQ;
-    let tmpStby = COM1_STBY_FREQ;
-    setDataRefValue([
-      { id: COM1_ACT_ID, value: tmpStby },
-      { id: COM1_STBY_ID, value: tmpAct },
-    ]);
+    console.log("COM1 Switched");
+    let tmp = {
+      com1Switch: true,
+    };
+    ws.send(JSON.stringify(tmp));
   }
 
   function com2Switch() {
-    let tmpAct = COM2_ACT_FREQ;
-    let tmpStby = COM2_STBY_FREQ;
-    setDataRefValue([
-      { id: COM2_ACT_ID, value: tmpStby },
-      { id: COM2_STBY_ID, value: tmpAct },
-    ]);
-  }
-
-  async function updateCoordinates() {
-    try {
-      currentLongitude = await getDatarefValue(LONGITUDE_ID);
-      currentLatitude = await getDatarefValue(LATITUDE_ID);
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-    }
-  }
-
-  function updateCoordinatesInterval(interval) {
-    LongLatIntervalID = setInterval(async () => {
-      updateCoordinates();
-    }, interval);
+    console.log("COM2 Switched");
+    let tmp = {
+      com2Switch: true,
+    };
+    ws.send(JSON.stringify(tmp));
   }
 
   function com1Entry(frequency) {
-    console.log("COM1 Frequency Changed to: " + typeof frequency);
-    setDataRefValue(COM1_STBY_ID, frequency);
+    console.log("COM1 Frequency Changed to: " + frequency);
+    let tmp = {
+      com1Stby: String(frequency),
+    };
+    ws.send(JSON.stringify(tmp));
   }
 
   function com2Entry(frequency) {
     console.log("COM2 Frequency Changed to: " + frequency);
-    setDataRefValue(COM2_STBY_ID, frequency);
+    let tmp = {
+      com2Stby: String(frequency),
+    };
+    ws.send(JSON.stringify(tmp));
   }
 
   onDestroy(() => {
     if (ws) {
-      unsubscribeDataRefs();
       ws.close();
-    }
-    if (LongLatIntervalID) {
-      clearInterval(LongLatIntervalID);
     }
   });
 </script>
 
-{#if isWebSocketOpen && aircraftFound}
-  <RadioDisplay
-    {COM1_ACT_FREQ}
-    {COM1_STBY_FREQ}
-    {COM2_ACT_FREQ}
-    {COM2_STBY_FREQ}
-    com1SwitchCallback={com1Switch}
-    com2SwitchCallback={com2Switch}
-    com1EntryCallback={com1Entry}
-    com2EntryCallback={com2Entry}
-  />
-  <!--
-  <div class="block card card-hover m-4 p-4 text-lg">
-    Selected Aircraft: {AIRCRAFT_NAME}
-  </div>
-  -->
-  <hr class="!border-t-8" />
+{#if isWebSocketOpen}
+  {#if FsData.Connected}
+    <RadioDisplay
+      COM1_ACT_FREQ={FsData.Com1Act}
+      COM1_STBY_FREQ={FsData.Com1Stby}
+      COM2_ACT_FREQ={FsData.Com2Act}
+      COM2_STBY_FREQ={FsData.Com2Stby}
+      com1SwitchCallback={com1Switch}
+      com2SwitchCallback={com2Switch}
+      com1EntryCallback={com1Entry}
+      com2EntryCallback={com2Entry}
+    />
 
-  <VatsimFreqSelector lat={currentLatitude} long={currentLongitude} setCom1Callback={com1Entry} setCom2Callback={com2Entry}/>
+    <hr class="!border-t-8" />
+
+    {#if FsData.Position.Lat != 0.0 && FsData.Position.Lon != 0.0}
+      <VatsimFreqSelector
+        lat={FsData.Position.Lat}
+        long={FsData.Position.Lon}
+        setCom1Callback={com1Entry}
+        setCom2Callback={com2Entry}
+      />
+    {/if}
+  {:else}
+    <aside class="alert variant-filled-warning m-5">
+      <!-- Message -->
+      <div class="alert-message">
+        <h3 class="h3">FlightSim not Connected to fsConnect</h3>
+      </div>
+    </aside>
+  {/if}
 {:else}
   <aside class="alert variant-filled-warning m-5">
     <!-- Message -->
     <div class="alert-message">
-      <h3 class="h3">
-        {#if !isWebSocketOpen}
-          WebSocket connection failed
-        {:else if !aircraftFound}
-          Aircraft not found in Config
-        {/if}
-      </h3>
+      <h3 class="h3">WebSocket connection failed</h3>
     </div>
   </aside>
 {/if}

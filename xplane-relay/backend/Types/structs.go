@@ -6,9 +6,10 @@ type Position struct {
 }
 
 type FsData struct {
-	Position Position
-	Com1Stby string
-	Com1Act  string
-	Com2Stby string
-	Com2Act  string
+	Connected bool
+	Position  Position
+	Com1Stby  string
+	Com1Act   string
+	Com2Stby  string
+	Com2Act   string
 }

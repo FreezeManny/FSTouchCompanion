@@ -84,8 +84,7 @@ func (a *App) ChangeFlightSim(sim string) error {
 }
 
 func (a *App) GetConnectionStatus() bool {
-	return false
-	//return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
+	return a.fsData.Connected
 }
 
 func (a *App) GetAircraftName() string {
@@ -146,5 +145,10 @@ func (a *App) SetCom2ActData(frequency string) {
 func (a *App) SetPosition(lon float64, lat float64) {
 	a.fsData.Position.Lon = lon
 	a.fsData.Position.Lat = lat
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}
+
+func (a *App) SetConnection(status bool) {
+	a.fsData.Connected = status
 	a.efbConnector.UpdateFrontendData(a.fsData)
 }

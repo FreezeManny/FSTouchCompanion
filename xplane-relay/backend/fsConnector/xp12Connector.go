@@ -75,7 +75,7 @@ type XPlaneData struct {
 
 func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector := &Xp12Connector{app: app}
-	connector.connectionStatus = false
+	connector.app.SetConnection(false)
 
 	// Parse embedded X-Plane data
 	var xplaneData []XPlaneData
@@ -120,7 +120,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		return nil, err
 	}
 	connector.wsConn = conn
-	connector.connectionStatus = true
+	connector.app.SetConnection(true)
 	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
 
 	connector.SubscribeAllDatarefs()
@@ -259,7 +259,7 @@ func (x *Xp12Connector) listenForMessages() {
 		_, message, err := x.wsConn.ReadMessage()
 		if err != nil {
 			log.Printf("X-Plane: WebSocket read error: %v", err)
-			x.connectionStatus = false
+			x.app.SetConnection(false)
 			return
 		}
 		log.Printf("X-Plane: Received message: %s", message)
