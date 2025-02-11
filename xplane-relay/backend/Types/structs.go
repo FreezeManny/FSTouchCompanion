@@ -14,3 +14,11 @@ type FsData struct {
 	Com2Stby     string
 	Com2Act      string
 }
+
+// FlightsimE
+type FlightSim int
+
+const (
+	XPlane12 FlightSim = iota
+	FS2020
+)

@@ -2,13 +2,14 @@ package fsConnector
 
 import (
 	"errors"
+	fsData "fsConnector/backend/Types"
 )
 
-func NewFsConnector(sim string, app FsDataInterface) (FsConnector, error) {
+func NewFsConnector(sim fsData.FlightSim, app FsDataInterface) (FsConnector, error) {
 	switch sim {
-	case "xplane12":
+	case fsData.XPlane12:
 		return NewXPlane12Connector(app)
-	case "msfs2020":
+	case fsData.FS2020:
 		return NewMsfs2020Connector(app)
 	}
 

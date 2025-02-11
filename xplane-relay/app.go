@@ -17,7 +17,7 @@ type App struct {
 	fsData       fsData.FsData
 	fsConnector  fsConnector.FsConnector
 
-	flightSim string
+	flightSim fsData.FlightSim
 }
 
 // NewApp creates a new App application struct
@@ -45,7 +45,7 @@ func (a *App) startup(ctx context.Context) {
 	a.efbConnector = connector
 
 	// Create the FsConnector
-	fsConn, err := fsConnector.NewFsConnector("xplane12", a)
+	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
 		fmt.Println("Error creating FsConnector:", err)
 		return
@@ -61,7 +61,7 @@ func (a *App) startup(ctx context.Context) {
 
 // ------ Functions for Wails Frontend -------
 // ChangeFlightSim changes the flight simulator and updates the fsConnector
-func (a *App) ChangeFlightSim(sim string) error {
+func (a *App) ChangeFlightSim(sim fsData.FlightSim) error {
 	a.flightSim = sim
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
