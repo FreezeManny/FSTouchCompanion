@@ -59,16 +59,7 @@ func (a *App) startup(ctx context.Context) {
 	}()
 }
 
-// GetConnectionCount returns the number of active WebSocket connections
-func (a *App) GetConnectionCount() int {
-	return a.efbConnector.GetConnectionNumber() // Call the GetConnectionNumber function on the instance
-}
-
-func (a *App) SetFsData(data fsData.FsData) {
-	a.fsData = data
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
+// ------ Functions for Wails Frontend -------
 // ChangeFlightSim changes the flight simulator and updates the fsConnector
 func (a *App) ChangeFlightSim(sim string) error {
 	a.flightSim = sim
@@ -83,7 +74,10 @@ func (a *App) ChangeFlightSim(sim string) error {
 	return nil
 }
 
-// ------ Functions for Wails Frontend -------
+// GetConnectionCount returns the number of active WebSocket connections
+func (a *App) GetConnectionCount() int {
+	return a.efbConnector.GetConnectionNumber() // Call the GetConnectionNumber function on the instance
+}
 
 func (a *App) GetConnectionStatus() bool {
 	return a.fsData.Connected
@@ -121,4 +115,10 @@ func (a *App) SetCom1Stby(frequency string) {
 
 func (a *App) SetCom2Stby(frequency string) {
 	a.fsConnector.SetCom2Stby(frequency) // Call the SetCom2Stby method on the fsConnector
+}
+
+// ------ fsConnect Interface methods ------
+func (a *App) SetFsData(data fsData.FsData) {
+	a.fsData = data
+	a.efbConnector.UpdateFrontendData(a.fsData)
 }
