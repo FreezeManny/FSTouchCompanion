@@ -13,7 +13,7 @@ import (
 type App struct {
 	ctx context.Context
 
-	efbConnector efbConnector.EfbConnector // Changed to a pointer
+	efbConnector *efbConnector.EfbConnector // Changed to a pointer
 	fsData       fsData.FsData
 	fsConnector  fsConnector.FsConnector
 
@@ -42,7 +42,7 @@ func (a *App) startup(ctx context.Context) {
 	// Pass App (which has the COM methods) to the connector
 	connector.SetComInterface(a)
 
-	a.efbConnector = *connector
+	a.efbConnector = connector
 
 	// Create the FsConnector
 	fsConn, err := fsConnector.NewFsConnector("xplane12", a)
