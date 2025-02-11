@@ -137,3 +137,9 @@ func (a *App) SetCom2ActData(frequency string) {
 	a.fsData.Com2Act = frequency
 	a.efbConnector.UpdateFrontendData(a.fsData)
 }
+
+func (a *App) SetPosition(lon float64, lat float64) {
+	a.fsData.Position.Lon = lon
+	a.fsData.Position.Lat = lat
+	a.efbConnector.UpdateFrontendData(a.fsData)
+}

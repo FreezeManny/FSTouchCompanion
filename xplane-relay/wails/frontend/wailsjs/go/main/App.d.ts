@@ -24,6 +24,8 @@ export function SetCom2Stby(arg1:string):Promise<void>;
 
 export function SetFsData(arg1:structs.FsData):Promise<void>;
 
+export function SetPosition(arg1:number,arg2:number):Promise<void>;
+
 export function SwitchCom1():Promise<void>;
 
 export function SwitchCom2():Promise<void>;

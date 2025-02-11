@@ -5,6 +5,8 @@ type FsDataInterface interface {
 	SetCom1StbData(frequency string)
 	SetCom2ActData(frequency string)
 	SetCom2StbData(frequency string)
+
+	SetPosition(lon float64, lat float64)
 }
 
 type FsConnector interface {

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -127,6 +128,9 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	// Start listening for messages
 	go connector.listenForMessages()
 
+	// Start updating Lon and Lat every 10 seconds
+	go connector.UpdatePosition()
+
 	return connector, nil
 }
 
@@ -141,18 +145,6 @@ func (x *Xp12Connector) GetConnectionStatus() bool {
 func (x *Xp12Connector) SwitchCom1() error {
 	// Implement the logic for SwitchCom1
 	fmt.Println("X-Plane: SwitchCom1")
-	dataRefID, err := x.getDatarefID("sim/aircraft/view/acf_ui_name")
-	if err != nil {
-		log.Printf("X-Plane: Failed to get dataref ID: %v", err)
-		return err
-	}
-	fmt.Println("Dataref ID:", dataRefID)
-	dataRefValue, err := x.getDatarefValue(dataRefID)
-	if err != nil {
-		log.Printf("X-Plane: Failed to get dataref Value: %v", err)
-		return err
-	}
-	fmt.Println("Dataref value:", dataRefValue)
 	return nil
 }
 
@@ -466,4 +458,24 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 	}
 
 	return nil
+}
+
+func (x *Xp12Connector) UpdatePosition() {
+	for {
+		time.Sleep(10 * time.Second)
+
+		lon, err := x.getDatarefValue(x.IdData.Lon)
+		if err != nil {
+			log.Printf("X-Plane: Failed to get longitude dataref value: %v", err)
+			continue
+		}
+		lat, err := x.getDatarefValue(x.IdData.Lat)
+		if err != nil {
+			log.Printf("X-Plane: Failed to get latitude dataref value: %v", err)
+			continue
+		}
+
+		log.Printf("X-Plane: Updated Lon: %v, Lat: %v", lon, lat)
+		x.app.SetPosition(lon.(float64), lat.(float64))
+	}
 }

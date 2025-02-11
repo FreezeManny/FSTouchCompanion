@@ -46,6 +46,10 @@ export function SetFsData(arg1) {
   return window['go']['main']['App']['SetFsData'](arg1);
 }
 
+export function SetPosition(arg1, arg2) {
+  return window['go']['main']['App']['SetPosition'](arg1, arg2);
+}
+
 export function SwitchCom1() {
   return window['go']['main']['App']['SwitchCom1']();
 }
