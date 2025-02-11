@@ -20,6 +20,10 @@ import (
 //go:embed xplaneData.json
 var xplaneDataJSON []byte
 
+const xplanePort = 8086
+
+var httpAddress = fmt.Sprintf("http://localhost:%d/api/v2", xplanePort) // Replace with your actual HTTP server address
+
 type Xp12Connector struct {
 	app              FsDataInterface
 	connectionStatus bool
@@ -87,23 +91,19 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		log.Printf("X-Plane: Failed to parse X-Plane data: %v", err)
 		return nil, err
 	}
+	connector.xplaneData = xplaneData
 
-	lon, err := connector.getDatarefID("sim/flightmodel/position/longitude")
+	connector.IdData.Lon, err = connector.getDatarefID("sim/flightmodel/position/longitude")
 	if err != nil {
 		log.Printf("X-Plane: Error fetching longitude dataref ID: %v", err)
 		return nil, err
 	}
 
-	lat, err := connector.getDatarefID("sim/flightmodel/position/latitude")
+	connector.IdData.Lat, err = connector.getDatarefID("sim/flightmodel/position/latitude")
 	if err != nil {
 		log.Printf("X-Plane: Error fetching latitude dataref ID: %v", err)
 		return nil, err
 	}
-
-	connector.IdData.Lon = lon
-	connector.IdData.Lat = lat
-
-	connector.xplaneData = xplaneData
 
 	connector.IdData.AircraftName, _ = connector.getDatarefID("sim/aircraft/view/acf_ui_name")
 	val, err := connector.getDatarefValue(connector.IdData.AircraftName)
@@ -116,7 +116,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 
 	// WebSocket connection setup
 	var dialer websocket.Dialer
-	wsURL := "ws://localhost:8086/api/v2" // Replace with your WebSocket server URL
+	wsURL := fmt.Sprintf("ws://localhost:%d/api/v2", xplanePort) // Replace with your WebSocket server URL
 	conn, _, err := dialer.Dial(wsURL, nil)
 	if err != nil {
 		log.Printf("X-Plane: Failed to connect to WebSocket server: %v", err)
@@ -198,6 +198,11 @@ func (x *Xp12Connector) changeAircraft() error {
 
 	fmt.Println("X-Plane: Changed Aircraft")
 
+	return x.loadIDs()
+}
+
+func (x *Xp12Connector) loadIDs() error {
+	// Implement the logic for changing the aircraft
 	// Get IDs for all datarefs
 	var err error
 	x.IdData.Com1act, err = x.getDatarefID(x.selectedAircraftData.Data.Com1.DataRef.Active)
@@ -228,7 +233,6 @@ func (x *Xp12Connector) changeAircraft() error {
 	}
 
 	// Log the IDs to verify they are set correctly
-
 	return nil
 }
 
@@ -298,47 +302,50 @@ func (x *Xp12Connector) listenForMessages() {
 	}
 }
 
-func (x *Xp12Connector) getDatarefID(datarefName string) (string, error) {
-	httpAddress := "http://localhost:8086/api/v2" // Replace with your actual HTTP server address
-	url := fmt.Sprintf("%s/datarefs?filter[name]=%s", httpAddress, datarefName)
-
+func (x *Xp12Connector) fetchID(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Printf("X-Plane: Failed to fetch dataref ID: %v", err)
-		return "", err
+		return "", fmt.Errorf("failed to fetch ID: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to fetch dataref ID, status code: %d", resp.StatusCode)
+		return "", fmt.Errorf("failed to fetch ID, status code: %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("X-Plane: Failed to read response body: %v", err)
-		return "", err
+		return "", fmt.Errorf("failed to read response body: %v", err)
 	}
 
 	var result struct {
 		Data []struct {
-			ID int64 `json:"id"` // Changed from string to int64
+			ID int64 `json:"id"`
 		} `json:"data"`
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		log.Printf("X-Plane: Failed to parse JSON response: %v", err)
-		return "", err
+		return "", fmt.Errorf("failed to parse JSON response: %v", err)
 	}
 
 	if len(result.Data) > 0 {
-		return fmt.Sprintf("%d", result.Data[0].ID), nil // Convert int64 to string
+		return fmt.Sprintf("%d", result.Data[0].ID), nil
 	}
 
-	return "", fmt.Errorf("dataref %s not found", datarefName)
+	return "", fmt.Errorf("ID not found")
+}
+
+func (x *Xp12Connector) getDatarefID(datarefName string) (string, error) {
+	url := fmt.Sprintf("%s/datarefs?filter[name]=%s", httpAddress, datarefName)
+	return x.fetchID(url)
+}
+
+func (x *Xp12Connector) getCommandID(commandName string) (string, error) {
+	url := fmt.Sprintf("%s/commands?filter[name]=%s", httpAddress, commandName)
+	return x.fetchID(url)
 }
 
 func (x *Xp12Connector) getDatarefValue(id string) (interface{}, error) {
-	httpAddress := "http://localhost:8086/api/v2"
 	url := fmt.Sprintf("%s/datarefs/%s/value", httpAddress, id)
 
 	resp, err := http.Get(url)
@@ -386,7 +393,6 @@ func (x *Xp12Connector) getDatarefValue(id string) (interface{}, error) {
 	}
 }
 
-// SubscribeAllDatarefs sends a WebSocket message to subscribe to all recognized datarefs.
 func (x *Xp12Connector) SubscribeAllDatarefs() error {
 	if x.wsConn == nil {
 		return fmt.Errorf("WebSocket connection not initialized")
@@ -458,45 +464,6 @@ func (x *Xp12Connector) SetInitialData() {
 	x.FsData.Com2Stby = fmt.Sprintf("%v", val)
 
 	x.app.SetFsData(x.FsData)
-}
-
-func (x *Xp12Connector) getCommandID(datarefName string) (string, error) {
-	httpAddress := "http://localhost:8086/api/v2" // Replace with your actual HTTP server address
-	url := fmt.Sprintf("%s/commands?filter[name]=%s", httpAddress, datarefName)
-
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Printf("X-Plane: Failed to fetch command ID: %v", err)
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to fetch command ID, status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("X-Plane: Failed to read response body: %v", err)
-		return "", err
-	}
-
-	var result struct {
-		Data []struct {
-			ID int64 `json:"id"`
-		} `json:"data"`
-	}
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		log.Printf("X-Plane: Failed to parse JSON response: %v", err)
-		return "", err
-	}
-
-	if len(result.Data) > 0 {
-		return fmt.Sprintf("%d", result.Data[0].ID), nil // Convert int64 to string
-	}
-
-	return "", fmt.Errorf("command %s not found", datarefName)
 }
 
 func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {

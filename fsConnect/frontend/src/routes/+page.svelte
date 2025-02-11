@@ -11,21 +11,22 @@
 
 	let interval: NodeJS.Timeout;
 
-	onMount(() => {
-		// Poll GetConnectionNumber every 500ms
-		interval = setInterval(async () => {
-			try {
-				const count = await GetConnectionCount();
-				connectedClients.set(count); // Set value using store
-				const name = await GetAircraftName();
-				console.log('Aircraft Name:', name);
-				selectedAircraft.set(name); // Set value using store
-				console.log('Connected Clients:', count);
-			} catch (error) {
-				console.error('Error fetching connection number:', error);
-			}
-		}, 1000);
-	});
+    onMount(() => {
+        // Poll GetConnectionNumber every 500ms
+        interval = setInterval(async () => {
+            try {
+                const count = await GetConnectionCount();
+                connectedClients.set(count); // Set value using store
+                let name = await GetAircraftName();
+                name = name.replace(/\0/g, '').trim(); // Remove null characters and trim whitespace
+                console.log('Aircraft Name:', name);
+                selectedAircraft.set(name); // Set value using store
+                console.log('Connected Clients:', count);
+            } catch (error) {
+                console.error('Error fetching connection number:', error);
+            }
+        }, 1000);
+    });
 
 	// Cleanup interval on component destroy
 	onDestroy(() => {
