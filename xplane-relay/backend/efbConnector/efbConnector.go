@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
-	fsData "fsConnector/backend/Types"
+	dataTypes "fsConnector/backend/Types"
 )
 
 type ComInterface interface {
@@ -26,7 +26,7 @@ type ComInterface interface {
 type EfbConnector struct {
 	ctx              context.Context // Add a context to emit events
 	ConnectionNumber int32           // Use int32 for atomic operations
-	currData         fsData.FsData
+	currData         dataTypes.FsData
 	wsConns          []*websocket.Conn // Store multiple WebSocket connections
 	comInt           ComInterface
 	mu               sync.Mutex // Mutex to protect wsConns slice
@@ -176,7 +176,7 @@ func (e *EfbConnector) sendWebSocketMessage(messageType int, data []byte) error 
 	return nil
 }
 
-func (e *EfbConnector) UpdateFrontendData(data fsData.FsData) {
+func (e *EfbConnector) UpdateFrontendData(data dataTypes.FsData) {
 	// Use reflection to compare fields
 	oldValue := reflect.ValueOf(e.currData)
 	newValue := reflect.ValueOf(data)

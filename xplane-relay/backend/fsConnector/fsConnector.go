@@ -1,11 +1,11 @@
 package fsConnector
 
 import (
-	FsData "fsConnector/backend/Types"
+	dataTypes "fsConnector/backend/Types"
 )
 
 type FsDataInterface interface {
-	SetFsData(data FsData.FsData)
+	SetFsData(data dataTypes.FsData)
 }
 
 type FsConnector interface {

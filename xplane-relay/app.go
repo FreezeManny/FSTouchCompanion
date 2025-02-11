@@ -5,7 +5,7 @@ import (
 	"fmt"
 	efbConnector "fsConnector/backend/efbConnector"
 
-	fsData "fsConnector/backend/Types"
+	dataTypes "fsConnector/backend/Types"
 	fsConnector "fsConnector/backend/fsConnector"
 )
 
@@ -13,11 +13,12 @@ import (
 type App struct {
 	ctx context.Context
 
+	// Child Functions
 	efbConnector *efbConnector.EfbConnector // Changed to a pointer
-	fsData       fsData.FsData
 	fsConnector  fsConnector.FsConnector
 
-	flightSim fsData.FlightSim
+	flightSim dataTypes.FlightSim // FlightSim Type
+	fsData    dataTypes.FsData    // FlightsimData
 }
 
 // NewApp creates a new App application struct
@@ -61,7 +62,7 @@ func (a *App) startup(ctx context.Context) {
 
 // ------ Functions for Wails Frontend -------
 // ChangeFlightSim changes the flight simulator and updates the fsConnector
-func (a *App) ChangeFlightSim(sim fsData.FlightSim) error {
+func (a *App) ChangeFlightSim(sim dataTypes.FlightSim) error {
 	a.flightSim = sim
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
@@ -118,7 +119,7 @@ func (a *App) SetCom2Stby(frequency string) {
 }
 
 // ------ fsConnect Interface methods ------
-func (a *App) SetFsData(data fsData.FsData) {
+func (a *App) SetFsData(data dataTypes.FsData) {
 	a.fsData = data
 	a.efbConnector.UpdateFrontendData(a.fsData)
 }

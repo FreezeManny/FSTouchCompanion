@@ -14,7 +14,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	FsData "fsConnector/backend/Types"
+	dataTypes "fsConnector/backend/Types"
 )
 
 //go:embed xplaneData.json
@@ -33,7 +33,7 @@ type Xp12Connector struct {
 
 	IdData IdData
 
-	FsData FsData.FsData
+	FsData dataTypes.FsData
 }
 
 type IdData struct {
