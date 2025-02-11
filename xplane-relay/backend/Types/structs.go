@@ -6,10 +6,11 @@ type Position struct {
 }
 
 type FsData struct {
-	Connected bool
-	Position  Position
-	Com1Stby  string
-	Com1Act   string
-	Com2Stby  string
-	Com2Act   string
+	Connected    bool
+	AircraftName string
+	Position     Position
+	Com1Stby     string
+	Com1Act      string
+	Com2Stby     string
+	Com2Act      string
 }

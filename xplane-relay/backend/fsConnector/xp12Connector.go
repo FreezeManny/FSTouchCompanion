@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	FsData "fsConnector/backend/Types"
 )
 
 //go:embed xplaneData.json
@@ -29,9 +31,9 @@ type Xp12Connector struct {
 
 	selectedAircraftData XPlaneData
 
-	AircraftName string
-
 	IdData IdData
+
+	FsData FsData.FsData
 }
 
 type IdData struct {
@@ -75,7 +77,8 @@ type XPlaneData struct {
 
 func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector := &Xp12Connector{app: app}
-	connector.app.GetFsDataReference().Connected = false
+	connector.FsData.Connected = false
+	app.SetFsData(connector.FsData)
 
 	// Parse embedded X-Plane data
 	var xplaneData []XPlaneData
@@ -106,7 +109,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	val, err := connector.getDatarefValue(connector.IdData.AircraftName)
 	if err == nil {
 		if sVal, ok := val.(string); ok {
-			connector.AircraftName = sVal
+			connector.FsData.AircraftName = sVal
 		}
 	}
 	connector.changeAircraft()
@@ -120,7 +123,8 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		return nil, err
 	}
 	connector.wsConn = conn
-	connector.app.GetFsDataReference().Connected = true
+	connector.FsData.Connected = true
+	app.SetFsData(connector.FsData)
 
 	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
 
@@ -147,7 +151,7 @@ func (x *Xp12Connector) GetConnectionStatus() bool {
 
 func (x *Xp12Connector) GetAircraftName() string {
 	// Trim leading and trailing whitespace
-	aircraftName := strings.TrimSpace(x.AircraftName)
+	aircraftName := strings.TrimSpace(x.FsData.AircraftName)
 
 	// Remove non-printable characters
 	cleanedAircraftName := ""
@@ -187,7 +191,7 @@ func (x *Xp12Connector) changeAircraft() error {
 	// Implement the logic for changing the aircraft
 	fmt.Println("X-Plane: Change aircraft")
 
-	x.selectedAircraftData = x.LoadAircraftData(x.AircraftName)
+	x.selectedAircraftData = x.LoadAircraftData(x.FsData.AircraftName)
 
 	fmt.Println("X-Plane: Selected aircraft data:", x.selectedAircraftData)
 
@@ -260,9 +264,10 @@ func (x *Xp12Connector) listenForMessages() {
 		_, message, err := x.wsConn.ReadMessage()
 		if err != nil {
 			log.Printf("X-Plane: WebSocket read error: %v", err)
-			x.app.GetFsDataReference().Connected = false
+			x.FsData.Connected = false
 			return
 		}
+
 		log.Printf("X-Plane: Received message: %s", message)
 		x.ProcessXPlaneRecieve(string(message))
 	}
@@ -412,26 +417,28 @@ func (x *Xp12Connector) SetInitialData() {
 		log.Printf("X-Plane: Failed to get COM1 active dataref value: %v", err)
 		return
 	}
-	x.app.GetFsDataReference().Com1Act = fmt.Sprintf("%v", val)
+	x.FsData.Com1Act = fmt.Sprintf("%v", val)
 
 	val, err = x.getDatarefValue(x.IdData.Com1stby)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM1 standby dataref value: %v", err)
 		return
 	}
-	x.app.GetFsDataReference().Com1Stby = fmt.Sprintf("%v", val)
+	x.FsData.Com1Stby = fmt.Sprintf("%v", val)
 	val, err = x.getDatarefValue(x.IdData.Com2act)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM2 active dataref value: %v", err)
 		return
 	}
-	x.app.GetFsDataReference().Com2Act = fmt.Sprintf("%v", val)
+	x.FsData.Com2Act = fmt.Sprintf("%v", val)
 	val, err = x.getDatarefValue(x.IdData.Com2stby)
 	if err != nil {
 		log.Printf("X-Plane: Failed to get COM2 standby dataref value: %v", err)
 		return
 	}
-	x.app.GetFsDataReference().Com2Stby = fmt.Sprintf("%v", val)
+	x.FsData.Com2Stby = fmt.Sprintf("%v", val)
+
+	x.app.SetFsData(x.FsData)
 }
 
 func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
@@ -461,17 +468,19 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 			strValue := fmt.Sprintf("%v", value)
 			switch name {
 			case "Com1 Active":
-				x.app.GetFsDataReference().Com1Act = strValue
+				x.FsData.Com1Act = strValue
 			case "Com1 Standby":
-				x.app.GetFsDataReference().Com1Stby = strValue
+				x.FsData.Com1Stby = strValue
 			case "Com2 Active":
-				x.app.GetFsDataReference().Com2Act = strValue
+				x.FsData.Com2Act = strValue
 			case "Com2 Standby":
-				x.app.GetFsDataReference().Com2Stby = strValue
+				x.FsData.Com2Stby = strValue
 			}
 		}
 		fmt.Printf("Type: %s, ID: %s (%s), Value: %v\n", message.Type, id, name, value)
 	}
+
+	x.app.SetFsData(x.FsData)
 
 	return nil
 }
@@ -491,8 +500,10 @@ func (x *Xp12Connector) UpdatePosition() {
 		}
 
 		log.Printf("X-Plane: Updated Lon: %v, Lat: %v", lon, lat)
-		x.app.GetFsDataReference().Position.Lon = lon.(float64)
-		x.app.GetFsDataReference().Position.Lat = lat.(float64)
+		x.FsData.Position.Lon = lon.(float64)
+		x.FsData.Position.Lat = lat.(float64)
+
+		x.app.SetFsData(x.FsData)
 
 		time.Sleep(120 * time.Second)
 	}

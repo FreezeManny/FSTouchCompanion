@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	efbConnector "fsConnector/backend/efbConnector"
-	"time"
 
 	fsData "fsConnector/backend/Types"
 	fsConnector "fsConnector/backend/fsConnector"
@@ -84,12 +83,14 @@ func (a *App) ChangeFlightSim(sim string) error {
 	return nil
 }
 
+// ------ Functions for Wails Frontend -------
+
 func (a *App) GetConnectionStatus() bool {
 	return a.fsData.Connected
 }
 
 func (a *App) GetAircraftName() string {
-	return a.fsConnector.GetAircraftName() // Call the GetAircraftName method on the fsConnector
+	return a.fsData.AircraftName // Call the GetAircraftName method on the fsConnector
 }
 
 func (a *App) ReconnectFlightSim() error {
@@ -121,56 +122,3 @@ func (a *App) SetCom1Stby(frequency string) {
 func (a *App) SetCom2Stby(frequency string) {
 	a.fsConnector.SetCom2Stby(frequency) // Call the SetCom2Stby method on the fsConnector
 }
-
-// ---------------- Flightsim Call  methods ----------------
-
-func (a *App) GetFsDataReference() *fsData.FsData {
-	return &a.fsData
-}
-
-func (a *App) WatchFsDataChanges() {
-	go func() {
-		prev := a.fsData
-		for {
-			if prev != a.fsData {
-				fmt.Println("fsData changed:", a.fsData)
-				a.efbConnector.UpdateFrontendData(a.fsData)
-				prev = a.fsData
-			}
-			time.Sleep(time.Second)
-		}
-	}()
-}
-
-/*
-func (a *App) SetCom1StbData(frequency string) {
-	a.fsData.Com1Stby = frequency
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
-func (a *App) SetCom2StbData(frequency string) {
-	a.fsData.Com2Stby = frequency
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
-func (a *App) SetCom1ActData(frequency string) {
-	a.fsData.Com1Act = frequency
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
-func (a *App) SetCom2ActData(frequency string) {
-	a.fsData.Com2Act = frequency
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
-func (a *App) SetPosition(lon float64, lat float64) {
-	a.fsData.Position.Lon = lon
-	a.fsData.Position.Lat = lat
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-
-func (a *App) SetConnection(status bool) {
-	a.fsData.Connected = status
-	a.efbConnector.UpdateFrontendData(a.fsData)
-}
-*/
