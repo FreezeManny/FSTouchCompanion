@@ -84,8 +84,8 @@ func (a *App) ChangeFlightSim(sim string) error {
 }
 
 func (a *App) GetConnectionStatus() bool {
-	return false
-	//return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
+	//return false
+	return a.fsConnector.GetConnectionStatus() // Call the GetConnectionStatus method on the fsConnector
 }
 func (a *App) ReconnectFlightSim() error {
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)

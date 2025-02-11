@@ -11,7 +11,7 @@ type Msfs2020Connector struct {
 
 func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 	connector := &Msfs2020Connector{app: app}
-	connector.connectionStatus = true
+	connector.connectionStatus = false
 	return connector, nil
 }
 

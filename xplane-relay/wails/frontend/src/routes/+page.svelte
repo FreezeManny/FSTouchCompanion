@@ -31,9 +31,6 @@
 
 </script>
 
-<button type="button" class="btn variant-filled" on:click={() => console.log("Test")} > Debug </button>	
-
-
 <div class="card p-4 m-2 d-flex justify-content-between">
 	<div>Selected Aircraft: {selectedAircraft}</div>
 	<div>Connected Clients: {$connectedClients}</div>
