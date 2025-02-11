@@ -57,7 +57,7 @@ func (e *EfbConnector) GetConnectionNumber() int {
 	return int(atomic.LoadInt32(&e.ConnectionNumber))
 }
 
-func (e *EfbConnector) handleWebSocketMessage(msgType int, msg []byte) {
+func (e *EfbConnector) handleWebSocketMessage(msg []byte) {
 	// Process the WebSocket message
 	/*
 		{
@@ -135,7 +135,10 @@ func (e *EfbConnector) StartWebSocketServer() {
 			}
 
 			// Call the new handleWebSocketMessage function
-			e.handleWebSocketMessage(msgType, msg)
+			if msgType == websocket.TextMessage {
+				log.Println("Received non-text message")
+				e.handleWebSocketMessage(msg)
+			}
 		}
 	})
 
