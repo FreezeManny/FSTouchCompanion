@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	efbConnector "fsConnector/backend/efbConnector"
+	"time"
 
 	fsData "fsConnector/backend/Types"
 	fsConnector "fsConnector/backend/fsConnector"
@@ -124,9 +125,24 @@ func (a *App) SetCom2Stby(frequency string) {
 // ---------------- Flightsim Call  methods ----------------
 
 func (a *App) GetFsDataReference() *fsData.FsData {
-    return &a.fsData
+	return &a.fsData
 }
 
+func (a *App) WatchFsDataChanges() {
+	go func() {
+		prev := a.fsData
+		for {
+			if prev != a.fsData {
+				fmt.Println("fsData changed:", a.fsData)
+				a.efbConnector.UpdateFrontendData(a.fsData)
+				prev = a.fsData
+			}
+			time.Sleep(time.Second)
+		}
+	}()
+}
+
+/*
 func (a *App) SetCom1StbData(frequency string) {
 	a.fsData.Com1Stby = frequency
 	a.efbConnector.UpdateFrontendData(a.fsData)
@@ -157,3 +173,4 @@ func (a *App) SetConnection(status bool) {
 	a.fsData.Connected = status
 	a.efbConnector.UpdateFrontendData(a.fsData)
 }
+*/
