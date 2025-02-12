@@ -82,6 +82,7 @@ func (a *App) SetConnectionCount(count int) {
 }
 
 func (a *App) SetConnectionStatus(status bool) {
+	fmt.Println("Connection Status: ", status)
 	runtime.EventsEmit(a.ctx, "ConnectionStatus", status)
 }
 

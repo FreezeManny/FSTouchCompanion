@@ -128,6 +128,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	}
 	connector.wsConn = conn
 	connector.FsData.Connected = true
+	app.SetConnectionStatus(true)
 	app.SetFsData(connector.FsData)
 
 	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
@@ -146,14 +147,17 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 }
 
 func (x *Xp12Connector) checkConnection() error {
-	resp, err := http.Get(httpAddress)
+	url := fmt.Sprintf("%s/datarefs/count", httpAddress)
+	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		x.FsData.Connected = false
+		x.app.SetConnectionStatus(false)
 		x.app.SetFsData(x.FsData)
 		return fmt.Errorf("HTTP server not reachable: %v", err)
 	}
 	defer resp.Body.Close()
 	x.FsData.Connected = true
+	x.app.SetConnectionStatus(true)
 	x.app.SetFsData(x.FsData)
 	return nil
 }

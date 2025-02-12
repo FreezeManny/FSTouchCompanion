@@ -61,21 +61,7 @@
 				<strong class="text-xl uppercase">fsConnector</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-					<div class="input-group-shim">Simulator</div>
-					<select on:change={handleSimChange} bind:value={selectedSim}>
-						<option value="xplane12">X-Plane 12</option>
-						<option value="msfs2020">MSFS 2020</option>
-					</select>
-					<div style="background-color: {fsConnected ? 'green' : 'red'}"></div>
-				</div>
-				<button
-					type="button"
-					class="btn variant-filled flex items-center"
-					on:click={() => ReconnectFlightSim()}
-				>
-					Reconnect
-				</button>
+				
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
