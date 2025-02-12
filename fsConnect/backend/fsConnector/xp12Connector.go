@@ -83,9 +83,14 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector.FsData.Connected = false
 	app.SetFsData(connector.FsData)
 
+	err := connector.checkConnection()
+	if err != nil {
+		return nil, err
+	}
+
 	// Parse embedded X-Plane data
 	var xplaneData []XPlaneData
-	err := json.Unmarshal(xplaneDataJSON, &xplaneData)
+	err = json.Unmarshal(xplaneDataJSON, &xplaneData)
 	if err != nil {
 		log.Printf("X-Plane: Failed to parse X-Plane data: %v", err)
 		return nil, err
@@ -140,6 +145,19 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	return connector, nil
 }
 
+func (x *Xp12Connector) checkConnection() error {
+	resp, err := http.Get(httpAddress)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		x.FsData.Connected = false
+		x.app.SetFsData(x.FsData)
+		return fmt.Errorf("HTTP server not reachable: %v", err)
+	}
+	defer resp.Body.Close()
+	x.FsData.Connected = true
+	x.app.SetFsData(x.FsData)
+	return nil
+}
+
 func (x *Xp12Connector) GetAircraftName() string {
 	// Trim leading and trailing whitespace
 	aircraftName := strings.TrimSpace(x.FsData.AircraftName)
@@ -185,6 +203,7 @@ func (x *Xp12Connector) SetCom2Stby(frequency string) error {
 func (x *Xp12Connector) changeAircraft() error {
 	// Implement the logic for changing the aircraft
 
+	x.app.SetAircraftName(x.FsData.AircraftName)
 	x.selectedAircraftData = x.LoadAircraftData(x.FsData.AircraftName)
 
 	fmt.Println("X-Plane: Changed Aircraft")

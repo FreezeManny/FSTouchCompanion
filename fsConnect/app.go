@@ -82,15 +82,14 @@ func (a *App) SetConnectionCount(count int) {
 }
 
 func (a *App) SetConnectionStatus(status bool) {
-	runtime.EventsEmit(a.ctx, "ConnectionCount", status)
+	runtime.EventsEmit(a.ctx, "ConnectionStatus", status)
 }
 
 func (a *App) SetAircraftName(name string) {
-	runtime.EventsEmit(a.ctx, "ConnectionCount", name)
+	runtime.EventsEmit(a.ctx, "AircraftName", name)
 }
 
 func (a *App) ReconnectFlightSim() error {
-	a.SetAircraftName("XXXXXXXXXX")
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
 		fmt.Println("Error changing FsConnector:", err)
