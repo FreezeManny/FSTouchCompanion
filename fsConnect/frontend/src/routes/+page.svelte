@@ -1,37 +1,26 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { writable } from 'svelte/store'; // Import writable store
-	import runtime from '@wailsapp/runtime';
+	import { EventsOn } from '../../wailsjs/runtime';
 
-	import { GetConnectionCount, GetAircraftName } from '../../wailsjs/go/main/App';
+	//import { GetConnectionCount, GetAircraftName } from '../../wailsjs/go/main/App';
 
 	const selectedAircraft = writable('-----'); // Use writable store
 	const connectedClients = writable(0); // Use writable store
 	//let logOpen: boolean = false
 
-	let interval: NodeJS.Timeout;
+	onMount(() => {
+        EventsOn('ConnectionCount', (count: number) => {
+            connectedClients.set(count); // Set value using store
+            console.log('Connected Clients:', count);
+        });
 
-    onMount(() => {
-        // Poll GetConnectionNumber every 500ms
-        interval = setInterval(async () => {
-            try {
-                const count = await GetConnectionCount();
-                connectedClients.set(count); // Set value using store
-                let name = await GetAircraftName();
-                name = name.replace(/\0/g, '').trim(); // Remove null characters and trim whitespace
-                console.log('Aircraft Name:', name);
-                selectedAircraft.set(name); // Set value using store
-                console.log('Connected Clients:', count);
-            } catch (error) {
-                console.error('Error fetching connection number:', error);
-            }
-        }, 1000);
+        EventsOn('AircraftName', (name: string) => {
+            name = name.replace(/\0/g, '').trim(); // Remove null characters and trim whitespace
+            console.log('Aircraft Name:', name);
+            selectedAircraft.set(name); // Set value using store
+        });
     });
-
-	// Cleanup interval on component destroy
-	onDestroy(() => {
-		clearInterval(interval);
-	});
 
 </script>
 
@@ -55,5 +44,3 @@
 	{/if}
 </div>
 -->
-
-

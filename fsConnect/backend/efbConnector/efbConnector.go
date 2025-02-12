@@ -11,7 +11,6 @@ import (
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	dataTypes "fsConnector/backend/Types"
 )
@@ -21,6 +20,8 @@ type ComInterface interface {
 	SwitchCom2()
 	SetCom1Stby(frequency string)
 	SetCom2Stby(frequency string)
+
+	SetConnectionCount(count int)
 }
 
 type EfbConnector struct {
@@ -51,10 +52,6 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
-}
-
-func (e *EfbConnector) GetConnectionNumber() int {
-	return int(atomic.LoadInt32(&e.ConnectionNumber))
 }
 
 func (e *EfbConnector) handleWebSocketMessage(msg []byte) {
@@ -94,6 +91,7 @@ func (e *EfbConnector) handleWebSocketMessage(msg []byte) {
 }
 
 func (e *EfbConnector) StartWebSocketServer() {
+	fmt.Println("Starting WebSocket server...")
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -109,7 +107,7 @@ func (e *EfbConnector) StartWebSocketServer() {
 		atomic.AddInt32(&e.ConnectionNumber, 1)
 		// Emit new connection count
 		fmt.Println("Connection Number: ", e.ConnectionNumber)
-		runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
+		e.comInt.SetConnectionCount(int(e.ConnectionNumber))
 
 		// Send the current fsData to the new client
 		fsDataJSON, err := json.Marshal(e.currData)
@@ -154,7 +152,7 @@ func (e *EfbConnector) handleWebSocketDisconnect(ws *websocket.Conn) {
 	atomic.AddInt32(&e.ConnectionNumber, -1)
 	fmt.Println("Connection Number: ", e.ConnectionNumber)
 	// Emit updated count on disconnect
-	runtime.EventsEmit(e.ctx, "connectionCountChanged", e.GetConnectionNumber())
+	e.comInt.SetConnectionCount(int(e.ConnectionNumber))
 
 	e.mu.Lock()
 	defer e.mu.Unlock()

@@ -4,17 +4,17 @@ import {structs} from '../models';
 
 export function ChangeFlightSim(arg1:structs.FlightSim):Promise<void>;
 
-export function GetAircraftName():Promise<string>;
-
-export function GetConnectionCount():Promise<number>;
-
-export function GetConnectionStatus():Promise<boolean>;
-
 export function ReconnectFlightSim():Promise<void>;
+
+export function SetAircraftName(arg1:string):Promise<void>;
 
 export function SetCom1Stby(arg1:string):Promise<void>;
 
 export function SetCom2Stby(arg1:string):Promise<void>;
+
+export function SetConnectionCount(arg1:number):Promise<void>;
+
+export function SetConnectionStatus(arg1:boolean):Promise<void>;
 
 export function SetFsData(arg1:structs.FsData):Promise<void>;
 

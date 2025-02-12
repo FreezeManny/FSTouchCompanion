@@ -6,20 +6,12 @@ export function ChangeFlightSim(arg1) {
   return window['go']['main']['App']['ChangeFlightSim'](arg1);
 }
 
-export function GetAircraftName() {
-  return window['go']['main']['App']['GetAircraftName']();
-}
-
-export function GetConnectionCount() {
-  return window['go']['main']['App']['GetConnectionCount']();
-}
-
-export function GetConnectionStatus() {
-  return window['go']['main']['App']['GetConnectionStatus']();
-}
-
 export function ReconnectFlightSim() {
   return window['go']['main']['App']['ReconnectFlightSim']();
+}
+
+export function SetAircraftName(arg1) {
+  return window['go']['main']['App']['SetAircraftName'](arg1);
 }
 
 export function SetCom1Stby(arg1) {
@@ -28,6 +20,14 @@ export function SetCom1Stby(arg1) {
 
 export function SetCom2Stby(arg1) {
   return window['go']['main']['App']['SetCom2Stby'](arg1);
+}
+
+export function SetConnectionCount(arg1) {
+  return window['go']['main']['App']['SetConnectionCount'](arg1);
+}
+
+export function SetConnectionStatus(arg1) {
+  return window['go']['main']['App']['SetConnectionStatus'](arg1);
 }
 
 export function SetFsData(arg1) {

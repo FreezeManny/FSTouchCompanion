@@ -5,6 +5,8 @@ import (
 	"fmt"
 	efbConnector "fsConnector/backend/efbConnector"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
+
 	dataTypes "fsConnector/backend/Types"
 	fsConnector "fsConnector/backend/fsConnector"
 )
@@ -44,6 +46,10 @@ func (a *App) startup(ctx context.Context) {
 	connector.SetComInterface(a)
 
 	a.efbConnector = connector
+	go func() {
+		fmt.Println("Starting WebSocket server...")
+		a.efbConnector.StartWebSocketServer() // Start the server here
+	}()
 
 	// Create the FsConnector
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
@@ -53,11 +59,6 @@ func (a *App) startup(ctx context.Context) {
 	}
 
 	a.fsConnector = fsConn
-
-	go func() {
-		fmt.Println("Starting WebSocket server...")
-		a.efbConnector.StartWebSocketServer() // Start the server here
-	}()
 }
 
 // ------ Functions for Wails Frontend -------
@@ -76,19 +77,20 @@ func (a *App) ChangeFlightSim(sim dataTypes.FlightSim) error {
 }
 
 // GetConnectionCount returns the number of active WebSocket connections
-func (a *App) GetConnectionCount() int {
-	return a.efbConnector.GetConnectionNumber() // Call the GetConnectionNumber function on the instance
+func (a *App) SetConnectionCount(count int) {
+	runtime.EventsEmit(a.ctx, "ConnectionCount", count)
 }
 
-func (a *App) GetConnectionStatus() bool {
-	return a.fsData.Connected
+func (a *App) SetConnectionStatus(status bool) {
+	runtime.EventsEmit(a.ctx, "ConnectionCount", status)
 }
 
-func (a *App) GetAircraftName() string {
-	return a.fsData.AircraftName // Call the GetAircraftName method on the fsConnector
+func (a *App) SetAircraftName(name string) {
+	runtime.EventsEmit(a.ctx, "ConnectionCount", name)
 }
 
 func (a *App) ReconnectFlightSim() error {
+	a.SetAircraftName("XXXXXXXXXX")
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
 		fmt.Println("Error changing FsConnector:", err)

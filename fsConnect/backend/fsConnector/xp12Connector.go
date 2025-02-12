@@ -25,9 +25,8 @@ const xplanePort = 8086
 var httpAddress = fmt.Sprintf("http://localhost:%d/api/v2", xplanePort) // Replace with your actual HTTP server address
 
 type Xp12Connector struct {
-	app              FsDataInterface
-	connectionStatus bool
-	wsConn           *websocket.Conn
+	app    FsDataInterface
+	wsConn *websocket.Conn
 
 	reqIdCounter int
 
@@ -139,14 +138,6 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	go connector.UpdatePosition()
 
 	return connector, nil
-}
-
-func (x *Xp12Connector) GetConnectionStatus() bool {
-	if x == nil {
-		log.Printf("X-Plane: Xp12Connector instance is nil")
-		return false
-	}
-	return x.connectionStatus
 }
 
 func (x *Xp12Connector) GetAircraftName() string {

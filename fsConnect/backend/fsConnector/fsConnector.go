@@ -6,6 +6,9 @@ import (
 
 type FsDataInterface interface {
 	SetFsData(data dataTypes.FsData)
+
+	SetConnectionStatus(status bool)
+	SetAircraftName(name string)
 }
 
 type FsConnector interface {

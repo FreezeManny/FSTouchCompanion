@@ -4,8 +4,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { writable } from 'svelte/store'; // Import writable store
 
-
-
 	// Highlight JS
 	import hljs from 'highlight.js/lib/core';
 	import 'highlight.js/styles/github-dark.css';
@@ -25,9 +23,9 @@
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-	
-	import { ChangeFlightSim, GetConnectionStatus, ReconnectFlightSim } from '../../wailsjs/go/main/App';
 
+	import { ChangeFlightSim, ReconnectFlightSim } from '../../wailsjs/go/main/App';
+	import { EventsOn } from '../../wailsjs/runtime/runtime';
 
 	let fsConnected: boolean = false;
 	let selectedSim: string = 'xplane12';
@@ -36,33 +34,22 @@
 		const target = event.target as HTMLSelectElement;
 		selectedSim = target.value;
 		ChangeFlightSim(selectedSim)
-			.then(response => {
+			.then((response) => {
 				console.log('Flight simulator changed:', response);
 			})
-			.catch(error => {
+			.catch((error) => {
 				console.error('Error changing flight simulator:', error);
 			});
 	}
 
-	let interval: NodeJS.Timeout;
-
 	onMount(() => {
-		// Poll GetConnectionNumber every 500ms
-		interval = setInterval(async () => {
-			try {
-				const status = await GetConnectionStatus();
-				fsConnected = status; // Set value using store
-				console.log('Flightsim Connected:', status);
-			} catch (error) {
-				console.error('Error fetching connection number:', error);
-			}
-		}, 1000);
+		EventsOn('ConnectionStatus', (status: boolean) => {
+			fsConnected = status; // Set value using store
+			console.log('Flightsim Connected:', status);
+		});
 	});
 
-	// Cleanup interval on component destroy
-	onDestroy(() => {
-		clearInterval(interval);
-	});
+	
 </script>
 
 <!-- App Shell -->
@@ -80,9 +67,13 @@
 						<option value="xplane12">X-Plane 12</option>
 						<option value="msfs2020">MSFS 2020</option>
 					</select>
-                    <div style="background-color: {fsConnected ? 'green' : 'red'}"></div>
+					<div style="background-color: {fsConnected ? 'green' : 'red'}"></div>
 				</div>
-				<button type="button" class="btn variant-filled flex items-center" on:click={() => ReconnectFlightSim()}>
+				<button
+					type="button"
+					class="btn variant-filled flex items-center"
+					on:click={() => ReconnectFlightSim()}
+				>
 					Reconnect
 				</button>
 			</svelte:fragment>
