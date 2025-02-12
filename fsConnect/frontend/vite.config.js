@@ -8,7 +8,9 @@ export default defineConfig({
     server: {
         fs: {
             allow: [
-                // Add the wailsjs directory to the allow list
+                // Allow serving files from the project root
+                path.resolve(__dirname),
+                // Allow serving files from the wailsjs directory
                 path.resolve(__dirname, 'wailsjs')
             ]
         }

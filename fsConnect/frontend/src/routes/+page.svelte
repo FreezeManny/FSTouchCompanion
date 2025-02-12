@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { writable } from 'svelte/store'; // Import writable store
-	import { EventsOn } from '../../wailsjs/runtime';
+	import { EventsOn } from '../../wailsjs/runtime/runtime';
 	import { ChangeFlightSim, ReconnectFlightSim } from '../../wailsjs/go/main/App';
 
 	const selectedAircraft = writable('-----'); // Use writable store
@@ -23,6 +23,8 @@
 	}
 
 	onMount(() => {
+		ReconnectFlightSim();
+
 		EventsOn('ConnectionStatus', (status: boolean) => {
 			console.log('Flightsim Connected:', status);
 			fsConnected = status; // Set value using store
