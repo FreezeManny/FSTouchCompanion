@@ -83,6 +83,8 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector.FsData.Connected = false
 	app.SetFsData(connector.FsData)
 
+	app.SetConnectionStatus(false)
+
 	err := connector.checkConnection()
 	if err != nil {
 		return nil, err
@@ -109,7 +111,16 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		return nil, err
 	}
 
-	connector.IdData.AircraftName, _ = connector.getDatarefID("sim/aircraft/view/acf_ui_name")
+	// Handle AircraftName ID properly
+	connector.IdData.AircraftName, err = connector.getDatarefID("sim/aircraft/view/acf_ui_name")
+	if err != nil {
+		log.Printf("X-Plane: Error fetching aircraft name dataref ID: %v", err)
+		connector.FsData.Connected = false
+		app.SetConnectionStatus(false)
+		app.SetFsData(connector.FsData)
+		return nil, err
+	}
+
 	val, err := connector.getDatarefValue(connector.IdData.AircraftName)
 	if err == nil {
 		if sVal, ok := val.(string); ok {
@@ -127,6 +138,8 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 		return nil, err
 	}
 	connector.wsConn = conn
+
+	// Only set connected to true here if all IDs have been fetched successfully
 	connector.FsData.Connected = true
 	app.SetConnectionStatus(true)
 	app.SetFsData(connector.FsData)
@@ -151,13 +164,11 @@ func (x *Xp12Connector) checkConnection() error {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		x.FsData.Connected = false
-		x.app.SetConnectionStatus(false)
 		x.app.SetFsData(x.FsData)
 		return fmt.Errorf("HTTP server not reachable: %v", err)
 	}
 	defer resp.Body.Close()
 	x.FsData.Connected = true
-	x.app.SetConnectionStatus(true)
 	x.app.SetFsData(x.FsData)
 	return nil
 }
@@ -308,6 +319,7 @@ func (x *Xp12Connector) listenForMessages() {
 		if err != nil {
 			log.Printf("X-Plane: WebSocket read error: %v", err)
 			x.FsData.Connected = false
+			x.app.SetConnectionStatus(false)
 			return
 		}
 
