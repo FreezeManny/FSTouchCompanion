@@ -80,10 +80,7 @@ type XPlaneData struct {
 
 func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector := &Xp12Connector{app: app}
-	connector.FsData.Connected = false
-	app.SetFsData(connector.FsData)
-
-	app.SetConnectionStatus(false)
+	connector.updateConnection(false)
 
 	err := connector.checkConnection()
 	if err != nil {
@@ -115,9 +112,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector.IdData.AircraftName, err = connector.getDatarefID("sim/aircraft/view/acf_ui_name")
 	if err != nil {
 		log.Printf("X-Plane: Error fetching aircraft name dataref ID: %v", err)
-		connector.FsData.Connected = false
-		app.SetConnectionStatus(false)
-		app.SetFsData(connector.FsData)
+		connector.updateConnection(false)
 		return nil, err
 	}
 
@@ -140,9 +135,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	connector.wsConn = conn
 
 	// Only set connected to true here if all IDs have been fetched successfully
-	connector.FsData.Connected = true
-	app.SetConnectionStatus(true)
-	app.SetFsData(connector.FsData)
+	connector.updateConnection(true)
 
 	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
 
@@ -318,8 +311,7 @@ func (x *Xp12Connector) listenForMessages() {
 		_, message, err := x.wsConn.ReadMessage()
 		if err != nil {
 			log.Printf("X-Plane: WebSocket read error: %v", err)
-			x.FsData.Connected = false
-			x.app.SetConnectionStatus(false)
+			x.updateConnection(false)
 			return
 		}
 
@@ -634,4 +626,11 @@ func (x *Xp12Connector) triggerCommand(commandId string) error {
 	}
 
 	return nil
+}
+
+func (x *Xp12Connector) updateConnection(connected bool) {
+
+	x.FsData.Connected = connected
+	x.app.SetFsData(x.FsData)
+	x.app.SetConnectionStatus(connected)
 }
