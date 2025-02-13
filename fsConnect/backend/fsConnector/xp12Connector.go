@@ -156,13 +156,9 @@ func (x *Xp12Connector) checkConnection() error {
 	url := fmt.Sprintf("%s/datarefs/count", httpAddress)
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		x.FsData.Connected = false
-		x.app.SetFsData(x.FsData)
 		return fmt.Errorf("HTTP server not reachable: %v", err)
 	}
 	defer resp.Body.Close()
-	x.FsData.Connected = true
-	x.app.SetFsData(x.FsData)
 	return nil
 }
 
@@ -629,7 +625,6 @@ func (x *Xp12Connector) triggerCommand(commandId string) error {
 }
 
 func (x *Xp12Connector) updateConnection(connected bool) {
-
 	x.FsData.Connected = connected
 	x.app.SetFsData(x.FsData)
 	x.app.SetConnectionStatus(connected)
