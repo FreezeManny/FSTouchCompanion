@@ -39,6 +39,8 @@ func (a *App) startup(ctx context.Context) {
 		return
 	}
 
+	a.flightSim = "xplane12"
+
 	// Pass the Wails context to the connector
 	connector.SetContext(a.ctx)
 
