@@ -493,10 +493,11 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 	}
 
 	idMap := map[string]string{
-		x.IdData.Com1act:  "Com1 Active",
-		x.IdData.Com1stby: "Com1 Standby",
-		x.IdData.Com2act:  "Com2 Active",
-		x.IdData.Com2stby: "Com2 Standby",
+		x.IdData.AircraftName: "Aircraft Name",
+		x.IdData.Com1act:      "Com1 Active",
+		x.IdData.Com1stby:     "Com1 Standby",
+		x.IdData.Com2act:      "Com2 Active",
+		x.IdData.Com2stby:     "Com2 Standby",
 	}
 
 	for id, value := range message.Data {
@@ -506,6 +507,17 @@ func (x *Xp12Connector) ProcessXPlaneRecieve(msg string) error {
 		} else {
 			strValue := fmt.Sprintf("%v", value)
 			switch name {
+			case "Aircraft Name":
+				prevAircraft := x.FsData.AircraftName
+				decoded, decErr := base64.StdEncoding.DecodeString(strValue)
+				if decErr == nil {
+					x.FsData.AircraftName = string(decoded)
+				} else {
+					x.FsData.AircraftName = strValue
+				}
+				if prevAircraft != x.FsData.AircraftName {
+					x.changeAircraft()
+				}
 			case "Com1 Active":
 				x.FsData.Com1Act = strValue
 			case "Com1 Standby":

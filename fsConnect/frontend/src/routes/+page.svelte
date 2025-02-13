@@ -64,7 +64,7 @@
 
 <div class="flex space-x-4 p-2">
 	<div class="card p-4 rounded shadow w-full">
-		<div><strong>Selected Aircraft:</strong> {$selectedAircraft}</div>
+		<div><strong>Selected Aircraft:<br></strong> {$selectedAircraft}</div>
 	</div>
 	<div class="card p-4 rounded shadow w-full">
 		<div><strong>Connected Clients:</strong> {$connectedClients}</div>
