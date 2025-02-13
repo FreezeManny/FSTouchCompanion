@@ -20,9 +20,11 @@ import (
 //go:embed xplaneData.json
 var xplaneDataJSON []byte
 
+const xplaneAddress = "localhost"
 const xplanePort = 8086
 
-var httpAddress = fmt.Sprintf("http://localhost:%d/api/v2", xplanePort) // Replace with your actual HTTP server address
+var httpAddress = fmt.Sprintf("http://%s:%d/api/v2", xplaneAddress, xplanePort) // Replace with your actual HTTP server address
+var wsAddress = fmt.Sprintf("ws://%s:%d/api/v2", xplaneAddress, xplanePort)
 
 type Xp12Connector struct {
 	app    FsDataInterface
@@ -126,8 +128,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 
 	// WebSocket connection setup
 	var dialer websocket.Dialer
-	wsURL := fmt.Sprintf("ws://localhost:%d/api/v2", xplanePort) // Replace with your WebSocket server URL
-	conn, _, err := dialer.Dial(wsURL, nil)
+	conn, _, err := dialer.Dial(wsAddress, nil)
 	if err != nil {
 		log.Printf("X-Plane: Failed to connect to WebSocket server: %v", err)
 		return nil, err
@@ -137,7 +138,7 @@ func NewXPlane12Connector(app FsDataInterface) (FsConnector, error) {
 	// Only set connected to true here if all IDs have been fetched successfully
 	connector.updateConnection(true)
 
-	log.Printf("X-Plane: Connected to WebSocket server at %s", wsURL)
+	log.Printf("X-Plane: Connected to WebSocket server")
 
 	connector.SubscribeAllDatarefs()
 
@@ -598,7 +599,7 @@ func (x *Xp12Connector) triggerCommand(commandId string) error {
 	}
 
 	// Build the URL for the POST request
-	url := fmt.Sprintf("http://localhost:8086/api/v2/command/%d/activate", parsedID)
+	url := fmt.Sprintf("%s/command/%d/activate", httpAddress, parsedID)
 
 	// Create the request body
 	requestBody := map[string]interface{}{

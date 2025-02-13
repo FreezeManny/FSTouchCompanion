@@ -3,6 +3,7 @@
 	import { writable } from 'svelte/store'; // Import writable store
 	import { EventsOn } from '../../wailsjs/runtime/runtime';
 	import { ChangeFlightSim, ReconnectFlightSim } from '../../wailsjs/go/main/App';
+	//import { FsData } from "../../wailsjs/go/"
 
 	const selectedAircraft = writable('-----'); // Use writable store
 	const connectedClients = writable(0); // Use writable store
