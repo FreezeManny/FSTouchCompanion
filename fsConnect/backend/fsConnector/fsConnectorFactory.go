@@ -2,14 +2,13 @@ package fsConnector
 
 import (
 	"errors"
-	dataTypes "fsConnector/backend/Types"
 )
 
-func NewFsConnector(sim dataTypes.FlightSim, app FsDataInterface) (FsConnector, error) {
+func NewFsConnector(sim string, app FsDataInterface) (FsConnector, error) {
 	switch sim {
-	case dataTypes.XPlane12:
+	case "xplane12":
 		return NewXPlane12Connector(app)
-	case dataTypes.FS2020:
+	case "msfs2020":
 		return NewMsfs2020Connector(app)
 	}
 	return nil, errors.New("Not implemented")

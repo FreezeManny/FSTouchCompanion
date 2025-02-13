@@ -19,8 +19,8 @@ type App struct {
 	efbConnector *efbConnector.EfbConnector // Changed to a pointer
 	fsConnector  fsConnector.FsConnector
 
-	flightSim dataTypes.FlightSim // FlightSim Type
-	fsData    dataTypes.FsData    // FlightsimData
+	flightSim string           // FlightSim Type
+	fsData    dataTypes.FsData // FlightsimData
 }
 
 // NewApp creates a new App application struct
@@ -63,7 +63,7 @@ func (a *App) startup(ctx context.Context) {
 
 // ------ Functions for Wails Frontend -------
 // ChangeFlightSim changes the flight simulator and updates the fsConnector
-func (a *App) ChangeFlightSim(sim dataTypes.FlightSim) error {
+func (a *App) ChangeFlightSim(sim string) error {
 	a.flightSim = sim
 	fsConn, err := fsConnector.NewFsConnector(a.flightSim, a)
 	if err != nil {
