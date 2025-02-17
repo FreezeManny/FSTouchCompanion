@@ -14,35 +14,15 @@
       ? checklistData[$checklistState.aircraft][$checklistState.section]
       : [];
 
-  let checkboxes = [];
-
   function resetCheckboxes() {
-    checkboxes.forEach((checkbox) => (checkbox.checked = false));
+    console.log("Reset Checkboxes");
   }
 
   function checkNext() {
-    const nextCheckbox = checkboxes.find((checkbox) => !checkbox.checked);
-    console.log(nextCheckbox);
-    if (nextCheckbox) {
-      nextCheckbox.checked = true;
-    }
+    console.log("check Next");
   }
 
-  function nextSection(){
-
-  }
-
-  onMount(() => {
-    // Update the checkboxes array after the component is mounted
-    checkboxes = Array.from(
-      document.querySelectorAll("input[type='checkbox']"),
-    );
-  });
-
-  $: {
-    // Update the checkboxes array whenever checklistItems change
-    checkboxes = [];
-  }
+  function nextSection() {}
 </script>
 
 <!-- Top Bar -->
@@ -84,10 +64,10 @@
       <div>
         {#each Object.entries(item) as [key, value]}
           <label>
-            <input type="checkbox" bind:this={checkboxes[index]} />
+            <input class="checkbox" type="checkbox" />
             <strong>{key}:</strong>
             {value}
-          </label><br />
+          </label>
         {/each}
       </div>
       {#if index < checklistItems.length - 1}
@@ -106,8 +86,10 @@
       >Check</button
     >
   {:else}
-    <button type="button" class="btn variant-filled w-full" on:click={nextSection}
-      >Next Checklist</button
+    <button
+      type="button"
+      class="btn variant-filled w-full"
+      on:click={nextSection}>Next Checklist</button
     >
   {/if}
 </div>
