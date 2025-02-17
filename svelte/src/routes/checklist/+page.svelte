@@ -1,4 +1,5 @@
 <script lang="js">
+  import { onMount } from "svelte";
   import checklistData from "./checklistData.json";
   import { checklistState } from "$lib/stores.js";
 
@@ -8,9 +9,40 @@
     ? Object.keys(checklistData[$checklistState.aircraft])
     : [];
 
-  $: checklistItems = $checklistState.aircraft && $checklistState.section
-    ? checklistData[$checklistState.aircraft][$checklistState.section]
-    : [];
+  $: checklistItems =
+    $checklistState.aircraft && $checklistState.section
+      ? checklistData[$checklistState.aircraft][$checklistState.section]
+      : [];
+
+  let checkboxes = [];
+
+  function resetCheckboxes() {
+    checkboxes.forEach((checkbox) => (checkbox.checked = false));
+  }
+
+  function checkNext() {
+    const nextCheckbox = checkboxes.find((checkbox) => !checkbox.checked);
+    console.log(nextCheckbox);
+    if (nextCheckbox) {
+      nextCheckbox.checked = true;
+    }
+  }
+
+  function nextSection(){
+
+  }
+
+  onMount(() => {
+    // Update the checkboxes array after the component is mounted
+    checkboxes = Array.from(
+      document.querySelectorAll("input[type='checkbox']"),
+    );
+  });
+
+  $: {
+    // Update the checkboxes array whenever checklistItems change
+    checkboxes = [];
+  }
 </script>
 
 <!-- Top Bar -->
@@ -40,20 +72,26 @@
   <div class="flex-grow"></div>
   <!-- This will take up remaining space -->
 
-  <button type="button" class="btn variant-filled">Reset</button>
+  <button type="button" class="btn variant-filled" on:click={resetCheckboxes}
+    >Reset</button
+  >
 </div>
 
 <!-- Content -->
 <div class="p-4">
   {#if checklistItems.length > 0}
     {#each checklistItems as item, index}
-      <p>
+      <div>
         {#each Object.entries(item) as [key, value]}
-          <strong>{key}:</strong> {value}<br>
+          <label>
+            <input type="checkbox" bind:this={checkboxes[index]} />
+            <strong>{key}:</strong>
+            {value}
+          </label><br />
         {/each}
-      </p>
+      </div>
       {#if index < checklistItems.length - 1}
-        <hr class="my-4">
+        <hr class="my-4" />
       {/if}
     {/each}
   {:else}
@@ -64,10 +102,12 @@
 <!-- Bottom Bar -->
 <div class="p-4 w-full">
   {#if true}
-    <button type="button" class="btn variant-filled w-full">Check</button>
+    <button type="button" class="btn variant-filled w-full" on:click={checkNext}
+      >Check</button
+    >
   {:else}
-    <button type="button" class="btn variant-filled-success w-full"
-      >Next Section</button
+    <button type="button" class="btn variant-filled w-full" on:click={nextSection}
+      >Next Checklist</button
     >
   {/if}
 </div>
