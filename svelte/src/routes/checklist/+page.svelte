@@ -1,16 +1,40 @@
 <script lang="js">
-  import { selectedChecklist } from "$lib/stores";
+  import checklistData from "./checklistData.json";
+  import { checklistState } from "$lib/stores.js"
 
-  $: source = "/checklist/" + $selectedChecklist + ".pdf";
+  const aircraftNames = Object.keys(checklistData);
+
+  $: sections = $checklistState.aircraft
+    ? Object.keys(checklistData[$checklistState.aircraft])
+    : [];
 </script>
 
-{#if $selectedChecklist != null}
-  <iframe title="Checklist" src={source}  style="border: none;" class="w-full h-full" />
-{:else}
-  <aside class="alert variant-filled-warning m-5">
-    <!-- Message -->
-    <div class="alert-message">
-      <h3 class="h3">Select a Checklist</h3>
-    </div>
-  </aside>
-{/if}
+<div class="flex space-x-2 p-4">
+  <label class="label">
+    <select class="select" bind:value={$checklistState.aircraft}>
+      <option value="" disabled selected>Select Aircraft</option>
+      {#each aircraftNames as name}
+        <option value={name}>{name}</option>
+      {/each}
+    </select>
+  </label>
+
+  <label class="label">
+    <select
+      class="select"
+      bind:value={$checklistState.section}
+      disabled={!$checklistState.aircraft}
+    >
+      <option value="" disabled selected>Select Section</option>
+      {#each sections as section}
+        <option value={section}>{section}</option>
+      {/each}
+    </select>
+  </label>
+
+  <button type="button" class="btn variant-filled">Reset</button>
+</div>
+
+<div class="flex space-x-2 p-4">
+  <button type="button" class="btn variant-filled">Check</button>
+</div>
