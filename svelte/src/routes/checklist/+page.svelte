@@ -1,20 +1,53 @@
 <script lang="js">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import checklistData from "./checklistData.json";
   import { checklistState } from "$lib/stores.js";
 
   const aircraftNames = Object.keys(checklistData);
 
-  $: sections = $checklistState.aircraft
-    ? Object.keys(checklistData[$checklistState.aircraft])
+  let selectedAircraft = "";
+  let selectedSection = "";
+
+  onMount(() => {
+    selectedAircraft = $checklistState.aircraft;
+    selectedSection = $checklistState.section;
+  });
+  onDestroy(() => {
+    $checklistState.aircraft = selectedAircraft;
+    $checklistState.section = selectedSection;
+  });
+
+  $: sectionNames = selectedAircraft
+    ? Object.keys(checklistData[selectedAircraft])
     : [];
+  
+    $: console.log(sectionNames);
 
   $: checklistItems =
-    $checklistState.aircraft && $checklistState.section
-      ? checklistData[$checklistState.aircraft][$checklistState.section]
+    selectedAircraft && selectedSection
+      ? checklistData[selectedAircraft][selectedSection]
       : [];
 
+  let checkboxStates = [];
+  let previousSection = selectedSection;
+
+  $: if (checklistItems.length !== checkboxStates.length) {
+    checkboxStates = checklistItems.map((item) =>
+      Object.keys(item).map(() => false),
+    );
+    console.log("Checkbox states initialized:", checkboxStates);
+  }
+
+  $: if (selectedSection) {
+    console.log("Reactive statement triggered");
+    console.log(selectedSection);
+  }
+
+  // True if all checkboxes are selected
+  $: allSelected = checkboxStates.flat().every(Boolean);
+
   function resetCheckboxes() {
+    checkboxStates = checkboxStates.map((row) => row.map(() => false));
     console.log("Reset Checkboxes");
   }
 
@@ -22,13 +55,18 @@
     console.log("check Next");
   }
 
-  function nextSection() {}
+  function nextSection() {
+    const currentIndex = sectionNames.indexOf(selectedSection);
+    if (currentIndex >= 0 && currentIndex < sectionNames.length - 1) {
+      selectedSection = sectionNames[currentIndex + 1];
+    }
+  }
 </script>
 
 <!-- Top Bar -->
 <div class="flex space-x-2 p-4">
   <label class="label">
-    <select class="select" bind:value={$checklistState.aircraft}>
+    <select class="select" bind:value={selectedAircraft}>
       <option value="" disabled selected>Select Aircraft</option>
       {#each aircraftNames as name}
         <option value={name}>{name}</option>
@@ -39,11 +77,11 @@
   <label class="label">
     <select
       class="select"
-      bind:value={$checklistState.section}
-      disabled={!$checklistState.aircraft}
+      bind:value={selectedSection}
+      disabled={!selectedAircraft}
     >
       <option value="" disabled selected>Select Section</option>
-      {#each sections as section}
+      {#each sectionNames as section}
         <option value={section}>{section}</option>
       {/each}
     </select>
@@ -62,9 +100,13 @@
   {#if checklistItems.length > 0}
     {#each checklistItems as item, index}
       <div>
-        {#each Object.entries(item) as [key, value]}
+        {#each Object.entries(item) as [key, value], subIndex}
           <label>
-            <input class="checkbox" type="checkbox" />
+            <input
+              class="checkbox"
+              type="checkbox"
+              bind:checked={checkboxStates[index][subIndex]}
+            />
             <strong>{key}:</strong>
             {value}
           </label>
@@ -81,14 +123,14 @@
 
 <!-- Bottom Bar -->
 <div class="p-4 w-full">
-  {#if true}
+  {#if !allSelected}
     <button type="button" class="btn variant-filled w-full" on:click={checkNext}
       >Check</button
     >
   {:else}
     <button
       type="button"
-      class="btn variant-filled w-full"
+      class="btn variant-filled-success w-full"
       on:click={nextSection}>Next Checklist</button
     >
   {/if}
