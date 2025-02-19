@@ -11,17 +11,20 @@
   onMount(() => {
     selectedAircraft = $checklistState.aircraft;
     selectedSection = $checklistState.section;
+    console.log("onMount - selectedAircraft:", selectedAircraft);
+    console.log("onMount - selectedSection:", selectedSection);
   });
+
   onDestroy(() => {
     $checklistState.aircraft = selectedAircraft;
     $checklistState.section = selectedSection;
+    console.log("onDestroy - selectedAircraft:", selectedAircraft);
+    console.log("onDestroy - selectedSection:", selectedSection);
   });
 
   $: sectionNames = selectedAircraft
     ? Object.keys(checklistData[selectedAircraft])
     : [];
-  
-    $: console.log(sectionNames);
 
   $: checklistItems =
     selectedAircraft && selectedSection
@@ -29,9 +32,8 @@
       : [];
 
   let checkboxStates = [];
-  let previousSection = selectedSection;
 
-  $: if (checklistItems.length !== checkboxStates.length) {
+  $: if (checklistItems && checklistItems.length !== checkboxStates.length) {
     checkboxStates = checklistItems.map((item) =>
       Object.keys(item).map(() => false),
     );
@@ -40,14 +42,17 @@
 
   $: if (selectedSection) {
     console.log("Reactive statement triggered");
-    console.log(selectedSection);
+    console.log("selectedSection:", selectedSection);
+    resetCheckboxes();
   }
 
   // True if all checkboxes are selected
   $: allSelected = checkboxStates.flat().every(Boolean);
 
   function resetCheckboxes() {
-    checkboxStates = checkboxStates.map((row) => row.map(() => false));
+    checkboxStates = checklistItems.map((item) =>
+      Object.keys(item).map(() => false),
+    );
     console.log("Reset Checkboxes");
   }
 
@@ -97,7 +102,7 @@
 
 <!-- Content -->
 <div class="p-4">
-  {#if checklistItems.length > 0}
+  {#if checklistItems && checklistItems.length > 0}
     {#each checklistItems as item, index}
       <div>
         {#each Object.entries(item) as [key, value], subIndex}
@@ -127,7 +132,7 @@
     <button type="button" class="btn variant-filled w-full" on:click={checkNext}
       >Check</button
     >
-  {:else}
+  {:else if sectionNames.indexOf(selectedSection) != sectionNames.length - 1}
     <button
       type="button"
       class="btn variant-filled-success w-full"
