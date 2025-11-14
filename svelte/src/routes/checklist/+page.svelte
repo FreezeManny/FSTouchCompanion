@@ -57,7 +57,27 @@
   }
 
   function checkNext() {
-    console.log("check Next");
+    let foundUnchecked = false;
+    for (let i = 0; i < checkboxStates.length; i++) {
+      for (let j = 0; j < checkboxStates[i].length; j++) {
+        if (!checkboxStates[i][j]) {
+          checkboxStates[i][j] = true;
+          foundUnchecked = true;
+          return;
+        }
+      }
+    }
+    if (!foundUnchecked) {
+      // If no unchecked checkbox was found, start from the beginning
+      for (let i = 0; i < checkboxStates.length; i++) {
+        for (let j = 0; j < checkboxStates[i].length; j++) {
+          if (!checkboxStates[i][j]) {
+            checkboxStates[i][j] = true;
+            return;
+          }
+        }
+      }
+    }
   }
 
   function nextSection() {
