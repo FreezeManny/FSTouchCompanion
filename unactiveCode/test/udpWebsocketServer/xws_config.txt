@@ -1,4 +1,0 @@
-XWS_STATIC=./dist
-XWS_PORT=5001
-XWS_ENV=debug
-XWS_FLIP_BYTES=false
