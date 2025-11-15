@@ -36,7 +36,7 @@ export const checklistState: Writable<ChecklistState> = persisted("checklistStat
 export const settings: Writable<Settings> = persisted("settings", {
     appearance: "dark",
     simbriefUsername: "",
-    flightSimAddress: "",
+    flightSimAddress: "10.0.0.2",
     atcPlatform: "VATSIM",
 });
 
