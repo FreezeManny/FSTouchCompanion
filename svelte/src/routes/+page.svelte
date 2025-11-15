@@ -1,5 +1,4 @@
 <script lang="ts">
-export let params;
   import { settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   import { goto } from "$app/navigation";

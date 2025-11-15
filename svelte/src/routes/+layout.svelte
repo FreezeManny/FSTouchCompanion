@@ -1,5 +1,4 @@
 <script lang="ts">
-export let params;
 import "../app.css";
 import "../app.postcss";
 
