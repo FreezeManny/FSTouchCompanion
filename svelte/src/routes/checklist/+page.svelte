@@ -1,5 +1,5 @@
 <script lang="js">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import checklistData from "./checklistData.json";
   import { checklistState } from "$lib/stores.js";
 
@@ -7,19 +7,17 @@
 
   let selectedAircraft = "";
   let selectedSection = "";
+  let checkboxStates = [];
+
+  // Generate a unique key for the current aircraft/section combination
+  $: stateKey = selectedAircraft && selectedSection 
+    ? `${selectedAircraft}|${selectedSection}` 
+    : null;
 
   onMount(() => {
-    selectedAircraft = $checklistState.aircraft;
-    selectedSection = $checklistState.section;
-    console.log("onMount - selectedAircraft:", selectedAircraft);
-    console.log("onMount - selectedSection:", selectedSection);
-  });
-
-  onDestroy(() => {
-    $checklistState.aircraft = selectedAircraft;
-    $checklistState.section = selectedSection;
-    console.log("onDestroy - selectedAircraft:", selectedAircraft);
-    console.log("onDestroy - selectedSection:", selectedSection);
+    // Restore last selected aircraft and section
+    selectedAircraft = $checklistState.lastAircraft || "";
+    selectedSection = $checklistState.lastSection || "";
   });
 
   $: sectionNames = selectedAircraft
@@ -31,50 +29,57 @@
       ? checklistData[selectedAircraft][selectedSection]
       : [];
 
-  let checkboxStates = [];
-
-  $: if (checklistItems && checklistItems.length !== checkboxStates.length) {
-    checkboxStates = checklistItems.map((item) =>
-      Object.keys(item).map(() => false),
-    );
-    console.log("Checkbox states initialized:", checkboxStates);
+  // Initialize or restore checkbox states when checklist changes
+  $: if (stateKey && checklistItems.length > 0) {
+    const savedStates = $checklistState.states?.[stateKey];
+    
+    if (savedStates && savedStates.length === checklistItems.length) {
+      // Restore saved state
+      checkboxStates = savedStates;
+    } else {
+      // Initialize new state
+      checkboxStates = checklistItems.map((item) =>
+        Object.keys(item).map(() => false)
+      );
+      saveCheckboxStates();
+    }
   }
 
-  $: if (selectedSection) {
-    console.log("Reactive statement triggered");
-    console.log("selectedSection:", selectedSection);
-    resetCheckboxes();
+  // Save state whenever aircraft or section changes
+  $: if (selectedAircraft || selectedSection) {
+    $checklistState.lastAircraft = selectedAircraft;
+    $checklistState.lastSection = selectedSection;
   }
 
   // True if all checkboxes are selected
-  $: allSelected = checkboxStates.flat().every(Boolean);
+  $: allSelected = checkboxStates.length > 0 && checkboxStates.flat().every(Boolean);
+
+  function saveCheckboxStates() {
+    if (!stateKey) return;
+    
+    // Initialize states object if it doesn't exist
+    if (!$checklistState.states) {
+      $checklistState.states = {};
+    }
+    
+    // Save current state for this aircraft/section combination
+    $checklistState.states[stateKey] = checkboxStates;
+  }
 
   function resetCheckboxes() {
     checkboxStates = checklistItems.map((item) =>
-      Object.keys(item).map(() => false),
+      Object.keys(item).map(() => false)
     );
-    console.log("Reset Checkboxes");
+    saveCheckboxStates();
   }
 
   function checkNext() {
-    let foundUnchecked = false;
     for (let i = 0; i < checkboxStates.length; i++) {
       for (let j = 0; j < checkboxStates[i].length; j++) {
         if (!checkboxStates[i][j]) {
           checkboxStates[i][j] = true;
-          foundUnchecked = true;
+          saveCheckboxStates();
           return;
-        }
-      }
-    }
-    if (!foundUnchecked) {
-      // If no unchecked checkbox was found, start from the beginning
-      for (let i = 0; i < checkboxStates.length; i++) {
-        for (let j = 0; j < checkboxStates[i].length; j++) {
-          if (!checkboxStates[i][j]) {
-            checkboxStates[i][j] = true;
-            return;
-          }
         }
       }
     }
@@ -113,7 +118,6 @@
   </label>
 
   <div class="flex-grow"></div>
-  <!-- This will take up remaining space -->
 
   <button type="button" class="btn variant-filled" on:click={resetCheckboxes}
     >Reset</button
@@ -131,6 +135,7 @@
               class="checkbox"
               type="checkbox"
               bind:checked={checkboxStates[index][subIndex]}
+              on:change={saveCheckboxStates}
             />
             <strong>{key}:</strong>
             {value}

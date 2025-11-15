@@ -8,7 +8,8 @@ export const selectedAirports = persisted("selectedAirports", {
 
 export const checklistState = persisted("checklistState", {
     aircraft: "",
-    section: ""
+    section: "",
+    checkboxStates: []
 })
 export const settings = persisted("settings", {
     appearance: "dark",
