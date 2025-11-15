@@ -1,11 +1,17 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
   import { selectedAirports, settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   const toastStore = getToastStore();
 
-  const simbriefError = (message) => ({
+  type SimbriefError = {
+    message: string;
+    timeout: number;
+    hoverable: boolean;
+    background: string;
+  };
+  const simbriefError = (message: string): SimbriefError => ({
     message: message,
     timeout: 5000,
     hoverable: true,
@@ -20,16 +26,22 @@
   const fetchMode = {
     DEP: "DEP",
     ARR: "ARR",
-  };
+  } as const;
+  type FetchMode = typeof fetchMode[keyof typeof fetchMode];
 
   // Airport data stores
-  let dep = { atisCode: "", atisText: "", metar: "" };
-  let arr = { atisCode: "", atisText: "", metar: "" };
+  type AirportData = {
+    atisCode: string | null;
+    atisText: string;
+    metar: string;
+  };
+  let dep: AirportData = { atisCode: "", atisText: "", metar: "" };
+  let arr: AirportData = { atisCode: "", atisText: "", metar: "" };
 
   // Local storage for airport selections
 
   // Fetch airport data (ATIS and METAR)
-  async function fetchAirportData(mode) {
+  async function fetchAirportData(mode: FetchMode) {
     const airport = mode === fetchMode.DEP ? $selectedAirports.dep : $selectedAirports.arr;
     const upperAirport = airport.toUpperCase();
 
@@ -37,7 +49,7 @@
   }
 
   // Fetch METAR data
-  async function fetchMETAR(mode, airport) {
+  async function fetchMETAR(mode: FetchMode, airport: string) {
     try {
       const response = await fetch(`${VATSIM_METAR_URL}${airport}`);
       if (!response.ok) throw new Error("Network response was not ok");
@@ -56,22 +68,22 @@
   }
 
   // Set default METAR message
-  function setDefaultMetar(mode) {
+  function setDefaultMetar(mode: FetchMode) {
     if (mode === fetchMode.DEP) dep.metar = "METAR not available for this airport";
     else arr.metar = "METAR not available for this airport";
   }
 
   // Fetch ATIS data
-  async function fetchATIS(mode, airport) {
+  async function fetchATIS(mode: FetchMode, airport: string) {
     try {
       const response = await fetch(VATSIMDATAURL);
       const data = await response.json();
-      const atisList = data.atis.filter((element) => element.callsign.includes(airport));
+  const atisList = data.atis.filter((element: any) => element.callsign.includes(airport));
 
       if (atisList.length) {
-        let atisCodeList = atisList.map((item) => item.atis_code);
-        const atisCode = atisCodeList.every((code) => code === atisCodeList[0]) ? atisCodeList[0] : [];
-        const atisTexts = atisList.map((item) => item.text_atis).join("<br><br>");
+  let atisCodeList = atisList.map((item: any) => item.atis_code);
+  const atisCode = atisCodeList.every((code: any) => code === atisCodeList[0]) ? atisCodeList[0] : [];
+  const atisTexts = atisList.map((item: any) => item.text_atis).join("<br><br>");
 
         if (mode === fetchMode.DEP) {
           dep.atisCode = atisCode;
@@ -90,7 +102,7 @@
   }
 
   // Set default ATIS message
-  function setDefaultATIS(mode) {
+  function setDefaultATIS(mode: FetchMode) {
     if (mode === fetchMode.DEP) {
       dep.atisText = "No ATIS Online";
       dep.atisCode = null;

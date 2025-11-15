@@ -1,0 +1,11 @@
+// TypeScript configuration for SvelteKit
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["svelte", "node"],
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte", "src/**/*.js"]
+}

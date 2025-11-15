@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { ProgressRadial } from "@skeletonlabs/skeleton";
   import { settings } from "$lib/stores";
 
-  let responseStatus = 200;
-  let interval;
+  let responseStatus: number = 200;
+  let interval: ReturnType<typeof setInterval>;
 
   onMount(async () => {
     checkAlive();

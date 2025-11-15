@@ -1,16 +1,26 @@
-<script lang="js">
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
-
   import { settings } from "$lib/stores";
-
   import RadioDisplay from "./radio/RadioDisplay.svelte";
-
   import VatsimFreqSelector from "./frequencySelector/atcFreqSelector.svelte";
 
-  let isWebSocketOpen = false;
+  let isWebSocketOpen: boolean = false;
 
-  // FsData struct
-  let FsData = {
+  interface Position {
+    Lon: number;
+    Lat: number;
+  }
+
+  interface FsDataType {
+    Connected: boolean;
+    Position: Position;
+    Com1Stby: string;
+    Com1Act: string;
+    Com2Stby: string;
+    Com2Act: string;
+  }
+
+  let FsData: FsDataType = {
     Connected: false,
     Position: { Lon: 0.0, Lat: 0.0 },
     Com1Stby: "------",
@@ -22,7 +32,7 @@
   const wsPort = "8080";
   const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
 
-  let ws;
+  let ws: WebSocket;
 
   onMount(() => {
     webSocketFunction();
@@ -37,8 +47,7 @@
       isWebSocketOpen = true;
     };
 
-    // Update the WebSocket message handler to process aircraft name and check for new COM data
-    ws.onmessage = (event) => {
+    ws.onmessage = (event: MessageEvent) => {
       try {
         console.log("WebSocket message received:", event.data);
         const message = JSON.parse(event.data);
@@ -74,12 +83,12 @@
       isWebSocketOpen = false;
     };
 
-    ws.onerror = (error) => {
+    ws.onerror = (error: Event) => {
       console.error("WebSocket error:", error);
     };
   }
 
-  function com1Switch() {
+  function com1Switch(): void {
     console.log("COM1 Switched");
     let tmp = {
       com1Switch: true,
@@ -87,7 +96,7 @@
     ws.send(JSON.stringify(tmp));
   }
 
-  function com2Switch() {
+  function com2Switch(): void {
     console.log("COM2 Switched");
     let tmp = {
       com2Switch: true,
@@ -95,7 +104,7 @@
     ws.send(JSON.stringify(tmp));
   }
 
-  function com1Entry(frequency) {
+  function com1Entry(frequency: string | number): void {
     console.log("COM1 Frequency Changed to: " + frequency);
     let tmp = {
       com1Stby: String(frequency),
@@ -103,7 +112,7 @@
     ws.send(JSON.stringify(tmp));
   }
 
-  function com2Entry(frequency) {
+  function com2Entry(frequency: string | number): void {
     console.log("COM2 Frequency Changed to: " + frequency);
     let tmp = {
       com2Stby: String(frequency),

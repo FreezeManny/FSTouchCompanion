@@ -1,7 +1,7 @@
-<script lang="js">
+<script lang="ts">
   import { TabGroup, Tab } from "@skeletonlabs/skeleton";
   import { onMount, afterUpdate } from "svelte";
-  import { loadAtc, AtcType } from "./atcFreqFunctions";
+  import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
   import { popup } from "@skeletonlabs/skeleton";
 
@@ -11,12 +11,12 @@
     // Matches the data-popup value on your popup element
     target: "popupFeatured",
     // Defines which side of your trigger the popup will appear
-    placement: "left",
+    placement: "left" as any,
   };
 
-  let tabSet = "all";
+  let tabSet: keyof typeof atcDisplay = "all";
 
-  let atcControllers = [];
+  let atcControllers: AtcData[] = [];
 
   const atcDisplay = {
     all: {
@@ -58,31 +58,49 @@
     },
   };
 
-  export let long;
-  export let lat;
+  export let long: number;
+  export let lat: number;
 
-  export let setCom1Callback;
-  export let setCom2Callback;
+  export let setCom1Callback: (frequency: number) => void;
+  export let setCom2Callback: (frequency: number) => void;
 
   const loadControllers = () => {
     loadAtc(lat, long, $settings.atcPlatform)
-      .then((controllers) => {
+      .then((controllers: AtcData[]) => {
         atcControllers = controllers;
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.error("Error loading ATC data:", err);
       });
   };
 
+  let prevLat: number | undefined;
+  let prevLong: number | undefined;
+  let prevPlatform: string | undefined;
+
   onMount(() => {
     loadControllers();
+    prevLat = lat;
+    prevLong = long;
+    prevPlatform = $settings.atcPlatform;
   });
 
-  $: if (lat && long && $settings.atcPlatform) {
-    loadControllers();
-  }
+  afterUpdate(() => {
+    if (
+      lat !== prevLat ||
+      long !== prevLong ||
+      $settings.atcPlatform !== prevPlatform
+    ) {
+      if (lat && long && $settings.atcPlatform) {
+        loadControllers();
+      }
+      prevLat = lat;
+      prevLong = long;
+      prevPlatform = $settings.atcPlatform;
+    }
+  });
 
-  function formatFrequency(frequency) {
+  function formatFrequency(frequency: string): number {
     return Number(frequency.replace(".", ""));
   }
 </script>
@@ -94,16 +112,16 @@
   <!-- Tab Panels --->
   <svelte:fragment slot="panel">
     <div>
-      {#if atcControllers.some( (controller) => atcDisplay[tabSet].atcTypes.includes(controller.type), )}
+      {#if atcControllers.some( (controller) => Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type) )}
         {#each atcControllers as controller}
-          {#if atcDisplay[tabSet].atcTypes.includes(controller.type)}
+          {#if Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type)}
             <div class="card p-4 m-4 flex justify-between items-center">
               <div class="flex flex-col items-start">
                 <h3 class="h3 text-left">{controller.callsign}</h3>
                 <p class="text-left">
-                  {Object.keys(AtcType).find(
-                    (key) => AtcType[key] === controller.type,
-                  )}
+                  {Object.entries(AtcType).find(
+                    ([, value]) => value === controller.type
+                  )?.[0]}
                 </p>
               </div>
               <div class="flex items-center gap-2">
@@ -113,9 +131,9 @@
                   class="btn variant-filled"
                   use:popup={{
                     ...popupFeatured,
+                    event: "click",
                     target: `popupFeatured-${controller.callsign}`,
-                  }}>Set</button
-                >
+                  }}>Set</button>
 
                 <div
                   class="card p-4 shadow-xl"
@@ -126,15 +144,13 @@
                     class="btn variant-filled"
                     on:click={() =>
                       setCom1Callback(formatFrequency(controller.frequency))}
-                    >COM1</button
-                  >
+                    >COM1</button>
                   <button
                     type="button"
                     class="btn variant-filled"
                     on:click={() =>
                       setCom2Callback(formatFrequency(controller.frequency))}
-                    >COM2</button
-                  >
+                    >COM2</button>
                 </div>
               </div>
             </div>

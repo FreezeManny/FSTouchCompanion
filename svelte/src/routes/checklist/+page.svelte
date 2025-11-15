@@ -1,75 +1,67 @@
-<script lang="js">
-  import { onMount } from "svelte";
-  import checklistData from "./checklistData.json";
-  import { checklistState } from "$lib/stores.js";
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import checklistDataRaw from './checklistData.json';
+  import { checklistState } from '$lib/stores';
+  import type { ChecklistItem, ChecklistData } from '../../types';
 
-  const aircraftNames = Object.keys(checklistData);
-
-  let selectedAircraft = "";
-  let selectedSection = "";
-  let checkboxStates = [];
+  const checklistData: ChecklistData = checklistDataRaw as ChecklistData;
+  const aircraftNames: string[] = Object.keys(checklistData);
+  let selectedAircraft: string = "";
+  let selectedSection: string = "";
+  let checkboxStates: boolean[][] = [];
 
   // Generate a unique key for the current aircraft/section combination
   $: stateKey = selectedAircraft && selectedSection 
     ? `${selectedAircraft}|${selectedSection}` 
     : null;
 
+
   onMount(() => {
     // Restore last selected aircraft and section
-    selectedAircraft = $checklistState.lastAircraft || "";
-    selectedSection = $checklistState.lastSection || "";
+    selectedAircraft = $checklistState.aircraft || "";
+    selectedSection = $checklistState.section || "";
   });
 
   $: sectionNames = selectedAircraft
-    ? Object.keys(checklistData[selectedAircraft])
+    ? Object.keys(checklistData[selectedAircraft] || {})
     : [];
 
-  $: checklistItems =
-    selectedAircraft && selectedSection
-      ? checklistData[selectedAircraft][selectedSection]
+  $: rawChecklist = selectedAircraft && selectedSection
+    ? checklistData[selectedAircraft]?.[selectedSection]
+    : undefined;
+
+  $: checklistItems = Array.isArray(rawChecklist)
+    ? rawChecklist
+    : rawChecklist
+      ? [rawChecklist]
       : [];
 
   // Initialize or restore checkbox states when checklist changes
   $: if (stateKey && checklistItems.length > 0) {
-    const savedStates = $checklistState.states?.[stateKey];
-    
+    const savedStates = $checklistState.checkboxStates;
     if (savedStates && savedStates.length === checklistItems.length) {
-      // Restore saved state
       checkboxStates = savedStates;
     } else {
-      // Initialize new state
-      checkboxStates = checklistItems.map((item) =>
-        Object.keys(item).map(() => false)
-      );
+      checkboxStates = checklistItems.map(() => [false]);
       saveCheckboxStates();
     }
   }
 
   // Save state whenever aircraft or section changes
   $: if (selectedAircraft || selectedSection) {
-    $checklistState.lastAircraft = selectedAircraft;
-    $checklistState.lastSection = selectedSection;
+    $checklistState.aircraft = selectedAircraft;
+    $checklistState.section = selectedSection;
   }
 
   // True if all checkboxes are selected
   $: allSelected = checkboxStates.length > 0 && checkboxStates.flat().every(Boolean);
 
   function saveCheckboxStates() {
-    if (!stateKey) return;
-    
-    // Initialize states object if it doesn't exist
-    if (!$checklistState.states) {
-      $checklistState.states = {};
-    }
-    
-    // Save current state for this aircraft/section combination
-    $checklistState.states[stateKey] = checkboxStates;
+    $checklistState.checkboxStates = checkboxStates;
   }
 
   function resetCheckboxes() {
-    checkboxStates = checklistItems.map((item) =>
-      Object.keys(item).map(() => false)
-    );
+    checkboxStates = checklistItems.map(() => [false]);
     saveCheckboxStates();
   }
 

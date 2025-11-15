@@ -1,8 +1,8 @@
-<script lang="js">
+<script lang="ts">
   import { simbriefData } from "$lib/stores";
   let customFontSize = "15px"; // Your custom font size
 
-  function processHtml(html, fontSize) {
+  function processHtml(html: string, fontSize: string) {
     // Remove all hyperlinks
     let cleanedHtml = html.replace(/<a[^>]*>(.*?)<\/a>/gi, "$1");
     // Set custom font size
