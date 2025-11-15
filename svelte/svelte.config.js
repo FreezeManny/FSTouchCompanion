@@ -14,7 +14,11 @@ const config = {
     // See https://kit.svelte.dev/docs/adapters for more information about adapters.
     adapter: adapter(),
     csrf: {
-      checkOrigin: false,
+      // `checkOrigin` was deprecated; use `trustedOrigins` instead.
+      // `checkOrigin: false` allowed all origins, so preserve that behavior
+      // by trusting all origins. Note: trusting '*' disables origin checks
+      // and is generally not recommended in production unless intentional.
+      trustedOrigins: ['*'],
     },
   },
 };
