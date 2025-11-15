@@ -5,6 +5,7 @@ export interface ChecklistState {
   aircraft: string;
   section: string;
   checkboxStates: boolean[][];
+  statesMap?: Record<string, boolean[][]>;
 }
 
 export type ChecklistItem = Record<string, string | undefined>;

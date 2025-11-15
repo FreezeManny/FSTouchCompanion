@@ -44,9 +44,12 @@
 
 
   // Initialize or restore checkbox states when checklist changes
+  // Use a map to store checkbox states for each aircraft/section
   $: if (stateKey && checklistItems.length > 0) {
-    const savedStates = $checklistState.checkboxStates;
-    // Each checklistItem may have multiple keys (sub-items)
+    // Use a map object in checklistState to store states per key
+    if (!$checklistState.statesMap) $checklistState.statesMap = {};
+    const statesMap = $checklistState.statesMap;
+    const savedStates = statesMap[stateKey];
     const expectedStates = checklistItems.map(item => Object.keys(item).map(() => false));
     if (
       savedStates &&
@@ -70,7 +73,10 @@
   $: allSelected = checkboxStates.length > 0 && checkboxStates.flat().every(Boolean);
 
   function saveCheckboxStates() {
-    $checklistState.checkboxStates = checkboxStates;
+    if (!$checklistState.statesMap) $checklistState.statesMap = {};
+    if (stateKey) {
+      $checklistState.statesMap[stateKey] = checkboxStates;
+    }
   }
 
 
