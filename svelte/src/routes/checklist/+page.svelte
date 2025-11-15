@@ -26,23 +26,36 @@
     ? Object.keys(checklistData[selectedAircraft] || {})
     : [];
 
+
+  // Always normalize rawChecklist to an array of ChecklistItem
   $: rawChecklist = selectedAircraft && selectedSection
     ? checklistData[selectedAircraft]?.[selectedSection]
     : undefined;
 
-  $: checklistItems = Array.isArray(rawChecklist)
-    ? rawChecklist
-    : rawChecklist
-      ? [rawChecklist]
-      : [];
+  $: checklistItems = (() => {
+    if (!rawChecklist) return [];
+    if (Array.isArray(rawChecklist)) return rawChecklist;
+    if (typeof rawChecklist === 'object') {
+      // If it's a plain object, treat each key-value as a ChecklistItem
+      return [{ ...rawChecklist }];
+    }
+    return [];
+  })();
+
 
   // Initialize or restore checkbox states when checklist changes
   $: if (stateKey && checklistItems.length > 0) {
     const savedStates = $checklistState.checkboxStates;
-    if (savedStates && savedStates.length === checklistItems.length) {
+    // Each checklistItem may have multiple keys (sub-items)
+    const expectedStates = checklistItems.map(item => Object.keys(item).map(() => false));
+    if (
+      savedStates &&
+      savedStates.length === checklistItems.length &&
+      savedStates.every((row, i) => row.length === expectedStates[i].length)
+    ) {
       checkboxStates = savedStates;
     } else {
-      checkboxStates = checklistItems.map(() => [false]);
+      checkboxStates = expectedStates;
       saveCheckboxStates();
     }
   }
@@ -60,10 +73,12 @@
     $checklistState.checkboxStates = checkboxStates;
   }
 
+
   function resetCheckboxes() {
-    checkboxStates = checklistItems.map(() => [false]);
+    checkboxStates = checklistItems.map(item => Object.keys(item).map(() => false));
     saveCheckboxStates();
   }
+
 
   function checkNext() {
     for (let i = 0; i < checkboxStates.length; i++) {
