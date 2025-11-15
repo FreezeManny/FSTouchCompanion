@@ -1,37 +1,53 @@
-<script lang="js">
+<script lang="ts">
+export let params;
   import { settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   import { goto } from "$app/navigation";
 
   const toastStore = getToastStore();
 
-  const simbriefError = (message) => ({
-    message: message,
+  type SimbriefData = {
+    atc: { callsign: string };
+    origin: { icao_code: string; name: string };
+    destination: { icao_code: string; name: string };
+    aircraft: { name: string };
+    params: { time_generated: number };
+    fetch: { status: string };
+  };
+
+  type DepartureArrival = { code: string; name: string };
+
+  const simbriefError = (message: string) => ({
+    message,
     timeout: 5000,
     hoverable: true,
     background: "variant-filled-error",
   });
 
-  async function getFlightPlan() {
+  async function getFlightPlan(): Promise<void> {
     console.log("Fetching flight plan...");
-    const fetchURL = "https://www.simbrief.com/api/xml.fetcher.php?username=" + $settings.simbriefUsername + "&json=1";
+    const fetchURL =
+      "https://www.simbrief.com/api/xml.fetcher.php?username=" + $settings.simbriefUsername + "&json=1";
     try {
       const response = await fetch(fetchURL);
-      const data = await response.json();
+      const data: SimbriefData = await response.json();
 
-      if (data.fetch.status == "Success") {
+      if (data.fetch.status === "Success") {
         $simbriefData = data;
       } else {
         $simbriefData = null;
         toastStore.trigger(simbriefError("Simbrief: " + data.fetch.status));
       }
-    } catch (error) {}
+    } catch (error) {
+      // Optionally handle error
+    }
   }
-  let flightNumber = "";
-  let departure = "";
-  let arrival = "";
-  let aircraft = "";
-  let date = "";
+
+  let flightNumber: string = "";
+  let departure: DepartureArrival = { code: "", name: "" };
+  let arrival: DepartureArrival = { code: "", name: "" };
+  let aircraft: string = "";
+  let date: string = "";
 
   $: if ($simbriefData) {
     flightNumber = $simbriefData.atc.callsign;

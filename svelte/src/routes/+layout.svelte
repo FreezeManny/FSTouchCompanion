@@ -1,4 +1,6 @@
-<script>import "../app.css";
+<script lang="ts">
+export let params;
+import "../app.css";
 import "../app.postcss";
 
 // Highlight JS
@@ -17,7 +19,6 @@ hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("typescript", typescript);
 storeHighlightJs.set(hljs);
 
-
 // Floating UI for Popups
 import { computePosition, autoUpdate, flip, shift, offset, arrow } from "@floating-ui/dom";
 import { storePopup } from "@skeletonlabs/skeleton";
@@ -25,7 +26,7 @@ storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
 import Header from "./Header.svelte";
 
-//Modal Component
+// Modal Component
 import { Modal } from "@skeletonlabs/skeleton";
 
 import { initializeStores } from "@skeletonlabs/skeleton";
@@ -35,10 +36,16 @@ initializeStores();
 
 import settingsModal from "$lib/modals/settings.svelte";
 import radioModal from "$lib/modals/radioKeypad.svelte";
-const modalRegistry = {
+
+type ModalRegistry = {
+  [key: string]: { ref: typeof settingsModal | typeof radioModal };
+};
+
+const modalRegistry: ModalRegistry = {
   settingsModal: { ref: settingsModal },
   radioModal: { ref: radioModal },
-};</script>
+};
+</script>
 
 <Modal components="{modalRegistry}"></Modal>
 <Toast></Toast>
