@@ -7,14 +7,27 @@ export const AtcType = {
   APPROACH: 5,
   RADAR: 6,
   ATIS: 7,
-};
+} as const;
+
+export interface AtcData {
+  callsign: string;
+  frequency: string;
+  type: number;
+  visualRange: number;
+  distance: number;
+  latitude: number;
+  longitude: number;
+  textAtis: string[];
+}
 
 class ATC {
+  private atcData: AtcData[];
+
   constructor() {
     this.atcData = [];
   }
 
-  async get(source) {
+  async get(source: string): Promise<AtcData[]> {
     if (!source) {
       throw new Error("No source provided");
     }
@@ -35,7 +48,18 @@ class ATC {
   }
 }
 
-export const loadAtc = async (currentLatitude, currentLongitude, atisSource) => {
+/**
+ * Loads ATC data based on current position and ATC source
+ * @param currentLatitude - Current aircraft latitude
+ * @param currentLongitude - Current aircraft longitude
+ * @param atisSource - ATC data source (VATSIM or IVAO)
+ * @returns Array of ATC stations within range
+ */
+export const loadAtc = async (
+  currentLatitude: number, 
+  currentLongitude: number, 
+  atisSource: string
+): Promise<AtcData[]> => {
   if (!atisSource || (atisSource.toLowerCase() !== "vatsim" && atisSource.toLowerCase() !== "ivao")) {
     return [];
   }
@@ -72,12 +96,21 @@ export const loadAtc = async (currentLatitude, currentLongitude, atisSource) => 
 
     return allAtc.filter((a) => a.distance <= a.visualRange);
   } catch (e) {
-    console.error(`Error loading ATC data: ${e.message}`);
+    const error = e as Error;
+    console.error(`Error loading ATC data: ${error.message}`);
     return [];
   }
 };
 
-const getDistanceFromLatLonInNm = (lat1, lon1, lat2, lon2) => {
+/**
+ * Calculates the distance between two coordinates in nautical miles
+ * @param lat1 - First latitude
+ * @param lon1 - First longitude
+ * @param lat2 - Second latitude
+ * @param lon2 - Second longitude
+ * @returns Distance in nautical miles
+ */
+const getDistanceFromLatLonInNm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371; // Radius of the earth in km
   const dLat = deg2Rad(lat2 - lat1);
   const dLon = deg2Rad(lon2 - lon1);
@@ -88,4 +121,9 @@ const getDistanceFromLatLonInNm = (lat1, lon1, lat2, lon2) => {
   return R * c * 0.5399568; // Convert to nautical miles
 };
 
-const deg2Rad = (deg) => deg * (Math.PI / 180);
+/**
+ * Converts degrees to radians
+ * @param deg - Degrees
+ * @returns Radians
+ */
+const deg2Rad = (deg: number): number => deg * (Math.PI / 180);
