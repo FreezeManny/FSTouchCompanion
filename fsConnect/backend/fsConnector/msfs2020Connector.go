@@ -32,8 +32,9 @@ type Msfs2020Connector struct {
 	groupID    simconnect.DWord
 
 	// Cached position values (not sent with every update)
-	currentLat float64
-	currentLon float64
+	currentLat        float64
+	currentLon        float64
+	positionInitialized bool
 }
 
 type SimVar struct {
@@ -343,10 +344,24 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 					m.app.SetFsData(m.FsData)
 				case "PLANE LATITUDE":
 					m.currentLat = val
-					// Don't trigger update for position changes - handled by UpdatePosition ticker
+					// Send initial position update once, then handled by UpdatePosition ticker
+					if !m.positionInitialized && m.currentLat != 0 && m.currentLon != 0 {
+						m.positionInitialized = true
+						m.FsData.Position.Lat = m.currentLat
+						m.FsData.Position.Lon = m.currentLon
+						m.app.SetFsData(m.FsData)
+						log.Printf("MSFS2020: Initial position set - Lat: %.6f, Lon: %.6f", m.currentLat, m.currentLon)
+					}
 				case "PLANE LONGITUDE":
 					m.currentLon = val
-					// Don't trigger update for position changes - handled by UpdatePosition ticker
+					// Send initial position update once, then handled by UpdatePosition ticker
+					if !m.positionInitialized && m.currentLat != 0 && m.currentLon != 0 {
+						m.positionInitialized = true
+						m.FsData.Position.Lat = m.currentLat
+						m.FsData.Position.Lon = m.currentLon
+						m.app.SetFsData(m.FsData)
+						log.Printf("MSFS2020: Initial position set - Lat: %.6f, Lon: %.6f", m.currentLat, m.currentLon)
+					}
 				}
 			}
 		}
