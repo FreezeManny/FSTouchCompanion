@@ -107,13 +107,13 @@ func (m *Msfs2020Connector) subscribeToData() {
 		requestID := simconnect.NewRequestID()
 
 		// Determine data type based on unit
-		dataType := simconnect.DWord(simconnect.DataTypeFloat64)
 		if pair.name == "TITLE" {
-			dataType = simconnect.DWord(simconnect.DataTypeString256)
+			// Add string data definition
+			m.simConnect.AddToDataDefinition(defineID, pair.name, pair.unit, simconnect.DataTypeString256)
+		} else {
+			// Add numeric data definition
+			m.simConnect.AddToDataDefinition(defineID, pair.name, pair.unit, simconnect.DataTypeFloat64)
 		}
-
-		// Add the data definition
-		m.simConnect.AddToDataDefinition(defineID, pair.name, pair.unit, dataType)
 
 		// Request event-driven updates
 		m.simConnect.RequestDataOnSimObject(
@@ -236,13 +236,8 @@ func (m *Msfs2020Connector) HandleEvents() {
 
 func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID simconnect.DWord) {
 	if simVar, exists := m.simVarLookup[defineID]; exists {
-		var dataOffset uintptr
-		if simVar.Unit == "String" {
-			// For RecvSimObjectData, skip the header
-			dataOffset = unsafe.Sizeof(simconnect.RecvSimObjectData{})
-		} else {
-			dataOffset = unsafe.Sizeof(simconnect.RecvSimObjectData{})
-		}
+		// Calculate data offset - skip the RecvSimObjectData header
+		dataOffset := unsafe.Sizeof(simconnect.RecvSimObjectData{})
 
 		dataChanged := false
 
@@ -277,16 +272,24 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 
 				switch simVar.Name {
 				case "COM ACTIVE FREQUENCY:1":
-					m.FsData.Com1Act = fmt.Sprintf("%.0f", val*1000)
+					newVal := fmt.Sprintf("%.0f", val*1000)
+					log.Printf("MSFS2020: COM1 Active: %.3f MHz", val)
+					m.FsData.Com1Act = newVal
 					dataChanged = true
 				case "COM STANDBY FREQUENCY:1":
-					m.FsData.Com1Stby = fmt.Sprintf("%.0f", val*1000)
+					newVal := fmt.Sprintf("%.0f", val*1000)
+					log.Printf("MSFS2020: COM1 Standby: %.3f MHz", val)
+					m.FsData.Com1Stby = newVal
 					dataChanged = true
 				case "COM ACTIVE FREQUENCY:2":
-					m.FsData.Com2Act = fmt.Sprintf("%.0f", val*1000)
+					newVal := fmt.Sprintf("%.0f", val*1000)
+					log.Printf("MSFS2020: COM2 Active: %.3f MHz", val)
+					m.FsData.Com2Act = newVal
 					dataChanged = true
 				case "COM STANDBY FREQUENCY:2":
-					m.FsData.Com2Stby = fmt.Sprintf("%.0f", val*1000)
+					newVal := fmt.Sprintf("%.0f", val*1000)
+					log.Printf("MSFS2020: COM2 Standby: %.3f MHz", val)
+					m.FsData.Com2Stby = newVal
 					dataChanged = true
 				case "PLANE LATITUDE":
 					m.FsData.Position.Lat = val
