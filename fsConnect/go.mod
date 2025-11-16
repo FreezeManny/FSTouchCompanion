@@ -6,6 +6,7 @@ toolchain go1.23.5
 
 require (
 	github.com/gorilla/websocket v1.5.3
+	github.com/grumpypixel/msfs2020-simconnect-go v0.4.0
 	github.com/wailsapp/wails/v2 v2.9.2
 )
 
