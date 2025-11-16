@@ -37,14 +37,14 @@
   let ws: WebSocket;
 
   onMount(() => {
-    // Build WebSocket address from settings
-    wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
-    
-    // Add a delay for Safari on iOS to ensure the page is fully ready
-    // Safari sometimes needs a moment after onMount before WebSocket connections work
-    setTimeout(() => {
+    // Use requestAnimationFrame to ensure DOM and stores are fully ready
+    // This fixes Safari on iPad where initial connection fails
+    requestAnimationFrame(() => {
+      // Build WebSocket address from settings
+      wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
+      console.log("Settings loaded, connecting to:", wsAddress);
       webSocketFunction();
-    }, 500);
+    });
   });
 
   function webSocketFunction() {
