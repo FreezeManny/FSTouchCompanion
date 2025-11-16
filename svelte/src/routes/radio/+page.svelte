@@ -120,6 +120,14 @@
     ws.send(JSON.stringify(tmp));
   }
 
+  function retryWebSocketConnection(): void {
+    console.log("Retrying WebSocket connection...");
+    if (ws) {
+      ws.close();
+    }
+    webSocketFunction();
+  }
+
   onDestroy(() => {
     if (ws) {
       ws.close();
@@ -163,6 +171,13 @@
     <!-- Message -->
     <div class="alert-message">
       <h3 class="h3">WebSocket connection failed</h3>
+      <p class="mt-2">Unable to connect to {wsAddress}</p>
+    </div>
+    <!-- Actions -->
+    <div class="alert-actions">
+      <button class="btn variant-filled" on:click={retryWebSocketConnection}>
+        Retry Connection
+      </button>
     </div>
   </aside>
 {/if}
