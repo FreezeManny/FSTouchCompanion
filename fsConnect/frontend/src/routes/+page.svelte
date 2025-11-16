@@ -50,7 +50,7 @@
 		<div class="input-group-shim">Simulator</div>
 		<select on:change={handleSimChange} bind:value={selectedSim}>
 			<option value="xplane12">X-Plane 12</option>
-			<option value="msfs2020">MSFS 2020</option>
+			<option value="msfs">MSFS</option>
 		</select>
 		<div style="background-color: {fsConnected ? 'green' : 'red'}"></div>
 	</div>
