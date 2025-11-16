@@ -142,11 +142,61 @@ func (m *Msfs2020Connector) GetAircraftName() string {
 }
 
 func (m *Msfs2020Connector) SwitchCom1() error {
-	return m.triggerEvent("COM_STBY_RADIO_SWAP")
+	// Swap active and standby frequencies
+	newActive := m.FsData.Com1Stby
+	newStandby := m.FsData.Com1Act
+	
+	// Set the new active frequency in the sim
+	freqFloat, err := strconv.ParseFloat(newActive, 64)
+	if err != nil {
+		return fmt.Errorf("invalid active frequency format: %v", err)
+	}
+	freqHz := uint32((freqFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+	
+	// Set the new standby frequency in the sim
+	freqFloat, err = strconv.ParseFloat(newStandby, 64)
+	if err != nil {
+		return fmt.Errorf("invalid standby frequency format: %v", err)
+	}
+	freqHz = uint32((freqFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+	
+	log.Printf("MSFS2020: Swapped COM1 - New Active: %s, New Standby: %s", newActive, newStandby)
+	return nil
 }
 
 func (m *Msfs2020Connector) SwitchCom2() error {
-	return m.triggerEvent("COM2_RADIO_SWAP")
+	// Swap active and standby frequencies
+	newActive := m.FsData.Com2Stby
+	newStandby := m.FsData.Com2Act
+	
+	// Set the new active frequency in the sim
+	freqFloat, err := strconv.ParseFloat(newActive, 64)
+	if err != nil {
+		return fmt.Errorf("invalid active frequency format: %v", err)
+	}
+	freqHz := uint32((freqFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM2_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+	
+	// Set the new standby frequency in the sim
+	freqFloat, err = strconv.ParseFloat(newStandby, 64)
+	if err != nil {
+		return fmt.Errorf("invalid standby frequency format: %v", err)
+	}
+	freqHz = uint32((freqFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+	
+	log.Printf("MSFS2020: Swapped COM2 - New Active: %s, New Standby: %s", newActive, newStandby)
+	return nil
 }
 
 func (m *Msfs2020Connector) SetCom1Stby(frequency string) error {
