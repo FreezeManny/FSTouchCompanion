@@ -70,9 +70,9 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 		requestID := simconnect.NewRequestID()
 
 		// Determine data type based on unit
-		dataType := simconnect.DataTypeFloat64
+		dataType := simconnect.DWord(simconnect.DataTypeFloat64)
 		if pair.unit == "String" {
-			dataType = simconnect.DataTypeString256
+			dataType = simconnect.DWord(simconnect.DataTypeString256)
 		}
 
 		// Add the data definition
@@ -211,7 +211,17 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 
 		if simVar.Unit == "String" {
 			// Handle string data (aircraft name)
-			str := simconnect.ReadString256(ppData, dataOffset)
+			// Cast to byte array and convert to string
+			byteArray := *(*[256]byte)(unsafe.Pointer(uintptr(ppData) + dataOffset))
+			// Find null terminator
+			len := 0
+			for i, b := range byteArray {
+				if b == 0 {
+					len = i
+					break
+				}
+			}
+			str := string(byteArray[:len])
 			prevValue := m.FsData.AircraftName
 			m.FsData.AircraftName = strings.TrimSpace(str)
 			if prevValue != m.FsData.AircraftName && m.FsData.AircraftName != "" {
