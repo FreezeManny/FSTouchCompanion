@@ -40,11 +40,11 @@
     // Build WebSocket address from settings
     wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
     
-    // Add a small delay for Safari on iOS to ensure the page is fully ready
+    // Add a delay for Safari on iOS to ensure the page is fully ready
     // Safari sometimes needs a moment after onMount before WebSocket connections work
     setTimeout(() => {
       webSocketFunction();
-    }, 100);
+    }, 500);
   });
 
   function webSocketFunction() {
@@ -58,11 +58,10 @@
       
       // Set a connection timeout
       connectionTimeout = setTimeout(() => {
-        if (!isWebSocketOpen && ws.readyState !== WebSocket.OPEN) {
-          connectionError = `Connection timeout after ${CONNECTION_TIMEOUT_MS / 1000}s. Server may be unreachable from this device.`;
-          if (ws) {
-            ws.close();
-          }
+        if (!isWebSocketOpen && ws && ws.readyState !== WebSocket.OPEN) {
+          console.log("Connection timeout - WebSocket state:", ws.readyState);
+          connectionError = `Connection timeout after ${CONNECTION_TIMEOUT_MS / 1000}s. Server may be unreachable from this device. WebSocket state: ${ws.readyState}`;
+          ws.close();
         }
       }, CONNECTION_TIMEOUT_MS);
       
