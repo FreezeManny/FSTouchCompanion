@@ -23,7 +23,9 @@ type Msfs2020Connector struct {
 
 	FsData dataTypes.FsData
 
-	done chan bool
+	done       chan bool
+	simReady   chan bool
+	subscribed bool
 }
 
 type SimVar struct {
@@ -52,6 +54,35 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 	connector.simVars = make([]*SimVar, 0)
 	connector.simVarLookup = make(map[simconnect.DWord]*SimVar)
 	connector.lastValues = make(map[simconnect.DWord]float64)
+	connector.done = make(chan bool, 1)
+	connector.simReady = make(chan bool, 1)
+	connector.subscribed = false
+
+	// Start event handling first
+	go connector.HandleEvents()
+
+	// Wait for the sim to signal it's ready (via RecvIDOpen event)
+	select {
+	case <-connector.simReady:
+		log.Println("MSFS2020: Sim is ready, subscribing to data...")
+	case <-time.After(5 * time.Second):
+		log.Println("MSFS2020: Timeout waiting for sim ready, proceeding anyway...")
+	}
+
+	connector.subscribeToData()
+
+	log.Printf("MSFS2020: Connected to Flight Simulator")
+
+	// Start position updates
+	go connector.UpdatePosition()
+
+	return connector, nil
+}
+
+func (m *Msfs2020Connector) subscribeToData() {
+	if m.subscribed {
+		return
+	}
 
 	// Define SimVars to subscribe to
 	nameUnitPairs := []struct{ name, unit string }{
@@ -61,7 +92,7 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 		{"COM STANDBY FREQUENCY:2", "MHz"},
 		{"PLANE LATITUDE", "Degrees"},
 		{"PLANE LONGITUDE", "Degrees"},
-		{"TITLE", "String"},
+		{"TITLE", ""},
 	}
 
 	// Setup data definitions and subscribe to automatic updates
@@ -71,15 +102,15 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 
 		// Determine data type based on unit
 		dataType := simconnect.DWord(simconnect.DataTypeFloat64)
-		if pair.unit == "String" {
+		if pair.name == "TITLE" {
 			dataType = simconnect.DWord(simconnect.DataTypeString256)
 		}
 
 		// Add the data definition
-		connector.simConnect.AddToDataDefinition(defineID, pair.name, pair.unit, dataType)
+		m.simConnect.AddToDataDefinition(defineID, pair.name, pair.unit, dataType)
 
 		// Request event-driven updates
-		connector.simConnect.RequestDataOnSimObject(
+		m.simConnect.RequestDataOnSimObject(
 			requestID,
 			defineID,
 			simconnect.ObjectIDUser,
@@ -88,23 +119,12 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 		)
 
 		simVar := &SimVar{defineID, requestID, pair.name, pair.unit}
-		connector.simVars = append(connector.simVars, simVar)
-		connector.simVarLookup[defineID] = simVar
-		log.Printf("MSFS2020: Subscribed to '%s'", pair.name)
+		m.simVars = append(m.simVars, simVar)
+		m.simVarLookup[defineID] = simVar
 	}
 
-	connector.done = make(chan bool, 1)
-	connector.updateConnection(true)
-
-	log.Printf("MSFS2020: Connected to Flight Simulator")
-
-	// Start event handling
-	go connector.HandleEvents()
-
-	// Start position updates
-	go connector.UpdatePosition()
-
-	return connector, nil
+	m.subscribed = true
+	log.Printf("MSFS2020: Subscribed to %d SimVars", len(m.simVars))
 }
 
 func (m *Msfs2020Connector) GetConnectionStatus() bool {
@@ -174,8 +194,13 @@ func (m *Msfs2020Connector) HandleEvents() {
 			recv := *(*simconnect.Recv)(ppData)
 			switch recv.ID {
 			case simconnect.RecvIDOpen:
-				log.Println("MSFS2020: Connected to Flight Simulator")
+				log.Println("MSFS2020: SimConnect opened, signaling ready")
 				m.updateConnection(true)
+				// Signal that sim is ready for subscriptions
+				select {
+				case m.simReady <- true:
+				default:
+				}
 
 			case simconnect.RecvIDQuit:
 				log.Println("MSFS2020: Disconnected from Flight Simulator")
@@ -185,7 +210,9 @@ func (m *Msfs2020Connector) HandleEvents() {
 
 			case simconnect.RecvIDException:
 				recvException := *(*simconnect.RecvException)(ppData)
-				log.Printf("MSFS2020: SimConnect Exception: %d", recvException.Exception)
+				exceptionName := m.getExceptionName(recvException.Exception)
+				log.Printf("MSFS2020: SimConnect Exception %d (%s) - SendID: %d, Index: %d", 
+					recvException.Exception, exceptionName, recvException.SendID, recvException.Index)
 
 			case simconnect.RecvIDSimobjectData:
 				data := *(*simconnect.RecvSimObjectData)(ppData)
@@ -209,7 +236,9 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 			dataOffset = unsafe.Sizeof(simconnect.RecvSimObjectData{})
 		}
 
-		if simVar.Unit == "String" {
+		dataChanged := false
+
+		if simVar.Name == "TITLE" {
 			// Handle string data (aircraft name)
 			// Cast to byte array and convert to string
 			byteArray := *(*[256]byte)(unsafe.Pointer(uintptr(ppData) + dataOffset))
@@ -227,6 +256,7 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 			if prevValue != m.FsData.AircraftName && m.FsData.AircraftName != "" {
 				log.Printf("MSFS2020: Aircraft changed to '%s'", m.FsData.AircraftName)
 				m.app.SetAircraftName(m.FsData.AircraftName)
+				dataChanged = true
 			}
 		} else {
 			// Handle numeric data
@@ -240,21 +270,30 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 				switch simVar.Name {
 				case "COM ACTIVE FREQUENCY:1":
 					m.FsData.Com1Act = fmt.Sprintf("%.3f", val)
+					dataChanged = true
 				case "COM STANDBY FREQUENCY:1":
 					m.FsData.Com1Stby = fmt.Sprintf("%.3f", val)
+					dataChanged = true
 				case "COM ACTIVE FREQUENCY:2":
 					m.FsData.Com2Act = fmt.Sprintf("%.3f", val)
+					dataChanged = true
 				case "COM STANDBY FREQUENCY:2":
 					m.FsData.Com2Stby = fmt.Sprintf("%.3f", val)
+					dataChanged = true
 				case "PLANE LATITUDE":
 					m.FsData.Position.Lat = val
+					// Don't trigger update for position changes - handled by UpdatePosition ticker
 				case "PLANE LONGITUDE":
 					m.FsData.Position.Lon = val
+					// Don't trigger update for position changes - handled by UpdatePosition ticker
 				}
 			}
 		}
 
-		m.app.SetFsData(m.FsData)
+		// Only send update if non-position data changed
+		if dataChanged {
+			m.app.SetFsData(m.FsData)
+		}
 	}
 }
 
@@ -267,8 +306,8 @@ func (m *Msfs2020Connector) UpdatePosition() {
 		case <-m.done:
 			return
 		case <-ticker.C:
-			// Position updates are handled automatically via event-driven updates
-			// This goroutine just keeps the pattern consistent with X-Plane connector
+			// Trigger position update by sending the latest cached values
+			m.app.SetFsData(m.FsData)
 		}
 	}
 }
@@ -323,4 +362,36 @@ func (m *Msfs2020Connector) updateConnection(connected bool) {
 	m.FsData.Connected = connected
 	m.app.SetFsData(m.FsData)
 	m.app.SetConnectionStatus(connected)
+}
+
+func (m *Msfs2020Connector) getExceptionName(exception simconnect.DWord) string {
+	names := map[simconnect.DWord]string{
+		0:  "NONE",
+		1:  "ERROR",
+		2:  "SIZE_MISMATCH",
+		3:  "UNRECOGNIZED_ID",
+		4:  "UNOPENED",
+		5:  "VERSION_MISMATCH",
+		6:  "TOO_MANY_GROUPS",
+		7:  "NAME_UNRECOGNIZED",
+		8:  "TOO_MANY_EVENT_NAMES",
+		9:  "EVENT_ID_DUPLICATE",
+		10: "TOO_MANY_MAPS",
+		11: "TOO_MANY_OBJECTS",
+		12: "TOO_MANY_REQUESTS",
+		13: "WEATHER_INVALID_PORT",
+		14: "WEATHER_INVALID_METAR",
+		15: "WEATHER_UNABLE_TO_GET_OBSERVATION",
+		16: "WEATHER_UNABLE_TO_CREATE_STATION",
+		17: "WEATHER_UNABLE_TO_REMOVE_STATION",
+		18: "INVALID_DATA_TYPE",
+		19: "INVALID_DATA_SIZE",
+		20: "DATA_ERROR",
+		21: "INVALID_ARRAY",
+		22: "CREATE_OBJECT_FAILED",
+	}
+	if name, ok := names[exception]; ok {
+		return name
+	}
+	return "UNKNOWN"
 }
