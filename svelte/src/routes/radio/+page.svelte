@@ -5,6 +5,7 @@
   import VatsimFreqSelector from "./frequencySelector/atcFreqSelector.svelte";
 
   let isWebSocketOpen: boolean = false;
+  let connectionError: string = "";
 
   interface Position {
     Lon: number;
@@ -40,53 +41,69 @@
   });
 
   function webSocketFunction() {
-    ws = new WebSocket(wsAddress);
-    console.log("WebSocket connecting to:", wsAddress);
+    try {
+      connectionError = "Connecting...";
+      ws = new WebSocket(wsAddress);
+      console.log("WebSocket connecting to:", wsAddress);
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-      isWebSocketOpen = true;
-    };
+      ws.onopen = () => {
+        console.log("WebSocket connection established");
+        isWebSocketOpen = true;
+        connectionError = "";
+      };
 
-    ws.onmessage = (event: MessageEvent) => {
-      try {
-        console.log("WebSocket message received:", event.data);
-        const message = JSON.parse(event.data);
+      ws.onmessage = (event: MessageEvent) => {
+        try {
+          console.log("WebSocket message received:", event.data);
+          const message = JSON.parse(event.data);
 
-        if (message.Connected) {
-          FsData.Connected = message.Connected || false;
+          if (message.Connected) {
+            FsData.Connected = message.Connected || false;
+          }
+          if (message.Position) {
+            FsData.Position = {
+              ...FsData.Position,
+              ...message.Position,
+            };
+          }
+          if (message.Com1Stby) {
+            FsData.Com1Stby = message.Com1Stby || "------";
+          }
+          if (message.Com1Act) {
+            FsData.Com1Act = message.Com1Act || "------";
+          }
+          if (message.Com2Stby) {
+            FsData.Com2Stby = message.Com2Stby || "------";
+          }
+          if (message.Com2Act) {
+            FsData.Com2Act = message.Com2Act || "------";
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+          connectionError = `Parse error: ${error}`;
         }
-        if (message.Position) {
-          FsData.Position = {
-            ...FsData.Position,
-            ...message.Position,
-          };
-        }
-        if (message.Com1Stby) {
-          FsData.Com1Stby = message.Com1Stby || "------";
-        }
-        if (message.Com1Act) {
-          FsData.Com1Act = message.Com1Act || "------";
-        }
-        if (message.Com2Stby) {
-          FsData.Com2Stby = message.Com2Stby || "------";
-        }
-        if (message.Com2Act) {
-          FsData.Com2Act = message.Com2Act || "------";
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    };
+      };
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
+      ws.onclose = (event: CloseEvent) => {
+        console.log("WebSocket connection closed", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean
+        });
+        isWebSocketOpen = false;
+        connectionError = `Connection closed - Code: ${event.code}, Reason: ${event.reason || "None"}, Clean: ${event.wasClean}`;
+      };
+
+      ws.onerror = (error: Event) => {
+        console.error("WebSocket error:", error);
+        isWebSocketOpen = false;
+        connectionError = `WebSocket error occurred. Browser: ${navigator.userAgent.includes('Safari') ? 'Safari' : 'Other'}`;
+      };
+    } catch (error) {
+      console.error("Failed to create WebSocket:", error);
       isWebSocketOpen = false;
-    };
-
-    ws.onerror = (error: Event) => {
-      console.error("WebSocket error:", error);
-    };
+      connectionError = `Failed to create WebSocket: ${error}`;
+    }
   }
 
   function com1Switch(): void {
@@ -175,6 +192,9 @@
     <div class="alert-message">
       <h3 class="h3">WebSocket connection failed</h3>
       <p class="mt-2">Unable to connect to {wsAddress}</p>
+      {#if connectionError}
+        <p class="mt-2 text-sm font-mono bg-surface-900/50 p-2 rounded">{connectionError}</p>
+      {/if}
     </div>
     <!-- Actions -->
     <div class="alert-actions">
