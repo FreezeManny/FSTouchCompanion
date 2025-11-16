@@ -3,6 +3,8 @@ package fsConnector
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -47,8 +49,15 @@ func NewMsfsConnector (app FsDataInterface) (FsConnector, error) {
 	connector := &MsfsConnector {app: app}
 	connector.updateConnection(false)
 
-	// Initialize SimConnect
-	additionalSearchPath := ""
+	// Initialize SimConnect with path to executable directory
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Printf("MSFS: Failed to get executable path: %v", err)
+		return nil, err
+	}
+	additionalSearchPath := filepath.Dir(exePath)
+	log.Printf("MSFS: Using SimConnect search path: %s", additionalSearchPath)
+	
 	if err := simconnect.Initialize(additionalSearchPath); err != nil {
 		log.Printf("MSFS: Failed to initialize SimConnect: %v", err)
 		return nil, err
