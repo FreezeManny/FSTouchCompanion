@@ -30,11 +30,12 @@
   };
 
   const wsPort = "8080";
-  const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
-
+  let wsAddress: string;
   let ws: WebSocket;
 
   onMount(() => {
+    // Build WebSocket address from settings
+    wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
     webSocketFunction();
   });
 
@@ -121,10 +122,12 @@
   }
 
   function retryWebSocketConnection(): void {
-    console.log("Retrying WebSocket connection...");
+    console.log("Manual retry triggered");
     if (ws) {
       ws.close();
     }
+    // Rebuild WebSocket address in case settings changed
+    wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
     webSocketFunction();
   }
 
