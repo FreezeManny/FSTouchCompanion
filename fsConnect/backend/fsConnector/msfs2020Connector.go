@@ -30,6 +30,10 @@ type Msfs2020Connector struct {
 	// Cache for event IDs to avoid duplicate mappings
 	eventCache map[string]simconnect.DWord
 	groupID    simconnect.DWord
+
+	// Cached position values (not sent with every update)
+	currentLat float64
+	currentLon float64
 }
 
 type SimVar struct {
@@ -287,8 +291,6 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 		// Calculate data offset - skip the RecvSimObjectData header
 		dataOffset := unsafe.Sizeof(simconnect.RecvSimObjectData{})
 
-		dataChanged := false
-
 		if simVar.Name == "TITLE" {
 			// Handle string data (aircraft name)
 			// Cast to byte array and convert to string
@@ -307,7 +309,7 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 			if prevValue != m.FsData.AircraftName && m.FsData.AircraftName != "" {
 				log.Printf("MSFS2020: Aircraft changed to '%s'", m.FsData.AircraftName)
 				m.app.SetAircraftName(m.FsData.AircraftName)
-				dataChanged = true
+				m.app.SetFsData(m.FsData)
 			}
 		} else {
 			// Handle numeric data
@@ -323,35 +325,30 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 					newVal := fmt.Sprintf("%.0f", val*1000)
 					log.Printf("MSFS2020: COM1 Active: %.3f MHz", val)
 					m.FsData.Com1Act = newVal
-					dataChanged = true
+					m.app.SetFsData(m.FsData)
 				case "COM STANDBY FREQUENCY:1":
 					newVal := fmt.Sprintf("%.0f", val*1000)
 					log.Printf("MSFS2020: COM1 Standby: %.3f MHz", val)
 					m.FsData.Com1Stby = newVal
-					dataChanged = true
+					m.app.SetFsData(m.FsData)
 				case "COM ACTIVE FREQUENCY:2":
 					newVal := fmt.Sprintf("%.0f", val*1000)
 					log.Printf("MSFS2020: COM2 Active: %.3f MHz", val)
 					m.FsData.Com2Act = newVal
-					dataChanged = true
+					m.app.SetFsData(m.FsData)
 				case "COM STANDBY FREQUENCY:2":
 					newVal := fmt.Sprintf("%.0f", val*1000)
 					log.Printf("MSFS2020: COM2 Standby: %.3f MHz", val)
 					m.FsData.Com2Stby = newVal
-					dataChanged = true
+					m.app.SetFsData(m.FsData)
 				case "PLANE LATITUDE":
-					m.FsData.Position.Lat = val
+					m.currentLat = val
 					// Don't trigger update for position changes - handled by UpdatePosition ticker
 				case "PLANE LONGITUDE":
-					m.FsData.Position.Lon = val
+					m.currentLon = val
 					// Don't trigger update for position changes - handled by UpdatePosition ticker
 				}
 			}
-		}
-
-		// Only send update if non-position data changed
-		if dataChanged {
-			m.app.SetFsData(m.FsData)
 		}
 	}
 }
@@ -365,7 +362,9 @@ func (m *Msfs2020Connector) UpdatePosition() {
 		case <-m.done:
 			return
 		case <-ticker.C:
-			// Trigger position update by sending the latest cached values
+			// Update position in FsData and send
+			m.FsData.Position.Lat = m.currentLat
+			m.FsData.Position.Lon = m.currentLon
 			m.app.SetFsData(m.FsData)
 		}
 	}
