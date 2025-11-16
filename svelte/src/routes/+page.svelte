@@ -2,6 +2,7 @@
   import { settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   import { goto } from "$app/navigation";
+  import { isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
 
   const toastStore = getToastStore();
 
@@ -61,7 +62,45 @@
     aircraft = "XXXX";
     date = "XXXX";
   }
+
+  function handleRetryConnection() {
+    if ($retryConnectionCallback) {
+      $retryConnectionCallback();
+    }
+  }
 </script>
+
+<!-- WebSocket Connection Status -->
+<div class="card p-4 max-w-md mx-auto mt-5">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        {#if $isWebSocketOpen}
+          {#if $fsData.Connected}
+            <span class="badge variant-filled-success">●</span>
+            <span class="ml-2">Flight Sim Connected</span>
+          {:else}
+            <span class="badge variant-filled-warning">●</span>
+            <span class="ml-2">WebSocket Connected (Waiting for Flight Sim)</span>
+          {/if}
+        {:else}
+          <span class="badge variant-filled-error">●</span>
+          <span class="ml-2">Not Connected</span>
+        {/if}
+      </div>
+    </div>
+    {#if !$isWebSocketOpen}
+      <button class="btn btn-sm variant-filled-primary" on:click={handleRetryConnection}>
+        Retry
+      </button>
+    {/if}
+  </div>
+  {#if $connectionError && !$isWebSocketOpen}
+    <div class="text-sm text-error-500 mt-2">
+      {$connectionError}
+    </div>
+  {/if}
+</div>
 
 <div class="card p-6 max-w-md mx-auto my-5">
   {#if $simbriefData}

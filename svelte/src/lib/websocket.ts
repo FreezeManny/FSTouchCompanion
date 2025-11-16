@@ -34,6 +34,9 @@ export const fsData: Writable<FsDataType> = writable({
   Com2Act: "------",
 });
 
+// Store to hold the retry callback function set by the layout
+export const retryConnectionCallback: Writable<(() => void) | null> = writable(null);
+
 // Helper functions to send commands
 export function com1Switch(ws: WebSocket | null): void {
   if (!ws || ws.readyState !== WebSocket.OPEN) return;

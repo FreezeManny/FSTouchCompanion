@@ -48,14 +48,30 @@ const modalRegistry: ModalRegistry = {
 // WebSocket Management
 import { onMount, onDestroy } from "svelte";
 import { settings } from "$lib/stores";
-import { websocketStore, isWebSocketOpen, connectionError, fsData } from "$lib/websocket";
+import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
 
 const wsPort = "8080";
 let ws: WebSocket;
 let connectionTimeout: ReturnType<typeof setTimeout> | null = null;
 const CONNECTION_TIMEOUT_MS = 5000;
 
+function retryConnection() {
+  console.log("Manual retry triggered from homepage");
+  if (connectionTimeout) {
+    clearTimeout(connectionTimeout);
+    connectionTimeout = null;
+  }
+  if (ws) {
+    ws.close();
+  }
+  const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
+  connectWebSocket(wsAddress);
+}
+
 onMount(() => {
+  // Expose retry function to other components
+  retryConnectionCallback.set(retryConnection);
+  
   // Wait for next animation frame to ensure everything is ready
   requestAnimationFrame(() => {
     const wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
