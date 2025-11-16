@@ -26,6 +26,10 @@ type Msfs2020Connector struct {
 	done       chan bool
 	simReady   chan bool
 	subscribed bool
+
+	// Cache for event IDs to avoid duplicate mappings
+	eventCache map[string]simconnect.DWord
+	groupID    simconnect.DWord
 }
 
 type SimVar struct {
@@ -57,6 +61,8 @@ func NewMsfs2020Connector(app FsDataInterface) (FsConnector, error) {
 	connector.done = make(chan bool, 1)
 	connector.simReady = make(chan bool, 1)
 	connector.subscribed = false
+	connector.eventCache = make(map[string]simconnect.DWord)
+	connector.groupID = simconnect.DWord(0)
 
 	// Start event handling first
 	go connector.HandleEvents()
@@ -148,8 +154,9 @@ func (m *Msfs2020Connector) SetCom1Stby(frequency string) error {
 	if err != nil {
 		return fmt.Errorf("invalid frequency format: %v", err)
 	}
-	// COM_STBY_RADIO_SET_HZ expects frequency in Hz
-	freqHz := uint32(freqFloat * 1000000)
+	// Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
+	// Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
+	freqHz := uint32((freqFloat / 1000) * 1000000)
 	return m.triggerEventWithData("COM_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
 }
 
@@ -158,8 +165,9 @@ func (m *Msfs2020Connector) SetCom2Stby(frequency string) error {
 	if err != nil {
 		return fmt.Errorf("invalid frequency format: %v", err)
 	}
-	// COM2_STBY_RADIO_SET_HZ expects frequency in Hz
-	freqHz := uint32(freqFloat * 1000000)
+	// Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
+	// Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
+	freqHz := uint32((freqFloat / 1000) * 1000000)
 	return m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
 }
 
@@ -269,16 +277,16 @@ func (m *Msfs2020Connector) processSimObjectData(ppData unsafe.Pointer, defineID
 
 				switch simVar.Name {
 				case "COM ACTIVE FREQUENCY:1":
-					m.FsData.Com1Act = fmt.Sprintf("%.3f", val)
+					m.FsData.Com1Act = fmt.Sprintf("%.0f", val*1000)
 					dataChanged = true
 				case "COM STANDBY FREQUENCY:1":
-					m.FsData.Com1Stby = fmt.Sprintf("%.3f", val)
+					m.FsData.Com1Stby = fmt.Sprintf("%.0f", val*1000)
 					dataChanged = true
 				case "COM ACTIVE FREQUENCY:2":
-					m.FsData.Com2Act = fmt.Sprintf("%.3f", val)
+					m.FsData.Com2Act = fmt.Sprintf("%.0f", val*1000)
 					dataChanged = true
 				case "COM STANDBY FREQUENCY:2":
-					m.FsData.Com2Stby = fmt.Sprintf("%.3f", val)
+					m.FsData.Com2Stby = fmt.Sprintf("%.0f", val*1000)
 					dataChanged = true
 				case "PLANE LATITUDE":
 					m.FsData.Position.Lat = val
@@ -313,18 +321,21 @@ func (m *Msfs2020Connector) UpdatePosition() {
 }
 
 func (m *Msfs2020Connector) triggerEvent(eventName string) error {
-	eventID := simconnect.NewEventID()
-	groupID := simconnect.DWord(0)
-
-	m.simConnect.MapClientEventToSimEvent(eventID, eventName)
-	m.simConnect.AddClientEventToNotificationGroup(groupID, eventID, false)
-	m.simConnect.SetNotificationGroupPriority(groupID, simconnect.GroupPriorityHighest)
+	// Get or create event ID for this event name
+	eventID, exists := m.eventCache[eventName]
+	if !exists {
+		eventID = simconnect.NewEventID()
+		m.simConnect.MapClientEventToSimEvent(eventID, eventName)
+		m.simConnect.AddClientEventToNotificationGroup(m.groupID, eventID, false)
+		m.simConnect.SetNotificationGroupPriority(m.groupID, simconnect.GroupPriorityHighest)
+		m.eventCache[eventName] = eventID
+	}
 
 	err := m.simConnect.TransmitClientEvent(
 		uint32(simconnect.ObjectIDUser),
 		uint32(eventID),
 		simconnect.DWordZero,
-		groupID,
+		m.groupID,
 		simconnect.EventFlagGroupIDIsPriority,
 	)
 	if err != nil {
@@ -336,18 +347,21 @@ func (m *Msfs2020Connector) triggerEvent(eventName string) error {
 }
 
 func (m *Msfs2020Connector) triggerEventWithData(eventName string, data simconnect.DWord) error {
-	eventID := simconnect.NewEventID()
-	groupID := simconnect.DWord(0)
-
-	m.simConnect.MapClientEventToSimEvent(eventID, eventName)
-	m.simConnect.AddClientEventToNotificationGroup(groupID, eventID, false)
-	m.simConnect.SetNotificationGroupPriority(groupID, simconnect.GroupPriorityHighest)
+	// Get or create event ID for this event name
+	eventID, exists := m.eventCache[eventName]
+	if !exists {
+		eventID = simconnect.NewEventID()
+		m.simConnect.MapClientEventToSimEvent(eventID, eventName)
+		m.simConnect.AddClientEventToNotificationGroup(m.groupID, eventID, false)
+		m.simConnect.SetNotificationGroupPriority(m.groupID, simconnect.GroupPriorityHighest)
+		m.eventCache[eventName] = eventID
+	}
 
 	err := m.simConnect.TransmitClientEvent(
 		uint32(simconnect.ObjectIDUser),
 		uint32(eventID),
 		data,
-		groupID,
+		m.groupID,
 		simconnect.EventFlagGroupIDIsPriority,
 	)
 	if err != nil {
@@ -389,6 +403,16 @@ func (m *Msfs2020Connector) getExceptionName(exception simconnect.DWord) string 
 		20: "DATA_ERROR",
 		21: "INVALID_ARRAY",
 		22: "CREATE_OBJECT_FAILED",
+		23: "LOAD_FLIGHTPLAN_FAILED",
+		24: "OPERATION_INVALID_FOR_OBJECT_TYPE",
+		25: "ILLEGAL_OPERATION",
+		26: "ALREADY_SUBSCRIBED",
+		27: "INVALID_ENUM",
+		28: "DEFINITION_ERROR",
+		29: "DUPLICATE_ID",
+		30: "DATUM_ID",
+		31: "OUT_OF_BOUNDS",
+		32: "ALREADY_CREATED",
 	}
 	if name, ok := names[exception]; ok {
 		return name
