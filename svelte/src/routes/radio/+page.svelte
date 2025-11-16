@@ -6,6 +6,8 @@
 
   let isWebSocketOpen: boolean = false;
   let connectionError: string = "";
+  let connectionTimeout: ReturnType<typeof setTimeout> | null = null;
+  const CONNECTION_TIMEOUT_MS = 5000; // 5 seconds
 
   interface Position {
     Lon: number;
@@ -37,17 +39,42 @@
   onMount(() => {
     // Build WebSocket address from settings
     wsAddress = `ws://${$settings.flightSimAddress}:${wsPort}/ws`;
-    webSocketFunction();
+    
+    // Add a small delay for Safari on iOS to ensure the page is fully ready
+    // Safari sometimes needs a moment after onMount before WebSocket connections work
+    setTimeout(() => {
+      webSocketFunction();
+    }, 100);
   });
 
   function webSocketFunction() {
     try {
       connectionError = "Connecting...";
+      
+      // Clear any existing timeout
+      if (connectionTimeout) {
+        clearTimeout(connectionTimeout);
+      }
+      
+      // Set a connection timeout
+      connectionTimeout = setTimeout(() => {
+        if (!isWebSocketOpen && ws.readyState !== WebSocket.OPEN) {
+          connectionError = `Connection timeout after ${CONNECTION_TIMEOUT_MS / 1000}s. Server may be unreachable from this device.`;
+          if (ws) {
+            ws.close();
+          }
+        }
+      }, CONNECTION_TIMEOUT_MS);
+      
       ws = new WebSocket(wsAddress);
       console.log("WebSocket connecting to:", wsAddress);
 
       ws.onopen = () => {
         console.log("WebSocket connection established");
+        if (connectionTimeout) {
+          clearTimeout(connectionTimeout);
+          connectionTimeout = null;
+        }
         isWebSocketOpen = true;
         connectionError = "";
       };
@@ -90,8 +117,22 @@
           reason: event.reason,
           wasClean: event.wasClean
         });
+        if (connectionTimeout) {
+          clearTimeout(connectionTimeout);
+          connectionTimeout = null;
+        }
         isWebSocketOpen = false;
-        connectionError = `Connection closed - Code: ${event.code}, Reason: ${event.reason || "None"}, Clean: ${event.wasClean}`;
+        
+        // More descriptive error messages for common close codes
+        let errorMsg = "";
+        switch (event.code) {
+          case 1006:
+            errorMsg = "Code 1006: Connection failed or was terminated abnormally. The server at " + wsAddress + " may not be reachable from Safari on this device. Try checking: 1) Server is running, 2) IP address is correct in settings, 3) Device can reach the server network.";
+            break;
+          default:
+            errorMsg = `Connection closed - Code: ${event.code}, Reason: ${event.reason || "None"}, Clean: ${event.wasClean}`;
+        }
+        connectionError = errorMsg;
       };
 
       ws.onerror = (error: Event) => {
@@ -140,6 +181,10 @@
 
   function retryWebSocketConnection(): void {
     console.log("Manual retry triggered");
+    if (connectionTimeout) {
+      clearTimeout(connectionTimeout);
+      connectionTimeout = null;
+    }
     if (ws) {
       ws.close();
     }
@@ -149,6 +194,9 @@
   }
 
   onDestroy(() => {
+    if (connectionTimeout) {
+      clearTimeout(connectionTimeout);
+    }
     if (ws) {
       ws.close();
     }
