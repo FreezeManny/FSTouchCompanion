@@ -184,31 +184,32 @@ func (m *MsfsConnector ) SwitchCom1() error {
 }
 
 func (m *MsfsConnector ) SwitchCom2() error {
-	// Parse current frequencies
-	activeFloat, err := strconv.ParseFloat(m.FsData.Com2Act, 64)
-	if err != nil {
-		return fmt.Errorf("invalid active frequency format: %v", err)
-	}
-	standbyFloat, err := strconv.ParseFloat(m.FsData.Com2Stby, 64)
-	if err != nil {
-		return fmt.Errorf("invalid standby frequency format: %v", err)
-	}
-	
-	// Send swapped frequencies to sim (convert from KHz to Hz)
-	// Set new active (was standby)
-	freqHz := uint32((standbyFloat / 1000) * 1000000)
-	if err := m.triggerEventWithData("COM2_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
-		return err
-	}
-	
-	// Set new standby (was active)
-	freqHz = uint32((activeFloat / 1000) * 1000000)
-	if err := m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
-		return err
-	}
-	
-	log.Printf("MSFS: Swapped COM2 - New Active: %.3f MHz, New Standby: %.3f MHz", standbyFloat/1000, activeFloat/1000)
-	return nil
+    // Parse current frequencies
+    activeFloat, err := strconv.ParseFloat(m.FsData.Com2Act, 64)
+    if err != nil {
+        return fmt.Errorf("invalid active frequency format: %v", err)
+    }
+    standbyFloat, err := strconv.ParseFloat(m.FsData.Com2Stby, 64)
+    if err != nil {
+        return fmt.Errorf("invalid standby frequency format: %v", err)
+    }
+    
+    // Use COM_RADIO_SET with index 2 for COM2
+    // Send swapped frequencies to sim (convert from KHz to Hz)
+    // Set new active (was standby)
+    freqHz := uint32((standbyFloat / 1000) * 1000000)
+    if err := m.triggerEventWithData("COM2_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+        return err
+    }
+    
+    // Set new standby (was active)
+    freqHz = uint32((activeFloat / 1000) * 1000000)
+    if err := m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+        return err
+    }
+    
+    log.Printf("MSFS: Swapped COM2 - New Active: %.3f MHz, New Standby: %.3f MHz", standbyFloat/1000, activeFloat/1000)
+    return nil
 }
 
 func (m *MsfsConnector ) SetCom1Stby(frequency string) error {
@@ -223,14 +224,14 @@ func (m *MsfsConnector ) SetCom1Stby(frequency string) error {
 }
 
 func (m *MsfsConnector ) SetCom2Stby(frequency string) error {
-	freqFloat, err := strconv.ParseFloat(frequency, 64)
-	if err != nil {
-		return fmt.Errorf("invalid frequency format: %v", err)
-	}
-	// Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
-	// Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
-	freqHz := uint32((freqFloat / 1000) * 1000000)
-	return m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
+    freqFloat, err := strconv.ParseFloat(frequency, 64)
+    if err != nil {
+        return fmt.Errorf("invalid frequency format: %v", err)
+    }
+    // Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
+    // Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
+    freqHz := uint32((freqFloat / 1000) * 1000000)
+    return m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
 }
 
 // ----------------- MSFS specific methods -----------------
