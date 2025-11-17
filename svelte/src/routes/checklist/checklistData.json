@@ -723,7 +723,6 @@
         "ICE PROTECTION": "AS RQRD",
         "EXT. LIGHTS": "AS RQRD"
       }
-
     ],
     "DESCENT": [
       {
@@ -740,8 +739,8 @@
         "DA(BARO)": "SET, ___ ft",
         "XFEED KNOB": "OFF",
         "EXT. LIGHTS": "SET",
-        "SIGNS/OUTLET":"AS RQRD",
-        "PAX":"ADVISED"
+        "SIGNS/OUTLET": "AS RQRD",
+        "PAX": "ADVISED"
       }
     ],
     "BEFORE LANDING": [
