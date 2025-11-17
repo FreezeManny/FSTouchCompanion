@@ -662,5 +662,105 @@
         "R and L APU or EXT Bus Switches": "ON or OFF"
       }
     ]
+  },
+  "E55P": {
+    "BEFORE START": [
+      {
+        "PRE-FLIGHT & TESTS": "COMPLETED",
+        "OXYGEN BTL": "PUSH, PAX AUTO",
+        "OXYGEN PRESS": "DISPATCH",
+        "ELEC PANEL": ">27 VOLTS/GPU AS RQRD",
+        "BLEED PANEL": "ALL AUTO",
+        "FUEL PANEL": "PUMPS AUTO/XFEED OFF",
+        "HYD PUMPS SOV": "BOTH OPEN",
+        "PUSHER CUTOUT": "PUSHED OUT",
+        "ICE PROTCTION/ADS": "OFF/AS RQRD",
+        "PRESSURIZATION & A/C PNL": "AUTO/SET",
+        "ENGINE FIRE PANEL": "PUSHED OUT/BTL OFF",
+        "START/STOP & EIS": "STOP & OFF 2x",
+        "IGNITION": "BOTH AUTO",
+        "THRUST LEVERS": "IDLE",
+        "FLAPS & SPEED BRAKE": "UP & CLOSED",
+        "PARKING BRAKE": "SET",
+        "DOORS": "CLOSED"
+      }
+    ],
+    "AFTER START": [
+      {
+        "GPU": "DISC./AS RQRD",
+        "ELEC EMER": ">23.5V/ PUSHED OUT",
+        "STALL PROTECTION": "CHECKED",
+        "T/O DATA": "TESTED",
+        "TRIMS": "RUD & YAW 0/PITCH GREEN",
+        "FLIGHT CTL + SPEED BRAKE": "CHECKED",
+        "ICE PROTECTION": "AS RQRD",
+        "FLAPS": "__ T/O"
+      }
+    ],
+    "BEFORE TAKE-OFF": [
+      {
+        "TAKEOFF CONFIG": "TAKEOFF OK",
+        "CAS": "CHECKED",
+        "SIGNS": "PED-BELTS/OFF",
+        "YAW DAMPER": "OFF",
+        "ICE PROTECTION": "(AS RQRD: TESTED & SET)",
+        "ATR": "GREEN"
+      },
+      {
+        "PAX": "ADVISED",
+        "EXT. LIGHTS": "AS RQRD",
+        "XPDR": "ALT"
+      }
+    ],
+    "AFTER TAKE-OFF": [
+      {
+        "LANDING GEAR": "UP",
+        "FLAPS": "UP",
+        "YAW DAMPER": "ON",
+        "THRUST LEVERS": "MCT",
+        "PRESSURIZATION": "CHECKED",
+        "ALTIMETERS": "X-CHECKED",
+        "ICE PROTECTION": "AS RQRD",
+        "EXT. LIGHTS": "AS RQRD"
+      }
+
+    ],
+    "DESCENT": [
+      {
+        "APPROACH BRIEFING": "COMPLETED",
+        "LANDING DATA": "SET",
+        "WINDSHIELD HEAT": "ON",
+        "SIGNS/OUTLET": "AS RQRD",
+        "ICE PROTECTION": "AS RQRD"
+      }
+    ],
+    "APPROACH": [
+      {
+        "ALTIMETERS": "X-CHECKED",
+        "DA(BARO)": "SET, ___ ft",
+        "XFEED KNOB": "OFF",
+        "EXT. LIGHTS": "SET",
+        "SIGNS/OUTLET":"AS RQRD",
+        "PAX":"ADVISED"
+      }
+    ],
+    "BEFORE LANDING": [
+      {
+        "LANDING GEAR": "DOWN, 3 GREEN",
+        "FLAPS": "SET ___",
+        "YAW DAMPER": "OFF",
+        "SPEED BRAKE": "CLOSED",
+        "GO AROUND ALTITUDE": "SET",
+        "ICE PROTECTION": "AS RQRD"
+      }
+    ],
+    "AFTER LANDING": [
+      {
+        "FLAPS + SPEED BRAKE": "UP & CLOSED",
+        "EXT. LIGHTS": "SET",
+        "ICE PROTECTION": "AS RQRD",
+        "CABIN PRESSURE": "ALT AD (0.2 PSI DIFF MAX)"
+      }
+    ]
   }
 }
