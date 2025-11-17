@@ -15,7 +15,6 @@
     ? `${selectedAircraft}|${selectedSection}` 
     : null;
 
-
   onMount(() => {
     // Restore last selected aircraft and section
     selectedAircraft = $checklistState.aircraft || "";
