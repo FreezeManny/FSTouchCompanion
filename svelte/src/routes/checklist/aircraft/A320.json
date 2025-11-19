@@ -1,0 +1,52 @@
+{
+  "info": {
+    "name": "Airbus A320",
+    "codes": ["A318", "A319", "A320", "A321"]
+  },
+  "checklist": {
+    "BEFORE START": [
+      ["GEAR PINS, COVERS", "REMOVED | PM"],
+      [  "SIGNS", "value", "ON/AUTO" ],
+      ["ADIRS", "NAV"],
+      ["FUEL QUANTITY", "__,_ KG"],
+      ["ALTIMETERS", "__,_ | BOTH"],
+      [],
+      ["WINDOWS / DOORS", "CLOSED | BOTH"],
+      ["BEACON", "ON"],
+      ["PARK BRK", "AS RQRD"]
+    ],
+    "AFTER START": [
+      ["ANTI-ICE", "AS RQRD"],
+      ["ECAM STATUS", "CHECKED"],
+      ["TRIM", "_% SET, ZERO"]
+    ],
+    "BEFORE TAKEOFF": [
+      ["FLIGHT CONTROLS", "CHECK | BOTH"],
+      ["FLAPS", "_ | BOTH"],
+      ["TO SPEEDS/FLEX", "_,_,_/_ | BOTH"],
+      ["ECAM MEMO", "TO NO BLUE"],
+      [],
+      ["TO RWY:", "_,_ | BOTH"],
+      ["PACKS", "AS RQRD"]
+    ],
+    "LANDING": [
+      ["LDG GEAR", "DOWN | BOTH"],
+      ["SIGNS", "ON"],
+      ["FLAPS", "AS RQRD"]
+    ],
+    "PARKING": [
+      ["ENGINES", "OFF"],
+      ["RADAR / PWS", "OFF"],
+      ["FUEL PUMPS", "OFF"],
+      ["PARK BRK", "AS RQRD"]
+    ],
+    "SECURING THE AIRCRAFT": [
+      ["ADIRS", "OFF"],
+      ["OXYGEN", "OFF"],
+      ["APU BLEED", "OFF"],
+      ["EMER EXIT LT", "OFF"],
+      ["SIGNS", "OFF"],
+      ["APU and BAT", "OFF"]
+    ]
+  }
+}
