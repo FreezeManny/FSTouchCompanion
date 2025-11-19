@@ -2111,5 +2111,154 @@
         "WHEEL CHOCKS": "INSTALLED"
       }
     ]
+  },
+  "TBM850": {
+    "PRE-FLIGHT/BEFORE START": [
+      {
+        "PARKING BRAKE": "SET",
+        "CRASH LEVER": "UP",
+        "SOURCE SELECTOR": "OFF",
+        "GENERATOR": "MAIN",
+        "STARTER": "OFF",
+        "IGNITION": "AUTO",
+        "EXTERIOR LIGHTS": "OFF",
+        "GYRO INST": "OFF",
+        "CIRCUIT BREAKERS": "ALL IN",
+        "DEICE": "ALL OFF",
+        "GEAR": "DOWN",
+        "AP/TRIM": "OFF",
+        "RADIO MASTER": "OFF",
+        "BLEED AIR": "OFF",
+        "AC": "OFF",
+        "DUMP SWITCH": "GUARDED",
+        "FUEL SELECTOR": "MANUAL",
+        "AUX BOOST PUMP": "OFF",
+        "TANK SELECTOR": "L OR R",
+        "THROTTLE": "IDLE",
+        "PROPELLER": "FULL FWD",
+        "CONDITION LEVER": "CUTOFF",
+        "SOURCE SELECTOR": "BATTERY OR GPU",
+        "VOLTMETER": "25V",
+        "EXTERIOR LIGHTS": "LIGHT TEST",
+        "ANNUNCIATOR": "TEST 1 & 2",
+        "ECS": "LIGHT TEST",
+        "FLAPS": "FULL DOWN",
+        "LDG GEAR": "TEST 1 & 2",
+        "PITOT & STALL HEAT": "ON & CHK ANNUN",
+        "DEICE PANEL": "LIGHT TEST THEN CHK ALL OFF",
+        "OXYGEN PRESS": "CHECK & ON",
+        "RADIO MASTER": "ON",
+        "HORN TEST": "HOLD",
+        "FUEL SELECTOR": "AUTO",
+        "ITT TEST": "HOLD",
+        "NAV & STROBE LIGHTS": "ON",
+        "AP/TRIM (SYSTEM TEST)": "ON",
+        "TAXI LGT": "ON",
+        "INERTIAL SEPARATOR": "ON",
+        "TERRAIN TEST": "PUSH",
+        "TERRAIN LIGHT": "TEST"
+      }
+    ],
+    "ENGINE START": [
+      {
+        "CONDITION LEVER": "CUTOFF",
+        "SOURCE SELECTOR": "BAT OR GPU",
+        "AUX BOOST PUMP": "ON",
+        "IGNITION": "AUTO",
+        "STARTER": "ON",
+        "GAS GENERATOR(NG)": "AT LEAST 13%",
+        "CONDITION LEVER": "LOW IDLE",
+        "ITT": "BELOW 870",
+        "STARTER": "OFF @ 50% NG",
+        "SOURCE SELECTOR": "BAT",
+        "CONDITION LEVER": "HIGH IDLE",
+        "AUX BOOST PUMP": "AUTO",
+        "VOLTMETER": "28V",
+        "GYRO INST": "ALL ON",
+        "INERTIAL SEPARATOR": "ON",
+        "FLAPS": "FOR T/O",
+        "BLEED AIR": "AUTO",
+        "AIR CON": "ON",
+        "AIRFRAME DEICE": "ON CHK GREEN OFF",
+        "PROP DEICE": "ON CHK GREEN OFF",
+        "L WINDSHLD": "ON CHK GREEN OFF",
+        "R WINDSHLD": "ON CHK GREEN OFF",
+        "CABIN ALTITUDE": "CRZ+1000FT",
+        "EFIS": "ON"
+      }
+    ],
+    "TAKEOFF": [
+      {
+        "PITOT & STALL HEAT": "ON",
+        "WEATHER RADAR": "ON",
+        "LDG LIGHTS": "ON",
+        "IGNITION": "ON IF HEAVY RAIN",
+        "@ POSITIVE RATE": "GEAR UP",
+        "@ 500FT AGL & 120IAS": "FLAPS UP",
+        "FLAPS UP": "ENGAGE 850 MODE",
+        "TRQ": "MAX 121.4%"
+      }
+    ],
+    "CLIMB": [
+      {
+        "DEICE": "AS REQ",
+        "INERTIAL SEPARATOR": "AS REQ",
+        "CABIN ALTITUDE": "CRZ+1000FT"
+      }
+    ],
+    "CRUISE": [
+      {
+        "CABIN ALTITUDE": "CHECK",
+        "FUEL": "MONITOR",
+        "DEICE": "AS REQ",
+        "INERTIAL SEP": "AS REQ",
+        "IGNITION": "ON IF HEAVY RAIN"
+      }
+    ],
+    "DESCENT": [
+      {
+        "CABIN ALTITUDE": "AIRPORT ELEV+500FT",
+        "PULSE LIGHTS": "ON",
+        "DEICE": "AS REQ",
+        "INERTIAL SEPARATOR": "AS REQ",
+        "IGNITION": "ON IF HEAVY RAIN"
+      }
+    ],
+    "BEFORE LANDING": [
+      {
+        "LANDING LIGHTS": "ON",
+        "INERTIAL SEPARATOR": "ON <200KTS",
+        "LDG GEAR": "DOWN <178KTS",
+        "FLAPS 1": "<178KTS",
+        "FLAPS": "FULL DOWN <122KTS"
+      }
+    ],
+    "AFTER LANDING": [
+      {
+        "FLAPS": "UP",
+        "WEATHER RADAR": "STDBY/OFF",
+        "DEICE": "OFF",
+        "INERTIAL SEPARATOR": "CHK ON",
+        "LANDING LIGHT": "OFF",
+        "TAXI LIGHT": "ON",
+        "PULSE LIGHT": "OFF",
+        "OXYGEN SUPPLY": "OFF"
+      }
+    ],
+    "SHUTDOWN": [
+      {
+        "BLEED AIR": "OFF",
+        "AIR CON": "OFF",
+        "EFIS": "OFF",
+        "GYRO INST": "ALL OFF",
+        "AP/TRIM": "OFF",
+        "RADIO MASTER": "OFF",
+        "THROTTLE": "IDLE 1 MIN",
+        "PROPELLER": "FEATHER 15 SECONDS",
+        "CONDITION LEVER": "CUTOFF",
+        "AUX BOOST PUMP": "OFF",
+        "CHECK EVERYTHING OFF": "& CRASH LEVER DOWN"
+      }
+    ]
   }
 }
