@@ -1,0 +1,168 @@
+{
+    "info": {
+        "name": "Cessna 150",
+        "codes": ["C150"]
+    },
+    "checklist": {
+        "COCKPIT PRE-FLIGHT": [
+            ["Parking Brake", "CHECK SET"],
+            ["Battery Charge (Tablet)", "CHECK / CHARGE"],
+            ["Oil Quantity (Tablet)", "CHECK/SET"],
+            ["Engine Health (Tablet)", "CHECK/FIX"],
+            ["Ignition", "OFF"],
+            ["Master Battery Switch", "ON"],
+            ["Fuel Quantity", "CHECK"],
+            ["Master Battery Switch", "OFF"],
+            ["Weight & Balance", "CHECK"],
+            ["Engine and Pitot Covers", "REMOVE"],
+            ["Mixture", "CUTOFF"],
+            ["Thrust Lever", "0%"],
+            ["Avionics", "OFF"],
+            ["Lights", "OFF"],
+            ["Elevator Trim", "T/O"],
+            ["Carb Heat", "OFF (IN)"],
+            ["Cabin Air", "OFF (IN)"],
+            ["Cabin Heat", "OFF (IN)"],
+            ["Fuel Shutoff Valve", "ON"]
+        ],
+        "ENGINE START": [
+            ["Mixture", "RICH"],
+            ["Carb Heat", "COLD"],
+            ["Primer", "AS REQ (UP TO 3 STROKES)"],
+            ["Throttle", "1/2 INCH OPEN"],
+            ["Master Battery Switch", "ON"],
+            ["Internal Lights", "AS REQ"],
+            ["Nav Lights", "ON"],
+            ["Beacon", "ON"],
+            ["Propeller Area", "CLEAR"],
+            ["Ignition", "START THEN BOTH"],
+            ["Throttle", "ADJUST FOR 1000 RPM"],
+            ["Oil Pressure", "CHECK"],
+            ["Master Alternator Switch", "ON"],
+            ["Ammeter", "CHECK"]
+        ],
+        "AFTER ENGINE START": [
+            ["Mixture", "LEAN"],
+            ["Cabin Air", "AS REQ"],
+            ["Cabin Heat", "AS REQ"],
+            ["Avionics", "ON & SET"],
+            ["Altimeter", "SET"],
+            ["Heading Indicator", "TUNE"],
+            ["Autopilot", "PRESS BARO"],
+            ["Transponder", "SET & STBY"],
+            ["Flight Controls", "CHECK FREE & CORRECT"],
+            ["Doors", "CLOSED & LATCHED"]
+        ],
+        "BEFORE TAXI": [
+            ["Fuel Quantity", "CHECK"],
+            ["Flaps", "SET FOR T/O"],
+            ["Elevator Trim", "CHECK SET FOR T/O"],
+            ["Pitot Heat", "AS REQ"],
+            ["Request ATC Clearance", "COMPLETED"],
+            ["Taxi Lights", "ON"]
+        ],
+        "TAXI": [
+            ["Parking Brake", "OFF"],
+            ["Max. Speed", "15 KIAS/5 IN TURNS"],
+            ["Brakes", "TEST"],
+            ["Rudder", "TEST"]
+        ],
+        "ENGINE RUN-UP TEST": [
+            ["Parking Brake", "SET"],
+            ["Mixture*", "AS REQ"],
+            ["Throttle", "ADJUST FOR ~ 1700 RPM"],
+            ["Magneto Check**", "LEFT, BOTH, RIGHT, BOTH"],
+            ["Carb Heat Check***", "ON THEN OFF"],
+            ["Ammeter", "CHECK > 0"],
+            ["Suction Gauge", "CHECK GREEN RANGE"],
+            ["Oil Temp", "CHECK GREEN RANGE"],
+            ["Oil Pressure", "CHECK GREEN RANGE"],
+            ["Throttle", "IDLE"],
+            ["Throttle", "ADJUST FOR ~ 1000 RPM"]
+        ],
+        "BEFORE TAKEOFF": [
+            ["Altimeter", "CHECK/SET LOCAL"],
+            ["Pitot Heat", "AS REQ"],
+            ["Carb Heat", "OFF (IN)"],
+            ["Mixture*", "AS REQ"],
+            ["Flaps", "CHECK/SET FOR T/O"],
+            ["Elevator Trim", "CHECK/SET FOR T/O"],
+            ["Flight Instruments", "CHECK"],
+            ["Engine Instruments", "CHECK"],
+            ["Avionics", "CHECK"],
+            ["Windows", "CLOSED & LATCHED"],
+            ["Request ATC Clearance for Takeoff", "COMPLETED"],
+            ["Landing Lights", "ON"],
+            ["Taxi Lights", "OFF"],
+            ["Strobe Lights", "ON"],
+            ["Transponder", "ON"]
+        ],
+        "TAKEOFF": [
+            ["Parking Brake", "OFF"],
+            ["Brakes", "RELEASE"],
+            ["Throttle", "FULL"],
+            ["Air Speed Indicator", "CHECK"],
+            ["At 50 KIAS", "ROTATE"],
+            ["Initial Climb Speed", "65-75 KIAS"],
+            ["Flaps", "UP ABOVE 300 FT"]
+        ],
+        "ON CLIMB": [
+            ["Flaps", "CHECK UP"],
+            ["Airspeed", "75-85 KIAS"],
+            ["Pitot Heat", "AS REQ"],
+            ["Carb Heat", "AS REQ"],
+            ["Throttle", "FULL"],
+            ["Mixture*", "AS REQ"],
+            ["Landing Lights", "OFF (ABOVE FL100)"]
+        ],
+        "CRUISE": [
+            ["Pitot Heat", "AS REQ"],
+            ["Carb Heat", "AS REQ"],
+            ["Throttle", "AS REQ"]
+        ],
+        "DESCENT": [
+            ["Mixture*", "AS REQ"],
+            ["Landing Lights", "ON (BELOW FL100)"]
+        ],
+        "APPROACH": [
+            ["Altimeter", "SET LOCAL"],
+            ["Speed", "85 KIAS"],
+            ["Downwind Leg Speed", "60-70 KIAS"],
+            ["Downwind Leg Flaps", "10 DEGREES (BEFORE BASE LEG)"],
+            ["Base Leg Flaps", "20 DEGREES"],
+            ["Final Speed", "55-60 KIAS"],
+            ["Final Flaps", "30 DEGREES/FULL"]
+        ],
+        "GO AROUND": [
+            ["Throttle", "FULL (2300 RPM MIN)"],
+            ["Flaps", "RETRACT TO 20 DEGREES"],
+            ["Speed", "MAINTAIN 54 KIAS"],
+            ["Flaps", "RETRACT TO 10 DEGREES"],
+            ["Accelerate...", "FLAPS RETRACT ABOVE 60 KIAS"]
+        ],
+        "AFTER LANDING": [
+            ["Taxi Lights", "ON"],
+            ["Landing Lights", "OFF"],
+            ["Strobe Lights", "OFF"],
+            ["Flaps", "0 DEGREES"],
+            ["Elevator Trim", "SET FOR T/O"],
+            ["Carb Heat", "OFF"],
+            ["Transponder", "STBY"]
+        ],
+        "PARKING": [
+            ["Taxi Light", "OFF"],
+            ["Throttle", "IDLE"],
+            ["Parking Brake", "SET"]
+        ],
+        "SHUTDOWN": [
+            ["Parking Brake", "CHECK SET"],
+            ["Mixture", "CUTOFF"],
+            ["Ignition", "OFF"],
+            ["Fuel Shutoff Valve", "OFF"],
+            ["Avionics", "OFF"],
+            ["Transponder", "OFF"],
+            ["Lights", "ALL OFF"],
+            ["Master Switches (ALT & BAT)", "OFF"]
+        ]
+    }
+}
