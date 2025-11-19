@@ -10,7 +10,7 @@
       ["ADIRS", "NAV"],
       ["FUEL QUANTITY", "__,_ KG"],
       ["ALTIMETERS", "__,_ | BOTH"],
-      [],
+      { "break": true },
       ["WINDOWS / DOORS", "CLOSED | BOTH"],
       ["BEACON", "ON"],
       ["PARK BRK", "AS RQRD"]
@@ -25,7 +25,7 @@
       ["FLAPS", "_ | BOTH"],
       ["TO SPEEDS/FLEX", "_,_,_/_ | BOTH"],
       ["ECAM MEMO", "TO NO BLUE"],
-      [],
+      { "break": true },
       ["TO RWY:", "_,_ | BOTH"],
       ["PACKS", "AS RQRD"]
     ],
