@@ -1,6 +1,8 @@
 <script lang="ts">
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
+  import { popup } from "@skeletonlabs/skeleton";
+  import type { PopupSettings } from "@skeletonlabs/skeleton";
 
   // Load and sort aircraft data
   const modules = import.meta.glob("./aircraft/*.json", { eager: true });
@@ -55,10 +57,34 @@
     }
   }
 
-  function reset() {
+  function resetSection() {
     checkboxStates = new Array(items.length).fill(false);
     saveState();
   }
+
+  function resetAircraft() {
+    if (!$checklistState.aircraft) return;
+    const prefix = `${$checklistState.aircraft}|`;
+    const newStatesMap = { ...($checklistState.statesMap || {}) };
+    
+    let changed = false;
+    for (const key in newStatesMap) {
+      if (key.startsWith(prefix)) {
+        delete newStatesMap[key];
+        changed = true;
+      }
+    }
+    
+    if (changed) {
+      $checklistState.statesMap = newStatesMap;
+    }
+  }
+
+  const popupReset: PopupSettings = {
+    event: 'click',
+    target: 'popupReset',
+    placement: 'bottom'
+  };
 
   function checkNext() {
     if (nextItemIndex !== -1) {
@@ -94,7 +120,21 @@
   </label>
 
   <div class="flex-grow"></div>
-  <button type="button" class="btn variant-filled" on:click={reset}>Reset</button>
+  <button type="button" class="btn variant-filled" use:popup={popupReset}>Reset</button>
+  
+  <div class="card p-4 w-60 shadow-xl z-50" data-popup="popupReset">
+    <nav class="list-nav">
+      <ul>
+        <li>
+          <button type="button" class="w-full text-left" on:click={resetSection}>Reset Section</button>
+        </li>
+        <li>
+          <button type="button" class="w-full text-left" on:click={resetAircraft}>Reset Entire Aircraft</button>
+        </li>
+      </ul>
+    </nav>
+    <div class="arrow bg-surface-100-800-token" />
+  </div>
 </div>
 
 <!-- Content -->
