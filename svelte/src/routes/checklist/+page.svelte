@@ -41,6 +41,7 @@
 
   $: stateKey = $checklistState.aircraft && $checklistState.section ? `${$checklistState.aircraft}|${$checklistState.section}` : null;
   $: allSelected = items.length > 0 && items.every((item, i) => item.type === "break" || checkboxStates[i]);
+  $: nextItemIndex = checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break");
 
   // Restore state when selection changes
   $: if (stateKey) {
@@ -60,9 +61,8 @@
   }
 
   function checkNext() {
-    const index = checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break");
-    if (index !== -1) {
-      checkboxStates[index] = true;
+    if (nextItemIndex !== -1) {
+      checkboxStates[nextItemIndex] = true;
       saveState();
     }
   }
@@ -104,7 +104,7 @@
       {#if item.type === "break"}
         <hr class="my-4 opacity-50" />
       {:else}
-        <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer">
+        <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer {index === nextItemIndex ? 'ring-2 ring-primary-500' : ''}">
           <input class="checkbox mt-1" type="checkbox" bind:checked={checkboxStates[index]} on:change={saveState} />
           <div class="flex-grow">
             <div class="flex justify-between w-full">
