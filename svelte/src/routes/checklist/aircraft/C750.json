@@ -1,0 +1,177 @@
+{
+    "info": {
+        "name": "Cessna Citation X",
+        "codes": ["C750"]
+    },
+    "checklist": {
+        "COCKPIT PREPARATION": [
+            ["PREFLIGHT INSPECTION", "COMPLETE"],
+            ["EMERG LT SWITCH", "ARM"],
+            ["DAY/NITE DIM SWITCH", "AS REQUIRED"],
+            ["LH/RH GEN SWITCHES", "GEN"],
+            ["LH/RH FUEL BOOST", "NORM"],
+            ["LH/RH FADEC SWITCHES", "NORM"],
+            ["LH/RH IGNITION SWITCHES", "NORM"],
+            ["STBY GYRO", "CAGED"],
+            ["STBY PWR SWITCH", "ON"],
+            ["EXTERIOR LIGHTS", "AS REQUIRED"],
+            ["PRESSURIZATION CONTROL", "AS REQUIRED"],
+            ["BLEED/ENV CONTROL KNOB", "SET"],
+            ["ALL OTHER SWITCHES", "AS REQUIRED"],
+            ["BATT 1 & 2 SWITCHES", "ON"],
+            ["DC POWER BUS 1 & 2", "ON"],
+            ["DC POWER XTIE", "VERIFY CLOSED"],
+            ["AVIONICS SWITCH", "ON"],
+            ["PARKING BRAKE", "SET"],
+            ["APU START OR GPU", "CONNECTED"],
+            ["DC BATT AMMETERS", "VERIFY BOTH"],
+            ["IRS", "ALIGN/NAV / POS INIT"],
+            ["FMS", "CHECK/SET"],
+            ["FUEL TRANSFER/CROSSFEED", "CHECK/OFF"],
+            ["FLT CONTROL SHUTOFF", "ALL EXTINGUISHED"],
+            ["WARNING SYSTEMS", "CHECK"],
+            ["COCKPIT VOICE RECORDER", "TEST"],
+            ["AILERON & RUDDER TRIM", "CHECK/SET FOR T/O"],
+            ["FGC/STAB TRIM/YAW DAMP", "CHECK/SET"]
+        ],
+        "BEFORE START": [
+            ["STBY PWR SWITCH", "ON"],
+            ["EMERG LT SWITCH", "ARM"],
+            ["BATT 1 & 2 SWITCHES", "ON"],
+            ["DC BUS 1 & 2", "VERIFY NORM"],
+            ["DC POWER XTIE", "VERIFY CLSD"],
+            ["APU OR GPU", "CONN/ON/CHECK VOLTS"],
+            ["AVIONICS SWITCH", "ON"],
+            ["IRS 1 & 2", "ALIGN/NAV/POS INIT"],
+            ["FMS 1 & 2", "CHECK/SET"],
+            ["PARKING BRAKE", "VERIFY SET"],
+            ["WHEEL CHOCKS", "REMOVED"],
+            ["CABIN DOOR", "CLOSE/LOCK"],
+            ["PASSENGER BRIEFING", "COMPLETED"],
+            ["SEATS/BELTS/PEDALS", "ADJUST/SECURE"],
+            ["COCKPIT SIDE WINDOWS", "CLOSED/LATCHED"],
+            ["EXTERNAL LIGHTS", "AS REQUIRED"],
+            ["EICAS", "CHECKLIST"],
+            ["ATIS/CLEARANCE/FMS", "AS RQRD/SET"],
+            ["FLT INST/AVIONICS", "CHECK/SET"],
+            ["FUEL QUANTITY/BALANCE", "CHECK"]
+        ],
+        "STARTING ENGINES": [
+            ["APU/GND BLEED AIR", "ON (30 PSI)"],
+            ["PAC ISOL VALVE", "CLOSED"],
+            ["RIGHT ENGINE", "START"],
+            ["HYDRAULIC PRESSURE", "VERIFY"],
+            ["LEFT ENGINE", "START"],
+            ["HYDRAULIC PRESSURE", "VERIFY"],
+            ["GENERATORS", "CHECK AMPS/VOLTS"],
+            ["DC POWER XTIE", "VERIFY OPEN"],
+            ["GND AIR/GPU", "DISCONNECT"]
+        ],
+        "AFTER START": [
+            ["APU BLEED AIR", "OFF"],
+            ["R ENG BLD AIR KNOB", "HP/LP"],
+            ["PAC ISOL VALVE", "OPEN"],
+            ["L ENG BLD AIR KNOB", "HP/LP"],
+            ["APU BLEED SWITCH", "AS DESIRED"]
+        ],
+        "BEFORE TAXI": [
+            ["FLIGHT CONTROLS", "FREE/CORRECT"],
+            ["FLAPS/SLATS LEVER", "UP"],
+            ["FLAPS/SLATS", "SET T/O / CHECK IND"],
+            ["SPEED BRAKES", "CHECK/STOWED"],
+            ["AHRS OR IRS", "ALIGNED/NO FLAGS"],
+            ["EICAS", "CHECK"],
+            ["ANTI-ICE SYSTEMS", "AS REQUIRED"],
+            ["PRESSURIZATION", "SET"],
+            ["PASS ADVISORY LIGHTS", "PASS SAFETY"]
+        ],
+        "TAXI": [
+            ["EXTERIOR LIGHTS", "AS REQUIRED"],
+            ["BRAKES", "CHECK"],
+            ["PARKING BRAKE", "RELEASE"],
+            ["NOSE WHEEL STEERING", "CHECK"],
+            ["THRUST REVERSERS", "CHECK/STOWED"]
+        ],
+        "BEFORE TAKEOFF": [
+            ["ANTI-ICE SYSTEMS", "CHECK (IF RQRD)"],
+            ["SEATS/BELTS/DOORS", "SECURE/LATCHED OPEN"],
+            ["FLAPS/SLATS", "SET FOR TAKEOFF"],
+            ["SPEED BRAKES", "RETRACTED (0%)"],
+            ["TRIMS (3)", "SET FOR TAKEOFF"],
+            ["YAW DAMP/MACH TRIM", "CHECK ON"],
+            ["CREW BRIEFING", "COMPLETE"],
+            ["RADAR", "AS REQUIRED"],
+            ["TRANSPONDER", "TA/RA"],
+            ["PITOT/STATIC HEAT", "BOTH ON"],
+            ["EXTERIOR LIGHTS", "AS REQUIRED"],
+            ["ENGINE INSTRUMENTS", "CHECKED"],
+            ["EICAS", "CHECK"]
+        ],
+        "AFTER TAKEOFF/CLIMB": [
+            ["LANDING GEAR", "UP"],
+            ["FLAPS/SLATS", "UP (>170 KIAS)"],
+            ["THROTTLES", "CLB DETENT"],
+            ["ANTI-ICE SYSTEMS", "AS REQUIRED"],
+            ["ENG SYNC KNOB", "AS DESIRED"],
+            ["PRESSURIZATION", "CHECK"],
+            ["PASS ADVISORY LIGHTS", "AS REQUIRED"],
+            ["ALTIMETERS", "SET"],
+            ["EXTERIOR LIGHTS", "AS DESIRED"],
+            ["APU", "OFF (>FL310)"]
+        ],
+        "CRUISE": [
+            ["THROTTLES", "CRU DETENT"],
+            ["PRESSURIZATION", "CHECK"],
+            ["FUEL TRANSFER", "VERIFY"]
+        ],
+        "DESCENT": [
+            ["SEATS/BELTS", "CHECK/SECURE"],
+            ["PASS ADVISORY LIGHTS", "PASS SAFETY"],
+            ["IGNITION SWITCHES", "NORM"],
+            ["PRESSURIZATION", "ZERO DIFF"],
+            ["ENG SYNC KNOB", "OFF"]
+        ],
+        "APPROACH": [
+            ["LANDING DATA", "CONFIRM"],
+            ["AIRSPEED", "VAPP/VREF"],
+            ["LANDING DISTANCE", "CONFIRM"]
+        ],
+        "BEFORE LANDING": [
+            ["WINDSHIELD HEAT", "BOTH ON"],
+            ["SIDE WINDOW VENTS", "CLOSED"],
+            ["PRESSURIZATION", "CHECK/SET LND ELEV"],
+            ["ANTI-ICE SWITCHES", "AS REQUIRED"],
+            ["LANDING GEAR", "DOWN/3 GREEN"],
+            ["FLAPS", "AS REQUIRED"],
+            ["SPEED BRAKES", "RETRACTED (0%)"],
+            ["EICAS", "CHECK"],
+            ["AIRSPEED", "VREF"],
+            ["AUTOPILOT", "OFF"]
+        ],
+        "AFTER LANDING": [
+            ["THRUST REVERSERS", "STOW"],
+            ["SPEED BRAKES", "RETRACTED (0%)"],
+            ["FLAPS/SLATS", "UP/AS REQUIRED"],
+            ["RADAR", "OFF"],
+            ["TRANSPONDER", "STANDBY"],
+            ["PITOT/STATIC HEAT", "OFF"],
+            ["ANTI-ICE SYSTEMS", "ENG AS RQRD/OFF"],
+            ["EXTERIOR LIGHTS", "AS REQUIRED"],
+            ["APU", "AS DESIRED"]
+        ],
+        "SHUTDOWN": [
+            ["PARKING BRAKE", "SET"],
+            ["ANTI-ICE SYSTEMS", "OFF"],
+            ["THROTTLES", "CUTOFF"],
+            ["IRS MODE KNOBS", "OFF"],
+            ["PASS ADVISORY LIGHTS", "OFF"],
+            ["STANDBY GYRO", "CAGED"],
+            ["STBY PWR", "OFF"],
+            ["AVIONICS SWITCH", "OFF"],
+            ["EMERG LT SWITCH", "OFF"],
+            ["GRVTY XFLOW SWITCH", "OFF"],
+            ["APU", "OFF"],
+            ["BATT 1 & 2 SWITCHES", "OFF"]
+        ]
+    }
+}
