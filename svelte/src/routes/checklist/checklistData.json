@@ -931,12 +931,12 @@
         "Altimeters": "SET",
         "Pressurisation Controller (CRZ+1000)": "SET",
         "Gen 3": "OFF",
-        "APU Air (1)": "OFF",
+        "APU Air": "OFF",
         "APU Main": "ON",
         "Air Cond Main $(R/L)$": "R-ON/L-OFF",
         "APU": "START",
         "GEN 3": "ON",
-        "APU Air (2)": "ON"
+        "APU Air": "ON"
       },
       {
         "Parking Brake": "ON",
@@ -999,7 +999,7 @@
         "Landing Gear": "UP",
         "Flaps": "UP",
         "Lift Dumpers": "IN",
-        "TTCS": "CLIMB",
+        "TTCs": "climb",
         "Taxi Light": "OFF",
         "Eng Anti-Ice": "AUTO/ON"
       }
