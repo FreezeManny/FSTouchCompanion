@@ -1,6 +1,5 @@
 import { persisted } from "svelte-persisted-store";
 import type { Writable } from "svelte/store";
-import type { ChecklistItem, ChecklistState } from "../types";
 
 // Type definitions for stores
 export interface SelectedAirports {
@@ -8,7 +7,13 @@ export interface SelectedAirports {
     arr: string;
 }
 
-// ...existing code...
+export interface ChecklistState {
+    aircraft: string;
+    section: string;
+    checkboxStates: boolean[];
+    statesMap?: Record<string, boolean[]>;
+}
+
 
 export interface Settings {
     appearance: "dark" | "light";
@@ -30,7 +35,8 @@ export const selectedAirports: Writable<SelectedAirports> = persisted("selectedA
 export const checklistState: Writable<ChecklistState> = persisted("checklistState", {
     aircraft: "",
     section: "",
-    checkboxStates: []
+    checkboxStates: [],
+    statesMap: {}
 });
 
 export const settings: Writable<Settings> = persisted("settings", {

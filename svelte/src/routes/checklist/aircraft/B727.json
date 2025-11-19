@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "Boeing 727",
-        "codes": ["B727"]
+        "codes": ["B722", "B723"]
     },
     "checklist": {
         "BEFORE START": [
