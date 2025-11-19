@@ -1,75 +1,74 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import checklistDataRaw from './checklistData.json';
   import { checklistState } from '$lib/stores';
-  import type { ChecklistItem, ChecklistData } from '../../types';
+  import type { ChecklistItem, ChecklistData, ChecklistSection } from '../../types/checklist';
 
-  const checklistData: ChecklistData = checklistDataRaw as ChecklistData;
-  const aircraftNames: string[] = Object.keys(checklistData);
-  let selectedAircraft: string = "";
+  // Import all aircraft JSON files
+  const modules = import.meta.glob('./aircraft/*.json', { eager: true });
+  const aircraftList: ChecklistData[] = Object.values(modules).map((m: any) => m.default || m);
+  
+  // Sort aircraft by name
+  aircraftList.sort((a, b) => a.info.name.localeCompare(b.info.name));
+
+  let selectedAircraftName: string = "";
   let selectedSection: string = "";
-  let checkboxStates: boolean[][] = [];
+  let checkboxStates: boolean[] = [];
+
+  // Get current aircraft data
+  $: currentAircraft = aircraftList.find(a => a.info.name === selectedAircraftName);
+  
+  // Get available sections
+  $: sectionNames = currentAircraft ? Object.keys(currentAircraft.checklist) : [];
+
+  // Get current checklist items
+  $: checklistItems = (currentAircraft && selectedSection)
+    ? currentAircraft.checklist[selectedSection]
+    : [];
 
   // Generate a unique key for the current aircraft/section combination
-  $: stateKey = selectedAircraft && selectedSection 
-    ? `${selectedAircraft}|${selectedSection}` 
+  $: stateKey = selectedAircraftName && selectedSection 
+    ? `${selectedAircraftName}|${selectedSection}` 
     : null;
 
   onMount(() => {
     // Restore last selected aircraft and section
-    selectedAircraft = $checklistState.aircraft || "";
-    selectedSection = $checklistState.section || "";
+    if ($checklistState.aircraft && aircraftList.some(a => a.info.name === $checklistState.aircraft)) {
+      selectedAircraftName = $checklistState.aircraft;
+    }
+    if ($checklistState.section) {
+      selectedSection = $checklistState.section;
+    }
   });
 
-  $: sectionNames = selectedAircraft
-    ? Object.keys(checklistData[selectedAircraft] || {})
-    : [];
-
-
-  // Always normalize rawChecklist to an array of ChecklistItem
-  $: rawChecklist = selectedAircraft && selectedSection
-    ? checklistData[selectedAircraft]?.[selectedSection]
-    : undefined;
-
-  $: checklistItems = (() => {
-    if (!rawChecklist) return [];
-    if (Array.isArray(rawChecklist)) return rawChecklist;
-    if (typeof rawChecklist === 'object') {
-      // If it's a plain object, treat each key-value as a ChecklistItem
-      return [{ ...rawChecklist }];
-    }
-    return [];
-  })();
-
-
   // Initialize or restore checkbox states when checklist changes
-  // Use a map to store checkbox states for each aircraft/section
-  $: if (stateKey && checklistItems.length > 0) {
-    // Use a map object in checklistState to store states per key
+  $: if (stateKey) {
     if (!$checklistState.statesMap) $checklistState.statesMap = {};
-    const statesMap = $checklistState.statesMap;
-    const savedStates = statesMap[stateKey];
-    const expectedStates = checklistItems.map(item => Object.keys(item).map(() => false));
-    if (
-      savedStates &&
-      savedStates.length === checklistItems.length &&
-      savedStates.every((row, i) => row.length === expectedStates[i].length)
-    ) {
+    const savedStates = $checklistState.statesMap[stateKey];
+    
+    // Create default states (all false)
+    const defaultStates = checklistItems.map(() => false);
+
+    // Restore if valid, otherwise reset
+    if (savedStates && savedStates.length === defaultStates.length) {
       checkboxStates = savedStates;
     } else {
-      checkboxStates = expectedStates;
-      saveCheckboxStates();
+      checkboxStates = defaultStates;
     }
   }
 
   // Save state whenever aircraft or section changes
-  $: if (selectedAircraft || selectedSection) {
-    $checklistState.aircraft = selectedAircraft;
+  $: if (selectedAircraftName || selectedSection) {
+    $checklistState.aircraft = selectedAircraftName;
     $checklistState.section = selectedSection;
   }
 
-  // True if all checkboxes are selected
-  $: allSelected = checkboxStates.length > 0 && checkboxStates.flat().every(Boolean);
+  function isCheckable(item: ChecklistItem): boolean {
+    return !('break' in item);
+  }
+
+  // True if all checkable items are selected
+  $: allSelected = checklistItems.length > 0 && 
+     checklistItems.every((item, i) => !isCheckable(item) || checkboxStates[i]);
 
   function saveCheckboxStates() {
     if (!$checklistState.statesMap) $checklistState.statesMap = {};
@@ -78,22 +77,17 @@
     }
   }
 
-
   function resetCheckboxes() {
-    checkboxStates = checklistItems.map(item => Object.keys(item).map(() => false));
+    checkboxStates = checklistItems.map(() => false);
     saveCheckboxStates();
   }
 
-
   function checkNext() {
-    for (let i = 0; i < checkboxStates.length; i++) {
-      for (let j = 0; j < checkboxStates[i].length; j++) {
-        if (!checkboxStates[i][j]) {
-          checkboxStates[i][j] = true;
-          saveCheckboxStates();
-          return;
-        }
-      }
+    // Find first unchecked item that is checkable
+    const index = checkboxStates.findIndex((checked, i) => !checked && isCheckable(checklistItems[i]));
+    if (index !== -1) {
+      checkboxStates[index] = true;
+      saveCheckboxStates();
     }
   }
 
@@ -103,15 +97,20 @@
       selectedSection = sectionNames[currentIndex + 1];
     }
   }
+
+  // Type guards
+  const isTuple = (item: ChecklistItem): item is [string, string] => Array.isArray(item);
+  const isBreak = (item: ChecklistItem): item is { break: true } => 'break' in item;
+  const isObject = (item: ChecklistItem): item is { key: string; value?: string; subitems?: [string, string][] } => !Array.isArray(item) && !('break' in item);
 </script>
 
 <!-- Top Bar -->
 <div class="flex space-x-2 p-4">
   <label class="label">
-    <select class="select" bind:value={selectedAircraft}>
+    <select class="select" bind:value={selectedAircraftName}>
       <option value="" disabled selected>Select Aircraft</option>
-      {#each aircraftNames as name}
-        <option value={name}>{name}</option>
+      {#each aircraftList as aircraft}
+        <option value={aircraft.info.name}>{aircraft.info.name}</option>
       {/each}
     </select>
   </label>
@@ -120,7 +119,7 @@
     <select
       class="select"
       bind:value={selectedSection}
-      disabled={!selectedAircraft}
+      disabled={!selectedAircraftName}
     >
       <option value="" disabled selected>Select Section</option>
       {#each sectionNames as section}
@@ -140,22 +139,44 @@
 <div class="p-4">
   {#if checklistItems && checklistItems.length > 0}
     {#each checklistItems as item, index}
-      <div>
-        {#each Object.entries(item) as [key, value], subIndex}
-          <label>
-            <input
-              class="checkbox"
-              type="checkbox"
-              bind:checked={checkboxStates[index][subIndex]}
-              on:change={saveCheckboxStates}
-            />
-            <strong>{key}:</strong>
-            {value}
-          </label>
-        {/each}
-      </div>
-      {#if index < checklistItems.length - 1}
-        <hr class="my-4" />
+      {#if isBreak(item)}
+        <hr class="my-4 opacity-50" />
+      {:else}
+        <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer">
+          <input
+            class="checkbox mt-1"
+            type="checkbox"
+            bind:checked={checkboxStates[index]}
+            on:change={saveCheckboxStates}
+          />
+          <div class="flex-grow">
+            {#if isTuple(item)}
+              <div class="flex justify-between w-full">
+                <span>{item[0]}</span>
+                <span class="font-bold text-right">{item[1]}</span>
+              </div>
+            {:else if isObject(item)}
+              <div class="flex flex-col w-full">
+                <div class="flex justify-between w-full">
+                  <span>{item.key}</span>
+                  {#if item.value}
+                    <span class="font-bold text-right">{item.value}</span>
+                  {/if}
+                </div>
+                {#if item.subitems}
+                  <div class="pl-4 mt-1 text-sm opacity-75 space-y-1">
+                    {#each item.subitems as sub}
+                      <div class="flex justify-between">
+                        <span>- {sub[0]}</span>
+                        <span>{sub[1]}</span>
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+        </label>
       {/if}
     {/each}
   {:else}
