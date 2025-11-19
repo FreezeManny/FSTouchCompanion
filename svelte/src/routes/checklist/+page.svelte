@@ -14,21 +14,27 @@
   let selectedSection: string = "";
   let checkboxStates: boolean[] = [];
 
-  // Get current aircraft data
+  // Derived Data
   $: currentAircraft = aircraftList.find(a => a.info.name === selectedAircraftName);
-  
-  // Get available sections
   $: sectionNames = currentAircraft ? Object.keys(currentAircraft.checklist) : [];
+  $: checklistItems = (currentAircraft && selectedSection) ? currentAircraft.checklist[selectedSection] : [];
+  $: stateKey = (selectedAircraftName && selectedSection) ? `${selectedAircraftName}|${selectedSection}` : null;
+  
+  // Computed Status
+  $: allSelected = checklistItems.length > 0 && checklistItems.every((item, i) => !isCheckable(item) || checkboxStates[i]);
 
-  // Get current checklist items
-  $: checklistItems = (currentAircraft && selectedSection)
-    ? currentAircraft.checklist[selectedSection]
-    : [];
+  // Effect: Restore checkbox state
+  $: if (stateKey) {
+    const saved = $checklistState.statesMap?.[stateKey];
+    const fresh = checklistItems.map(() => false);
+    checkboxStates = (saved?.length === fresh.length) ? saved : fresh;
+  }
 
-  // Generate a unique key for the current aircraft/section combination
-  $: stateKey = selectedAircraftName && selectedSection 
-    ? `${selectedAircraftName}|${selectedSection}` 
-    : null;
+  // Effect: Persist selection
+  $: {
+    $checklistState.aircraft = selectedAircraftName;
+    $checklistState.section = selectedSection;
+  }
 
   onMount(() => {
     // Restore last selected aircraft and section
@@ -40,35 +46,9 @@
     }
   });
 
-  // Initialize or restore checkbox states when checklist changes
-  $: if (stateKey) {
-    if (!$checklistState.statesMap) $checklistState.statesMap = {};
-    const savedStates = $checklistState.statesMap[stateKey];
-    
-    // Create default states (all false)
-    const defaultStates = checklistItems.map(() => false);
-
-    // Restore if valid, otherwise reset
-    if (savedStates && savedStates.length === defaultStates.length) {
-      checkboxStates = savedStates;
-    } else {
-      checkboxStates = defaultStates;
-    }
-  }
-
-  // Save state whenever aircraft or section changes
-  $: if (selectedAircraftName || selectedSection) {
-    $checklistState.aircraft = selectedAircraftName;
-    $checklistState.section = selectedSection;
-  }
-
   function isCheckable(item: ChecklistItem): boolean {
     return !('break' in item);
   }
-
-  // True if all checkable items are selected
-  $: allSelected = checklistItems.length > 0 && 
-     checklistItems.every((item, i) => !isCheckable(item) || checkboxStates[i]);
 
   function saveCheckboxStates() {
     if (!$checklistState.statesMap) $checklistState.statesMap = {};
