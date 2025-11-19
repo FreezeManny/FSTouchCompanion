@@ -12,8 +12,9 @@ export interface ChecklistState {
     section: string;
     checkboxStates: boolean[];
     statesMap?: Record<string, boolean[]>;
+    manualAircraftOverride?: boolean;
+    lastSimbriefId?: string;
 }
-
 
 export interface Settings {
     appearance: "dark" | "light";
@@ -36,7 +37,9 @@ export const checklistState: Writable<ChecklistState> = persisted("checklistStat
     aircraft: "",
     section: "",
     checkboxStates: [],
-    statesMap: {}
+    statesMap: {},
+    manualAircraftOverride: false,
+    lastSimbriefId: ""
 });
 
 export const settings: Writable<Settings> = persisted("settings", {

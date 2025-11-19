@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { checklistState } from "$lib/stores";
+  import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
 
   // Load and sort aircraft data
@@ -7,6 +7,23 @@
   const aircraftList = Object.values(modules)
     .map((m: any) => m.default || m)
     .sort((a, b) => a.info.name.localeCompare(b.info.name)) as ChecklistData[];
+
+  $: if ($simbriefData && $simbriefData.params) {
+    const currentSimbriefId = $simbriefData.params.time_generated;
+    
+    if ($checklistState.lastSimbriefId !== currentSimbriefId) {
+      $checklistState.lastSimbriefId = currentSimbriefId;
+      $checklistState.manualAircraftOverride = false;
+      
+      const simbriefICAO = $simbriefData.aircraft?.icaocode;
+      if (simbriefICAO) {
+        const match = aircraftList.find(a => a.info.codes && a.info.codes.includes(simbriefICAO));
+        if (match) {
+            $checklistState.aircraft = match.info.name;
+        }
+      }
+    }
+  }
 
   let checkboxStates: boolean[] = [];
 
@@ -59,7 +76,7 @@
 <!-- Top Bar -->
 <div class="flex space-x-2 p-4">
   <label class="label">
-    <select class="select" bind:value={$checklistState.aircraft}>
+    <select class="select" bind:value={$checklistState.aircraft} on:change={() => $checklistState.manualAircraftOverride = true}>
       <option value="" disabled selected>Select Aircraft</option>
       {#each aircraftList as aircraft}
         <option value={aircraft.info.name}>{aircraft.info.name}</option>
