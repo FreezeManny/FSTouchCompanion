@@ -13,7 +13,7 @@
   // Derived Data
   $: currentAircraft = aircraftList.find((a) => a.info.name === $checklistState.aircraft);
   $: sectionNames = currentAircraft ? Object.keys(currentAircraft.checklist) : [];
-  $: rawItems = currentAircraft && $checklistState.section ? currentAircraft.checklist[$checklistState.section] : [];
+  $: rawItems = (currentAircraft && $checklistState.section ? currentAircraft.checklist[$checklistState.section] : []) || [];
 
   // Normalize items to a consistent structure for easier rendering
   $: items = rawItems.map((item) => {
