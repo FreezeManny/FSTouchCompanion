@@ -1740,5 +1740,200 @@
         "COMPASS POSITION": "SLEW TO MAG. HEADING"
       }
     ]
-  }
+  },
+  "C152": {
+    "COCKPIT PRE-FLIGHT": [
+      {
+        "PARKING BRAKE": "CHECK SET",
+        "BATTERY CHARGE (TABLET)": "CHECK / CHARGE",
+        "OIL QUANTITY (TABLET)": "CHECK/SET",
+        "ENGINE HEALTH (TABLET)": "CHECK/FIX",
+        "IGNITION": "OFF",
+        "MASTER BATTERY SWITCH": "ON",
+        "FUEL QUANTITY": "CHECK",
+        "MASTER BATTERY SWITCH": "OFF",
+        "WEIGHT & BALANCE": "CHECK",
+        "ENGINE AND PITOT COVERS": "REMOVE",
+        "MIXTURE": "CUTOFF",
+        "THRUST LEVER": "0%",
+        "AVIONICS": "OFF",
+        "LIGHTS": "OFF",
+        "ELEVATOR TRIM": "T/O",
+        "CARB HEAT": "OFF (IN)",
+        "CABIN AIR": "OFF (IN)",
+        "CABIN HEAT": "OFF (IN)",
+        "FUEL SHUTOFF VALVE": "ON"
+      }
+    ],
+    "ENGINE START": [
+      {
+        "MIXTURE": "RICH",
+        "CARB HEAT": "COLD",
+        "PRIMER": "AS REQ (UP TO 3 STROKES)",
+        "THROTTLE": "1/2 INCH OPEN",
+        "MASTER BATTERY SWITCH": "ON",
+        "INTERNAL LIGHTS": "AS REQ",
+        "NAV LIGHTS": "ON",
+        "BEACON": "ON",
+        "PROPELLER AREA": "CLEAR",
+        "IGNITION": "START THEN BOTH",
+        "THROTTLE": "ADJUST FOR 1000 RPM",
+        "OIL PRESSURE": "CHECK",
+        "MASTER ALTERNATOR SWITCH": "ON",
+        "AMMETER": "CHECK"
+      }
+    ],
+    "AFTER ENGINE START": [
+      {
+        "MIXTURE": "LEAN",
+        "CABIN AIR": "AS REQ",
+        "CABIN HEAT": "AS REQ",
+        "AVIONICS": "ON & SET",
+        "ALTIMETER": "SET",
+        "HEADING INDICATOR": "TUNE",
+        "AUTOPILOT": "PRESS BARO",
+        "TRANSPONDER": "SET & STBY",
+        "FLIGHT CONTROLS": "CHECK FREE & CORRECT",
+        "DOORS": "CLOSED & LATCHED"
+      }
+    ],
+    "BEFORE TAXI": [
+      {
+        "FUEL QUANTITY": "CHECK",
+        "FLAPS": "SET FOR T/O",
+        "ELEVATOR TRIM": "CHECK SET FOR T/O",
+        "PITOT HEAT": "AS REQ",
+        "REQUEST ATC CLEARANCE": "COMPLETED",
+        "TAXI LIGHTS": "ON"
+      }
+    ],
+    "TAXI": [
+      {
+        "PARKING BRAKE": "OFF",
+        "MAX. SPEED": "15 KIAS/5 IN TURNS",
+        "BRAKES": "TEST",
+        "RUDDER": "TEST"
+      }
+    ],
+    "ENGINE RUN-UP TEST": [
+      {
+        "PARKING BRAKE": "SET",
+        "MIXTURE*": "AS REQ",
+        "THROTTLE": "ADJUST FOR ~ 1700 RPM",
+        "MAGNETO CHECK**": "LEFT, BOTH, RIGHT, BOTH",
+        "CARB HEAT CHECK***": "ON THEN OFF",
+        "AMMETER": "CHECK > 0",
+        "SUCTION GAUGE": "CHECK GREEN RANGE",
+        "OIL TEMP": "CHECK GREEN RANGE",
+        "OIL PRESSURE": "CHECK GREEN RANGE",
+        "THROTTLE": "IDLE",
+        "THROTTLE": "ADJUST FOR ~ 1000 RPM"
+      }
+    ],
+    "BEFORE TAKEOFF": [
+      {
+        "ALTIMETER": "CHECK/SET LOCAL",
+        "PITOT HEAT": "AS REQ",
+        "CARB HEAT": "OFF (IN)",
+        "MIXTURE*": "AS REQ",
+        "FLAPS": "CHECK/SET FOR T/O",
+        "ELEVATOR TRIM": "CHECK/SET FOR T/O",
+        "FLIGHT INSTRUMENTS": "CHECK",
+        "ENGINE INSTRUMENTS": "CHECK",
+        "AVIONICS": "CHECK",
+        "WINDOWS": "CLOSED & LATCHED",
+        "REQUEST ATC CLEARANCE FOR TAKEOFF": "COMPLETED",
+        "LANDING LIGHTS": "ON",
+        "TAXI LIGHTS": "OFF",
+        "STROBE LIGHTS": "ON",
+        "TRANSPONDER": "ON"
+      }
+    ],
+    "TAKEOFF": [
+      {
+        "PARKING BRAKE": "OFF",
+        "BRAKES": "RELEASE",
+        "THROTTLE": "FULL",
+        "AIR SPEED INDICATOR": "CHECK",
+        "AT 50 KIAS": "ROTATE",
+        "INITIAL CLIMB SPEED": "65-75 KIAS",
+        "FLAPS": "UP ABOVE 300 FT"
+      }
+    ],
+    "ON CLIMB": [
+      {
+        "FLAPS": "CHECK UP",
+        "AIRSPEED": "75-85 KIAS",
+        "PITOT HEAT": "AS REQ",
+        "CARB HEAT": "AS REQ",
+        "THROTTLE": "FULL",
+        "MIXTURE*": "AS REQ",
+        "LANDING LIGHTS": "OFF (ABOVE FL100)"
+      }
+    ],
+    "CRUISE": [
+      {
+        "PITOT HEAT": "AS REQ",
+        "CARB HEAT": "AS REQ",
+        "THROTTLE": "AS REQ"
+      }
+    ],
+    "DESCENT": [
+      {
+        "MIXTURE*": "AS REQ",
+        "LANDING LIGHTS": "ON (BELOW FL100)"
+      }
+    ],
+    "APPROACH": [
+      {
+        "ALTIMETER": "SET LOCAL",
+        "SPEED": "85 KIAS",
+        "DOWNWIND LEG SPEED": "60-70 KIAS",
+        "DOWNWIND LEG FLAPS": "10 DEGREES (BEFORE BASE LEG)",
+        "BASE LEG FLAPS": "20 DEGREES",
+        "FINAL SPEED": "55-60 KIAS",
+        "FINAL FLAPS": "30 DEGREES/FULL"
+      }
+    ],
+    "GO AROUND": [
+      {
+        "THROTTLE": "FULL (2300 RPM MIN)",
+        "FLAPS": "RETRACT TO 20 DEGREES",
+        "SPEED": "MAINTAIN 54 KIAS",
+        "FLAPS": "RETRACT TO 10 DEGREES",
+        "ACCELERATE...": "FLAPS RETRACT ABOVE 60 KIAS"
+      }
+    ],
+    "AFTER LANDING": [
+      {
+        "TAXI LIGHTS": "ON",
+        "LANDING LIGHTS": "OFF",
+        "STROBE LIGHTS": "OFF",
+        "FLAPS": "0 DEGREES",
+        "ELEVATOR TRIM": "SET FOR T/O",
+        "CARB HEAT": "OFF",
+        "TRANSPONDER": "STBY"
+      }
+    ],
+    "PARKING": [
+      {
+        "TAXI LIGHT": "OFF",
+        "THROTTLE": "IDLE",
+        "PARKING BRAKE": "SET"
+      }
+    ],
+    "SHUTDOWN": [
+      {
+        "PARKING BRAKE": "CHECK SET",
+        "MIXTURE": "CUTOFF",
+        "IGNITION": "OFF",
+        "FUEL SHUTOFF VALVE": "OFF",
+        "AVIONICS": "OFF",
+        "TRANSPONDER": "OFF",
+        "LIGHTS": "ALL OFF",
+        "MASTER SWITCHES (ALT & BAT)": "OFF"
+      }
+    ]
+  },
+  
 }
