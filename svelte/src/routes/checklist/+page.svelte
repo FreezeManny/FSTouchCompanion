@@ -1,87 +1,73 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { checklistState } from '$lib/stores';
-  import type { ChecklistItem, ChecklistData, ChecklistSection } from '../../types/checklist';
+  import { onMount } from "svelte";
+  import { checklistState } from "$lib/stores";
+  import type { ChecklistData } from "../../types/checklist";
 
-  // Import all aircraft JSON files
-  const modules = import.meta.glob('./aircraft/*.json', { eager: true });
-  const aircraftList: ChecklistData[] = Object.values(modules).map((m: any) => m.default || m);
-  
-  // Sort aircraft by name
-  aircraftList.sort((a, b) => a.info.name.localeCompare(b.info.name));
+  // Load and sort aircraft data
+  const modules = import.meta.glob("./aircraft/*.json", { eager: true });
+  const aircraftList = Object.values(modules)
+    .map((m: any) => m.default || m)
+    .sort((a, b) => a.info.name.localeCompare(b.info.name)) as ChecklistData[];
 
-  let selectedAircraftName: string = "";
-  let selectedSection: string = "";
+  let selectedAircraftName = "";
+  let selectedSection = "";
   let checkboxStates: boolean[] = [];
 
   // Derived Data
-  $: currentAircraft = aircraftList.find(a => a.info.name === selectedAircraftName);
+  $: currentAircraft = aircraftList.find((a) => a.info.name === selectedAircraftName);
   $: sectionNames = currentAircraft ? Object.keys(currentAircraft.checklist) : [];
-  $: checklistItems = (currentAircraft && selectedSection) ? currentAircraft.checklist[selectedSection] : [];
-  $: stateKey = (selectedAircraftName && selectedSection) ? `${selectedAircraftName}|${selectedSection}` : null;
-  
-  // Computed Status
-  $: allSelected = checklistItems.length > 0 && checklistItems.every((item, i) => !isCheckable(item) || checkboxStates[i]);
+  $: rawItems = currentAircraft && selectedSection ? currentAircraft.checklist[selectedSection] : [];
 
-  // Effect: Restore checkbox state
+  // Normalize items to a consistent structure for easier rendering
+  $: items = rawItems.map((item) => {
+    if ("break" in item) return { type: "break" as const };
+    if (Array.isArray(item)) return { type: "item" as const, label: item[0], value: item[1] };
+    return { type: "item" as const, label: item.key, value: item.value, subitems: item.subitems };
+  });
+
+  $: stateKey = selectedAircraftName && selectedSection ? `${selectedAircraftName}|${selectedSection}` : null;
+  $: allSelected = items.length > 0 && items.every((item, i) => item.type === "break" || checkboxStates[i]);
+
+  // Restore state when selection changes
   $: if (stateKey) {
     const saved = $checklistState.statesMap?.[stateKey];
-    const fresh = checklistItems.map(() => false);
-    checkboxStates = (saved?.length === fresh.length) ? saved : fresh;
+    checkboxStates = saved?.length === items.length ? saved : new Array(items.length).fill(false);
   }
 
-  // Effect: Persist selection
+  // Persist selection
   $: {
     $checklistState.aircraft = selectedAircraftName;
     $checklistState.section = selectedSection;
   }
 
   onMount(() => {
-    // Restore last selected aircraft and section
-    if ($checklistState.aircraft && aircraftList.some(a => a.info.name === $checklistState.aircraft)) {
-      selectedAircraftName = $checklistState.aircraft;
-    }
-    if ($checklistState.section) {
-      selectedSection = $checklistState.section;
-    }
+    if ($checklistState.aircraft) selectedAircraftName = $checklistState.aircraft;
+    if ($checklistState.section) selectedSection = $checklistState.section;
   });
 
-  function isCheckable(item: ChecklistItem): boolean {
-    return !('break' in item);
-  }
-
-  function saveCheckboxStates() {
-    if (!$checklistState.statesMap) $checklistState.statesMap = {};
+  function saveState() {
     if (stateKey) {
-      $checklistState.statesMap[stateKey] = checkboxStates;
+      $checklistState.statesMap = { ...($checklistState.statesMap || {}), [stateKey]: checkboxStates };
     }
   }
 
-  function resetCheckboxes() {
-    checkboxStates = checklistItems.map(() => false);
-    saveCheckboxStates();
+  function reset() {
+    checkboxStates = new Array(items.length).fill(false);
+    saveState();
   }
 
   function checkNext() {
-    // Find first unchecked item that is checkable
-    const index = checkboxStates.findIndex((checked, i) => !checked && isCheckable(checklistItems[i]));
+    const index = checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break");
     if (index !== -1) {
       checkboxStates[index] = true;
-      saveCheckboxStates();
+      saveState();
     }
   }
 
   function nextSection() {
-    const currentIndex = sectionNames.indexOf(selectedSection);
-    if (currentIndex >= 0 && currentIndex < sectionNames.length - 1) {
-      selectedSection = sectionNames[currentIndex + 1];
-    }
+    const idx = sectionNames.indexOf(selectedSection);
+    if (idx >= 0 && idx < sectionNames.length - 1) selectedSection = sectionNames[idx + 1];
   }
-
-  // Type guards
-  const isTuple = (item: ChecklistItem): item is [string, string] => Array.isArray(item);
-  const isBreak = (item: ChecklistItem): item is { break: true } => 'break' in item;
-  const isObject = (item: ChecklistItem): item is { key: string; value?: string; subitems?: [string, string][] } => !Array.isArray(item) && !('break' in item);
 </script>
 
 <!-- Top Bar -->
@@ -96,11 +82,7 @@
   </label>
 
   <label class="label">
-    <select
-      class="select"
-      bind:value={selectedSection}
-      disabled={!selectedAircraftName}
-    >
+    <select class="select" bind:value={selectedSection} disabled={!selectedAircraftName}>
       <option value="" disabled selected>Select Section</option>
       {#each sectionNames as section}
         <option value={section}>{section}</option>
@@ -109,50 +91,28 @@
   </label>
 
   <div class="flex-grow"></div>
-
-  <button type="button" class="btn variant-filled" on:click={resetCheckboxes}
-    >Reset</button
-  >
+  <button type="button" class="btn variant-filled" on:click={reset}>Reset</button>
 </div>
 
 <!-- Content -->
 <div class="p-4">
-  {#if checklistItems && checklistItems.length > 0}
-    {#each checklistItems as item, index}
-      {#if isBreak(item)}
+  {#if items.length > 0}
+    {#each items as item, index}
+      {#if item.type === "break"}
         <hr class="my-4 opacity-50" />
       {:else}
         <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer">
-          <input
-            class="checkbox mt-1"
-            type="checkbox"
-            bind:checked={checkboxStates[index]}
-            on:change={saveCheckboxStates}
-          />
+          <input class="checkbox mt-1" type="checkbox" bind:checked={checkboxStates[index]} on:change={saveState} />
           <div class="flex-grow">
-            {#if isTuple(item)}
-              <div class="flex justify-between w-full">
-                <span>{item[0]}</span>
-                <span class="font-bold text-right">{item[1]}</span>
-              </div>
-            {:else if isObject(item)}
-              <div class="flex flex-col w-full">
-                <div class="flex justify-between w-full">
-                  <span>{item.key}</span>
-                  {#if item.value}
-                    <span class="font-bold text-right">{item.value}</span>
-                  {/if}
-                </div>
-                {#if item.subitems}
-                  <div class="pl-4 mt-1 text-sm opacity-75 space-y-1">
-                    {#each item.subitems as sub}
-                      <div class="flex justify-between">
-                        <span>- {sub[0]}</span>
-                        <span>{sub[1]}</span>
-                      </div>
-                    {/each}
-                  </div>
-                {/if}
+            <div class="flex justify-between w-full">
+              <span>{item.label}</span>
+              {#if item.value}<span class="font-bold text-right">{item.value}</span>{/if}
+            </div>
+            {#if item.subitems}
+              <div class="pl-4 mt-1 text-sm opacity-75 space-y-1">
+                {#each item.subitems as sub}
+                  <div class="flex justify-between"><span>- {sub[0]}</span><span>{sub[1]}</span></div>
+                {/each}
               </div>
             {/if}
           </div>
@@ -167,14 +127,8 @@
 <!-- Bottom Bar -->
 <div class="p-4 w-full">
   {#if !allSelected}
-    <button type="button" class="btn variant-filled w-full" on:click={checkNext}
-      >Check</button
-    >
+    <button type="button" class="btn variant-filled w-full" on:click={checkNext}>Check</button>
   {:else if sectionNames.indexOf(selectedSection) != sectionNames.length - 1}
-    <button
-      type="button"
-      class="btn variant-filled-success w-full"
-      on:click={nextSection}>Next Checklist</button
-    >
+    <button type="button" class="btn variant-filled-success w-full" on:click={nextSection}>Next Checklist</button>
   {/if}
 </div>
