@@ -173,5 +173,7 @@
     <button type="button" class="btn variant-filled w-full" on:click={checkNext}>Check</button>
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
     <button type="button" class="btn variant-filled-success w-full" on:click={nextSection}>Next Checklist</button>
+  {:else}
+    <button type="button" class="btn variant-filled-error w-full" on:click={resetAircraft}>Reset all</button>
   {/if}
 </div>
