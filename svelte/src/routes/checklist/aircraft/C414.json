@@ -1,0 +1,159 @@
+{
+    "info": {
+        "name": "Cessna 414",
+        "codes": ["C-414", "C414"]
+    },
+    "checklist": {
+        "SAFETY AND INSPECTION": [
+            ["Fuel and Oil Quantity", "CHECKED"],
+            ["Surfaces and Chocks", "CHECKED"],
+            ["Maintenance Status", "CHECKED"],
+            ["Passenger Briefing", "COMPLETED"],
+            ["Weight and Balance", "COMPLETED"]
+        ],
+        "BEFORE STARTING ENGINES": [
+            ["Parking Brake", "SET"],
+            ["Preflight", "COMPLETED"],
+            ["Cabin Door", "LATCHED AND SECURE"],
+            ["Seat, Belts and Harnesses", "SECURED"],
+            ["Emergency Crossfeed Shutoff", "OPEN"],
+            ["Fuel Selectors", "MAIN TANKS"],
+            ["Cowl Flaps", "OPEN"],
+            ["Yaw Damper", "OFF"],
+            ["Mixtures", "FULL RICH"],
+            ["Props", "HIGH RPM"],
+            ["Throttles", "1/2 INCH OPEN"],
+            ["Synchrophaser", "OFF"],
+            ["Flight Controls", "CHECK"],
+            ["Switches & Circuit Breakers", "SET"],
+            ["Magneto Switches", "ON"],
+            ["Battery and Alternator Switches", "ON"],
+            ["Fuel Quantity Gauges", "CHECK"],
+            ["Gear Switch and Position Lights", "CHECK"],
+            ["Prop and Blast Areas", "CLEAR"],
+            ["Exterior Lights", "AS REQUIRED"]
+        ],
+        "CLEARED FOR START": [
+            ["Engines", "START"],
+            ["Oil Pressure", "25 PSI WITHIN 30 SECONDS"],
+            ["Engine Indicators", "CHECK"],
+            ["Vacuum Gage", "CHECK"],
+            ["Air Conditioner", "RECIRCULATE OR OFF"],
+            ["Boost Pumps", "LOW"],
+            ["Lights", "AS REQUIRED"],
+            ["Anti-Ice", "AS REQUIRED"],
+            ["Power", "SET"],
+            ["Fuel Flow & Engine Instruments", "CHECKED"],
+            ["Takeoff Time", "DOCUMENT"]
+        ],
+        "AFTER START/TAXI": [
+            ["Aux. Fuel Pumps", "OFF"],
+            ["Warm Up", "900-1000 RPM"],
+            ["Avionics", "ON"],
+            ["Exterior Lights", "AS REQUIRED"],
+            ["Air Circulator/Heater", "AS REQUIRED"],
+            ["Interior Lights", "AS REQUIRED"],
+            ["Accessory Switches", "ON"],
+            ["Mixtures", "SET"],
+            ["Radios", "SET"],
+            ["Brakes", "CHECK"],
+            ["Instruments", "CHECK"],
+            ["Altimeters/ASA", "SET"]
+        ],
+        "BEFORE TAKEOFF": [
+            ["Parking Brake", "SET"],
+            ["Autopilot", "CHECK"],
+            ["Electric Trim", "CHECK"],
+            ["Fuel Quantity", "CHECK"],
+            ["Fuel Selectors", "MAIN TANKS"],
+            ["Cowl Flaps", "OPEN"],
+            ["Flaps", "UP"],
+            ["Trim", "SET FOR TAKEOFF"],
+            ["Avionics and Radios", "SET"],
+            ["Flight Instruments", "SET"],
+            ["Alternate Air and Ram Dump", "IN"],
+            ["Pressurization Controls", "SET"],
+            ["Mixture", "RICH OR AS REQ'D"],
+            ["Throttles", "1700 RPM"],
+            ["L&R HYD Flow Lights", "OFF"],
+            ["Vacuum System", "CHECK"],
+            ["Annunciator Panel", "CHECK"],
+            ["Alternators and Battery Meter", "CHECK"],
+            ["Props", "FEATHERING CHECK"],
+            ["Magnetos", "CHECK"],
+            ["Engine Instruments", "CHECK"],
+            ["Throttles", "IDLE 1000 RPM"],
+            ["Doors and Windows", "LOCKED"],
+            ["Spoilers (if installed)", "RETRACTED"],
+            ["Takeoff Briefing", "REVIEWED"],
+            ["Parking Brake", "OFF"],
+            ["Minimum Takeoff Oil Temp", "75F"]
+        ],
+        "CLEARED FOR TAKEOFF": [
+            ["Wing Flaps", "UP"],
+            ["Transponder", "ON ALT"]
+        ],
+        "AFTER TAKEOFF/CLIMB": [
+            ["Gear", "UP"],
+            ["Yaw Damper", "ON"],
+            ["Taxi Lights", "OFF"],
+            ["Heater or Air Conditioner", "AS REQUIRED"],
+            ["Climb Power", "SET"],
+            ["Mixtures", "CHECK"],
+            ["Engine Instruments", "CHECK"],
+            ["Pressurization", "CHECK"]
+        ],
+        "CRUISE": [
+            ["Cruise Power", "SET"],
+            ["Cowl Flaps", "AS REQUIRED"],
+            ["Props", "SET"],
+            ["Mixture", "SET"],
+            ["Cabin Altitude and Differential", "CHECK"],
+            ["Recognition Lights (if installed)", "OFF"]
+        ],
+        "DESCENT/APPROACH": [
+            ["Approach Briefing", "COMPLETE"],
+            ["Fuel Selectors", "MAIN"],
+            ["Pressurization", "SET"],
+            ["Altimeters", "SET"],
+            ["Power", "SET"],
+            ["Anti-Ice", "AS REQUIRED"],
+            ["Mixtures", "ADJUST"],
+            ["Seat Belts and Shoulder Harnesses", "ON"],
+            ["Seat Backs", "UPRIGHT"],
+            ["Tables", "STOWED"],
+            ["Lights", "AS REQUIRED"],
+            ["Cowl Flaps", "CLOSED"]
+        ],
+        "BEFORE LANDING": [
+            ["Heater", "COMBUSTION OFF"],
+            ["Lights", "AS REQUIRED"],
+            ["Boost Pumps", "LOW"],
+            ["Prop Sync", "OFF"],
+            ["Gear", "DOWN"],
+            ["Mixtures", "ADJUST"],
+            ["Auto-pilot", "OFF"],
+            ["Flaps", "AS REQUIRED"],
+            ["Yaw Damper", "OFF"],
+            ["Props", "SET"]
+        ],
+        "AFTER LANDING": [
+            ["Cowl Flaps", "OPEN"],
+            ["Flaps", "UP"],
+            ["Trim Tab", "SET TO ZERO"],
+            ["Transponder", "STANDBY"],
+            ["Air Circulation", "AS REQUIRED"],
+            ["Boost Pumps", "OFF"],
+            ["Lights", "AS REQUIRED"]
+        ],
+        "SHUTDOWN": [
+            ["Flight Time", "DOCUMENT"],
+            ["Accessory Switches/Air Circulators", "OFF"],
+            ["Mixtures", "IDLE CUT OFF"],
+            ["Magneto Switches", "OFF"],
+            ["Battery and Alternators", "OFF"],
+            ["Emergency Crossfeed Shutoff", "CLOSED"],
+            ["Wheel Chocks", "INSTALLED"]
+        ]
+    }
+}
