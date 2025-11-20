@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { settings } from "$lib/stores";
-  import { Settings } from '@lucide/svelte';
+  import { Settings, XIcon } from '@lucide/svelte';
 
   export let open = false;
 
@@ -16,7 +16,13 @@
     <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50/75 dark:bg-surface-950/75" />
     <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
       <Dialog.Content class="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-full max-w-lg">
-          <Dialog.Title class="h3">Einstellungen</Dialog.Title>
+          <!-- Add header with title and close button -->
+          <header class="flex justify-between items-center">
+            <Dialog.Title class="h3">Einstellungen</Dialog.Title>
+            <Dialog.CloseTrigger class="btn-icon hover:preset-tonal">
+              <XIcon class="size-4" />
+            </Dialog.CloseTrigger>
+          </header>
 
             <form class="w-full max-w-md space-y-4 p-4">
             <fieldset class="space-y-4">
@@ -42,15 +48,8 @@
                 </select>
               </label>
             </fieldset>
-
-
-
-            <fieldset class="flex justify-center pt-4">
-              <Dialog.CloseTrigger class="btn preset-filled-tertiary-500">
-                Close
-              </Dialog.CloseTrigger>
-            </fieldset>
-
+            <!-- Add explicit closing tag for form -->
+            </form>
       </Dialog.Content>
     </Dialog.Positioner>
   </Portal>
