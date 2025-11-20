@@ -1,19 +1,21 @@
 <script lang="ts">
 	import './layout.css';
+	import Header from "./Header.svelte";
 
-import Header from "./Header.svelte";
+	// WebSocket Management
+	import { onMount, onDestroy } from "svelte";
+	import { settings } from "$lib/stores";
+	import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
 
-// WebSocket Management
-import { onMount, onDestroy } from "svelte";
-import { settings } from "$lib/stores";
-import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
-  interface Props {
-    children?: import('svelte').Snippet;
-  }
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
 
-  let { children }: Props = $props();
+	let { children }: Props = $props();
 
-const wsPort = "8080";
+	const favicon = '/favicon.png';
+
+	const wsPort = "8080";
 let ws: WebSocket;
 let connectionTimeout: ReturnType<typeof setTimeout> | null = null;
 const CONNECTION_TIMEOUT_MS = 5000;
@@ -143,11 +145,15 @@ onDestroy(() => {
 });
 </script>
 
+<svelte:head>
+	<link rel="icon" href={favicon} />
+</svelte:head>
+
 <div class="h-full w-full flex flex-col overflow-hidden">
   <header class="flex-none">
     <Header></Header>
   </header>
   <div class="flex-auto overflow-y-auto">
-    {@render children?.()}
+    {@render children()}
   </div>
 </div>
