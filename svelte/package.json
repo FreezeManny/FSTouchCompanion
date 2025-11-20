@@ -27,6 +27,7 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "^1.6.10",
+    "@lucide/svelte": "^0.554.0",
     "@skeletonlabs/skeleton-svelte": "^4.4.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/express": "^5.0.5",
