@@ -1,17 +1,21 @@
 <script lang="js">
+  import { run } from 'svelte/legacy';
+
   import { getModalStore, LightSwitch } from "@skeletonlabs/skeleton";
   import { onMount } from "svelte";
 
   import { settings } from "$lib/stores";
-
-  export let parent; // Keep this as is to allow it to be passed as a prop
-  $: parentValue = parent;
+
 
   import { modeUserPrefers } from "@skeletonlabs/skeleton";
+  let { parent } = $props();
 
 
+
+  const modalStore = getModalStore();
+  let parentValue = $derived(parent);
   // Reactively update the class based on the selected mode
-  $: {
+  run(() => {
     if ($settings.appearance === "dark") {
       document.documentElement.classList.add("dark");
       modeUserPrefers.set(true);
@@ -19,9 +23,7 @@
       document.documentElement.classList.remove("dark");
       modeUserPrefers.set(false);
     }
-  }
-
-  const modalStore = getModalStore();
+  });
 </script>
 
 <div class="container mx-small p-8 space-y-8 variant-filled-surface rounded w-auto">
@@ -56,7 +58,7 @@
   </div>
 
   <div class="space-y-8 flex flex-col items-center">
-    <button type="button" class="btn variant-filled-tertiary" on:click={() => modalStore.clear()}>Close</button>
+    <button type="button" class="btn variant-filled-tertiary" onclick={() => modalStore.clear()}>Close</button>
   </div>
 
 </div>

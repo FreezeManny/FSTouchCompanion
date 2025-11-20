@@ -49,6 +49,11 @@ const modalRegistry: ModalRegistry = {
 import { onMount, onDestroy } from "svelte";
 import { settings } from "$lib/stores";
 import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 
 const wsPort = "8080";
 let ws: WebSocket;
@@ -185,12 +190,14 @@ onDestroy(() => {
 
 
 <AppShell>
-  <svelte:fragment slot="header"><Header></Header></svelte:fragment>
+  {#snippet header()}
+    <Header></Header>
+  {/snippet}
   <!-- (sidebarLeft) -->
   <!-- (sidebarRight) -->
   <!-- (pageHeader) -->
   <!-- Router Slot -->
-  <slot></slot>
+  {@render children?.()}
   <!-- ---- / ---- -->
   <!-- (pageFooter) -->
   <!-- (footer) -->

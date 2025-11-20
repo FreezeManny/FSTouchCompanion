@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { settings, simbriefData } from "$lib/stores";
   import { getToastStore } from "@skeletonlabs/skeleton";
   import { goto } from "$app/navigation";
@@ -43,25 +45,27 @@
     }
   }
 
-  let flightNumber: string = "";
-  let departure: DepartureArrival = { code: "", name: "" };
-  let arrival: DepartureArrival = { code: "", name: "" };
-  let aircraft: string = "";
-  let date: string = "";
+  let flightNumber: string = $state("");
+  let departure: DepartureArrival = $state({ code: "", name: "" });
+  let arrival: DepartureArrival = $state({ code: "", name: "" });
+  let aircraft: string = $state("");
+  let date: string = $state("");
 
-  $: if ($simbriefData) {
-    flightNumber = $simbriefData.atc.callsign;
-    departure = { code: $simbriefData.origin.icao_code, name: $simbriefData.origin.name };
-    arrival = { code: $simbriefData.destination.icao_code, name: $simbriefData.destination.name };
-    aircraft = $simbriefData.aircraft.name;
-    date = new Date($simbriefData.params.time_generated * 1000).toUTCString();
-  } else {
-    flightNumber = "XXXX";
-    departure = { code: "", name: "XXXX" };
-    arrival = { code: "XXXX", name: "XXXX" };
-    aircraft = "XXXX";
-    date = "XXXX";
-  }
+  run(() => {
+    if ($simbriefData) {
+      flightNumber = $simbriefData.atc.callsign;
+      departure = { code: $simbriefData.origin.icao_code, name: $simbriefData.origin.name };
+      arrival = { code: $simbriefData.destination.icao_code, name: $simbriefData.destination.name };
+      aircraft = $simbriefData.aircraft.name;
+      date = new Date($simbriefData.params.time_generated * 1000).toUTCString();
+    } else {
+      flightNumber = "XXXX";
+      departure = { code: "", name: "XXXX" };
+      arrival = { code: "XXXX", name: "XXXX" };
+      aircraft = "XXXX";
+      date = "XXXX";
+    }
+  });
 
   function handleRetryConnection() {
     if ($retryConnectionCallback) {
@@ -90,7 +94,7 @@
       </div>
     </div>
     {#if !$isWebSocketOpen}
-      <button class="btn btn-sm variant-filled-primary" on:click={handleRetryConnection}>
+      <button class="btn btn-sm variant-filled-primary" onclick={handleRetryConnection}>
         Retry
       </button>
     {/if}
@@ -152,7 +156,7 @@
 
   <!-- Action Buttons -->
   <div class="flex justify-around">
-    <button class="btn variant-filled" on:click={getFlightPlan}>Load Flightplan</button>
-    <button class="btn variant-filled" on:click={() => goto("/flightplan")}>View Flightplan</button>
+    <button class="btn variant-filled" onclick={getFlightPlan}>Load Flightplan</button>
+    <button class="btn variant-filled" onclick={() => goto("/flightplan")}>View Flightplan</button>
   </div>
 </div>

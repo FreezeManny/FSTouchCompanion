@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
   import { popup } from "@skeletonlabs/skeleton";
@@ -10,46 +12,50 @@
     .map((m: any) => m.default || m)
     .sort((a, b) => a.info.name.localeCompare(b.info.name)) as ChecklistData[];
 
-  $: if ($simbriefData && $simbriefData.params) {
-    const currentSimbriefId = $simbriefData.params.time_generated;
-    
-    if ($checklistState.lastSimbriefId !== currentSimbriefId) {
-      $checklistState.lastSimbriefId = currentSimbriefId;
-      $checklistState.manualAircraftOverride = false;
+  run(() => {
+    if ($simbriefData && $simbriefData.params) {
+      const currentSimbriefId = $simbriefData.params.time_generated;
       
-      const simbriefICAO = $simbriefData.aircraft?.icaocode;
-      if (simbriefICAO) {
-        const match = aircraftList.find(a => a.info.codes && a.info.codes.includes(simbriefICAO));
-        if (match) {
-            $checklistState.aircraft = match.info.name;
+      if ($checklistState.lastSimbriefId !== currentSimbriefId) {
+        $checklistState.lastSimbriefId = currentSimbriefId;
+        $checklistState.manualAircraftOverride = false;
+        
+        const simbriefICAO = $simbriefData.aircraft?.icaocode;
+        if (simbriefICAO) {
+          const match = aircraftList.find(a => a.info.codes && a.info.codes.includes(simbriefICAO));
+          if (match) {
+              $checklistState.aircraft = match.info.name;
+          }
         }
       }
     }
-  }
+  });
 
-  let checkboxStates: boolean[] = [];
+  let checkboxStates: boolean[] = $state([]);
 
   // Derived Data
-  $: currentAircraft = aircraftList.find((a) => a.info.name === $checklistState.aircraft);
-  $: sectionNames = currentAircraft ? Object.keys(currentAircraft.checklist) : [];
-  $: rawItems = (currentAircraft && $checklistState.section ? currentAircraft.checklist[$checklistState.section] : []) || [];
+  let currentAircraft = $derived(aircraftList.find((a) => a.info.name === $checklistState.aircraft));
+  let sectionNames = $derived(currentAircraft ? Object.keys(currentAircraft.checklist) : []);
+  let rawItems = $derived((currentAircraft && $checklistState.section ? currentAircraft.checklist[$checklistState.section] : []) || []);
 
   // Normalize items to a consistent structure for easier rendering
-  $: items = rawItems.map((item) => {
+  let items = $derived(rawItems.map((item) => {
     if ("break" in item) return { type: "break" as const };
     if (Array.isArray(item)) return { type: "item" as const, label: item[0], value: item[1] };
     return { type: "item" as const, label: item.key, value: item.value, subitems: item.subitems };
-  });
+  }));
 
-  $: stateKey = $checklistState.aircraft && $checklistState.section ? `${$checklistState.aircraft}|${$checklistState.section}` : null;
-  $: allSelected = items.length > 0 && items.every((item, i) => item.type === "break" || checkboxStates[i]);
-  $: nextItemIndex = checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break");
+  let stateKey = $derived($checklistState.aircraft && $checklistState.section ? `${$checklistState.aircraft}|${$checklistState.section}` : null);
+  let allSelected = $derived(items.length > 0 && items.every((item, i) => item.type === "break" || checkboxStates[i]));
+  let nextItemIndex = $derived(checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break"));
 
   // Restore state when selection changes
-  $: if (stateKey) {
-    const saved = $checklistState.statesMap?.[stateKey];
-    checkboxStates = saved?.length === items.length ? saved : new Array(items.length).fill(false);
-  }
+  run(() => {
+    if (stateKey) {
+      const saved = $checklistState.statesMap?.[stateKey];
+      checkboxStates = saved?.length === items.length ? saved : new Array(items.length).fill(false);
+    }
+  });
 
   function saveState() {
     if (stateKey) {
@@ -106,12 +112,12 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
 <!-- Top Bar -->
 <div class="flex space-x-2 p-4">
   <label class="label">
-    <select class="select" bind:value={$checklistState.aircraft} on:change={() => $checklistState.manualAircraftOverride = true}>
+    <select class="select" bind:value={$checklistState.aircraft} onchange={() => $checklistState.manualAircraftOverride = true}>
       <option value="" disabled selected>Select Aircraft</option>
       {#each aircraftList as aircraft}
         <option value={aircraft.info.name}>{aircraft.info.name}</option>
@@ -135,14 +141,14 @@
     <nav class="list-nav">
       <ul>
         <li>
-          <button type="button" class="w-full text-left" on:click={resetSection}>Reset Section</button>
+          <button type="button" class="w-full text-left" onclick={resetSection}>Reset Section</button>
         </li>
         <li>
-          <button type="button" class="w-full text-left" on:click={resetAircraft}>Reset Entire Aircraft</button>
+          <button type="button" class="w-full text-left" onclick={resetAircraft}>Reset Entire Aircraft</button>
         </li>
       </ul>
     </nav>
-    <div class="arrow bg-surface-100-800-token" />
+    <div class="arrow bg-surface-100-800-token"></div>
   </div>
 </div>
 
@@ -154,7 +160,7 @@
         <hr class="my-4 opacity-50" />
       {:else}
         <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer {index === nextItemIndex ? 'ring-2 ring-primary-500' : ''}">
-          <input class="checkbox mt-1" type="checkbox" bind:checked={checkboxStates[index]} on:change={saveState} />
+          <input class="checkbox mt-1" type="checkbox" bind:checked={checkboxStates[index]} onchange={saveState} />
           <div class="flex-grow">
             <div class="flex justify-between w-full">
               <span>{item.label}</span>
@@ -179,10 +185,10 @@
 <!-- Floating Bottom Button -->
 <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10">
   {#if !allSelected}
-    <button type="button" class="btn variant-filled px-8 shadow-lg" on:click={checkNext}>Check</button>
+    <button type="button" class="btn variant-filled px-8 shadow-lg" onclick={checkNext}>Check</button>
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
-    <button type="button" class="btn variant-filled-success px-8 shadow-lg" on:click={nextSection}>Next Checklist</button>
+    <button type="button" class="btn variant-filled-success px-8 shadow-lg" onclick={nextSection}>Next Checklist</button>
   {:else}
-    <button type="button" class="btn variant-filled-error px-8 shadow-lg" on:click={resetAircraft}>Reset all</button>
+    <button type="button" class="btn variant-filled-error px-8 shadow-lg" onclick={resetAircraft}>Reset all</button>
   {/if}
 </div>

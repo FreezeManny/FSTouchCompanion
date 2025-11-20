@@ -3,7 +3,7 @@
   import { ProgressRadial } from "@skeletonlabs/skeleton";
   import { settings } from "$lib/stores";
 
-  let responseStatus: number = 200;
+  let responseStatus: number = $state(200);
   let interval: ReturnType<typeof setInterval>;
 
   onMount(async () => {
@@ -26,7 +26,7 @@
     src={"http://" + $settings.flightSimAddress + ":8083/#/mcdu?cdu=1&fullscreen=false"}
     style="border: none;"
     class="w-full h-full"
-  />
+></iframe>
 {:else}
   <div class="h-full flex items-center justify-center">
     <div class="flex flex-col items-center">

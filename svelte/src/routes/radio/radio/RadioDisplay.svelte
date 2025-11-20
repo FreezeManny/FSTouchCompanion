@@ -5,15 +5,28 @@
   import { formatFrequency, isBase64, processData } from "../utils";
 
   const modalStore = getModalStore();
-  export let COM1_ACT_FREQ: number | string;
-  export let COM1_STBY_FREQ: number | string;
-  export let COM2_ACT_FREQ: number | string;
-  export let COM2_STBY_FREQ: number | string;
 
-  export let com1SwitchCallback: () => void;
-  export let com2SwitchCallback: () => void;
-  export let com1EntryCallback: (r: number | string) => void;
-  export let com2EntryCallback: (r: number | string) => void;
+  interface Props {
+    COM1_ACT_FREQ: number | string;
+    COM1_STBY_FREQ: number | string;
+    COM2_ACT_FREQ: number | string;
+    COM2_STBY_FREQ: number | string;
+    com1SwitchCallback: () => void;
+    com2SwitchCallback: () => void;
+    com1EntryCallback: (r: number | string) => void;
+    com2EntryCallback: (r: number | string) => void;
+  }
+
+  let {
+    COM1_ACT_FREQ,
+    COM1_STBY_FREQ,
+    COM2_ACT_FREQ,
+    COM2_STBY_FREQ,
+    com1SwitchCallback,
+    com2SwitchCallback,
+    com1EntryCallback,
+    com2EntryCallback
+  }: Props = $props();
 
   const COM1_Modal = {
     type: "component" as const,
@@ -35,15 +48,17 @@
   slotDefault="place-self-center"
   slotTrail="place-content-end"
 >
-  <svelte:fragment slot="lead">
-    <button
-      type="button"
-      id="btn_COM1"
-      class="btn btn-lg variant-filled-primary px-2 font-bold"
-    >
-      COM1
-    </button>
-  </svelte:fragment>
+  {#snippet lead()}
+  
+      <button
+        type="button"
+        id="btn_COM1"
+        class="btn btn-lg variant-filled-primary px-2 font-bold"
+      >
+        COM1
+      </button>
+    
+  {/snippet}
 
   <div class="flex justify-center">
     <span class="badge variant-filled p-4">
@@ -55,7 +70,7 @@
     <button
       type="button"
       class="btn btn-lg variant-filled-primary mx-1"
-      on:click={com1SwitchCallback}
+      onclick={com1SwitchCallback}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -80,28 +95,30 @@
     </span>
   </div>
 
-  <svelte:fragment slot="trail">
-    <button
-      type="button"
-      class="btn btn-lg variant-filled-primary"
-      on:click={() => modalStore.trigger(COM1_Modal)}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
+  {#snippet trail()}
+  
+      <button
+        type="button"
+        class="btn btn-lg variant-filled-primary"
+        onclick={() => modalStore.trigger(COM1_Modal)}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-        />
-      </svg>
-    </button>
-  </svelte:fragment>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+          />
+        </svg>
+      </button>
+    
+  {/snippet}
 </AppBar>
 
 <hr class="!border-t-8" />
@@ -111,15 +128,17 @@
   slotDefault="place-self-center"
   slotTrail="place-content-end"
 >
-  <svelte:fragment slot="lead">
-    <button
-      type="button"
-      id="btn_COM2"
-      class="btn btn-lg variant-filled-primary px-2 font-bold"
-    >
-      COM2
-    </button>
-  </svelte:fragment>
+  {#snippet lead()}
+  
+      <button
+        type="button"
+        id="btn_COM2"
+        class="btn btn-lg variant-filled-primary px-2 font-bold"
+      >
+        COM2
+      </button>
+    
+  {/snippet}
 
   <div class="flex justify-center">
     <span class="badge variant-filled p-4">
@@ -131,7 +150,7 @@
     <button
       type="button"
       class="btn btn-lg variant-filled-primary mx-1"
-      on:click={com2SwitchCallback}
+      onclick={com2SwitchCallback}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -156,26 +175,28 @@
     </span>
   </div>
 
-  <svelte:fragment slot="trail">
-    <button
-      type="button"
-      class="btn btn-lg variant-filled-primary"
-      on:click={() => modalStore.trigger(COM2_Modal)}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
+  {#snippet trail()}
+  
+      <button
+        type="button"
+        class="btn btn-lg variant-filled-primary"
+        onclick={() => modalStore.trigger(COM2_Modal)}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-        />
-      </svg>
-    </button>
-  </svelte:fragment>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+          />
+        </svg>
+      </button>
+    
+  {/snippet}
 </AppBar>

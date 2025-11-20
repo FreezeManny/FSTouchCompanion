@@ -4,12 +4,12 @@
 
   const modalStore = getModalStore();
 
-  export let parent; // Keep this as is to allow it to be passed as a prop
-  $: parentValue = parent;
+  let { parent } = $props();
+  let parentValue = $derived(parent);
 
-  let frequency = "XXX.XXX";
-  let buttonsEnabled = "1";
-  let validFrequencies = [""];
+  let frequency = $state("XXX.XXX");
+  let buttonsEnabled = $state("1");
+  let validFrequencies = $state([""]);
 
   onMount(() => {
     validFrequencies = generateValidFrequencies();
@@ -135,60 +135,60 @@
 
   <div class="flex flex-wrap rounded-xl max-w-sm mx-auto mt-24">
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")}>
         1
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")}>
         2
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")}>
         3
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")}>
         4
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")}>
         5
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")}>
         6
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")}>
         7
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")}>
         8
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")}>
         9
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled-error w-full h-20 text-2xl" on:click={() => onRemove()} disabled={frequency == "XXX.XXX"}> Remove </button>
+      <button class="btn variant-filled-error w-full h-20 text-2xl" onclick={() => onRemove()} disabled={frequency == "XXX.XXX"}> Remove </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled w-full h-20 text-2xl" on:click={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")}>
+      <button class="btn variant-filled w-full h-20 text-2xl" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")}>
         0
       </button>
     </div>
     <div class="w-1/3 px-2 py-2">
-      <button class="btn variant-filled-success w-full h-20 text-2xl" on:click={() => onEnter()} disabled={!validFrequencies.includes(frequency)}>
+      <button class="btn variant-filled-success w-full h-20 text-2xl" onclick={() => onEnter()} disabled={!validFrequencies.includes(frequency)}>
         Enter
       </button>
     </div>

@@ -35,8 +35,8 @@
     atisText: string;
     metar: string;
   };
-  let dep: AirportData = { atisCode: "", atisText: "", metar: "" };
-  let arr: AirportData = { atisCode: "", atisText: "", metar: "" };
+  let dep: AirportData = $state({ atisCode: "", atisText: "", metar: "" });
+  let arr: AirportData = $state({ atisCode: "", atisText: "", metar: "" });
 
   // Local storage for airport selections
 
@@ -165,7 +165,7 @@
         type="text"
         placeholder="EDDS"
         bind:value={$selectedAirports.dep}
-        on:input={updateDeparture}
+        oninput={updateDeparture}
         maxlength="4"
       />
     </div>
@@ -173,12 +173,12 @@
   <div class="mx-3">
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <div class="input-group-shim">Arr</div>
-      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} on:input={updateArrival} maxlength="4" />
+      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} oninput={updateArrival} maxlength="4" />
     </div>
   </div>
   <div class="grid grid-cols-2">
-    <button type="button" class="btn variant-filled mx-1" on:click={simbriefButtonHandler}>Simbrief</button>
-    <button type="button" class="btn variant-filled mx-1" on:click={updateButtonHandler}
+    <button type="button" class="btn variant-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
+    <button type="button" class="btn variant-filled mx-1" onclick={updateButtonHandler}
       ><svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

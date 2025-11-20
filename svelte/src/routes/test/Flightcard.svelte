@@ -1,10 +1,21 @@
-<script>
-  export let flightNumber = "HLF5MF";
-  export let departure = { code: "EDDS", city: "Stuttgart" };
-  export let arrival = { code: "EDDF", city: "Frankfurt/Main" };
-  export let aircraft = "B737-800";
-  export let aircraftType = "ZIBO";
-  export let date = "11 Sep 2024 - 18:49 UTC";
+<script lang="ts">
+  interface Props {
+    flightNumber?: string;
+    departure?: any;
+    arrival?: any;
+    aircraft?: string;
+    aircraftType?: string;
+    date?: string;
+  }
+
+  let {
+    flightNumber = "HLF5MF",
+    departure = { code: "EDDS", city: "Stuttgart" },
+    arrival = { code: "EDDF", city: "Frankfurt/Main" },
+    aircraft = "B737-800",
+    aircraftType = "ZIBO",
+    date = "11 Sep 2024 - 18:49 UTC"
+  }: Props = $props();
 </script>
 
 <!-- Card Container -->
