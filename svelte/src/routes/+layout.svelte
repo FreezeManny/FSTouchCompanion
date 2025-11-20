@@ -1,6 +1,5 @@
 <script lang="ts">
 import "../app.css";
-import "../app.postcss";
 
 // Highlight JS
 import hljs from "highlight.js/lib/core";
