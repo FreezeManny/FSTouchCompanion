@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { AppBar } from "@skeletonlabs/skeleton";
+  import { AppBar } from "@skeletonlabs/skeleton-svelte";
   import { onMount, onDestroy } from "svelte";
-  import { getModalStore } from "@skeletonlabs/skeleton";
   import { formatFrequency, isBase64, processData } from "../utils";
 
   const modalStore = getModalStore();
@@ -53,7 +52,7 @@
       <button
         type="button"
         id="btn_COM1"
-        class="btn btn-lg variant-filled-primary px-2 font-bold"
+        class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
       >
         COM1
       </button>
@@ -61,7 +60,7 @@
   {/snippet}
 
   <div class="flex justify-center">
-    <span class="badge variant-filled p-4">
+    <span class="badge preset-filled p-4">
       <h1 class="h1">
   {formatFrequency(typeof COM1_ACT_FREQ === 'string' ? Number(COM1_ACT_FREQ) : COM1_ACT_FREQ)}
       </h1>
@@ -69,7 +68,7 @@
 
     <button
       type="button"
-      class="btn btn-lg variant-filled-primary mx-1"
+      class="btn btn-lg preset-filled-primary-500 mx-1"
       onclick={com1SwitchCallback}
       aria-label="Switch COM1"
     >
@@ -89,7 +88,7 @@
       </svg>
     </button>
 
-    <span class="badge variant-filled p-4">
+    <span class="badge preset-filled p-4">
       <h1 class="h1">
   {formatFrequency(typeof COM1_STBY_FREQ === 'string' ? Number(COM1_STBY_FREQ) : COM1_STBY_FREQ)}
       </h1>
@@ -100,7 +99,7 @@
   
       <button
         type="button"
-        class="btn btn-lg variant-filled-primary"
+        class="btn btn-lg preset-filled-primary-500"
         onclick={() => modalStore.trigger(COM1_Modal)}
         aria-label="Open COM1 Modal"
       >
@@ -135,7 +134,7 @@
       <button
         type="button"
         id="btn_COM2"
-        class="btn btn-lg variant-filled-primary px-2 font-bold"
+        class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
       >
         COM2
       </button>
@@ -143,7 +142,7 @@
   {/snippet}
 
   <div class="flex justify-center">
-    <span class="badge variant-filled p-4">
+    <span class="badge preset-filled p-4">
       <h1 class="h1">
   {formatFrequency(typeof COM2_ACT_FREQ === 'string' ? Number(COM2_ACT_FREQ) : COM2_ACT_FREQ)}
       </h1>
@@ -151,7 +150,7 @@
 
     <button
       type="button"
-      class="btn btn-lg variant-filled-primary mx-1"
+      class="btn btn-lg preset-filled-primary-500 mx-1"
       onclick={com2SwitchCallback}
       aria-label="Switch COM2"
     >
@@ -171,7 +170,7 @@
       </svg>
     </button>
 
-    <span class="badge variant-filled p-4">
+    <span class="badge preset-filled p-4">
       <h1 class="h1">
   {formatFrequency(typeof COM2_STBY_FREQ === 'string' ? Number(COM2_STBY_FREQ) : COM2_STBY_FREQ)}
       </h1>
@@ -182,7 +181,7 @@
   
       <button
         type="button"
-        class="btn btn-lg variant-filled-primary"
+        class="btn btn-lg preset-filled-primary-500"
         onclick={() => modalStore.trigger(COM2_Modal)}
         aria-label="Open COM2 Modal"
       >

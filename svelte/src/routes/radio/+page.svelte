@@ -54,7 +54,7 @@
       />
     {/if}
   {:else}
-    <aside class="alert variant-filled-warning m-5">
+    <aside class="alert preset-filled-warning-500 m-5">
       <!-- Message -->
       <div class="alert-message">
         <h3 class="h3">FlightSim not Connected to fsConnect</h3>
@@ -62,7 +62,7 @@
     </aside>
   {/if}
 {:else}
-  <aside class="alert variant-filled-warning m-5">
+  <aside class="alert preset-filled-warning-500 m-5">
     <!-- Message -->
     <div class="alert-message">
       <h3 class="h3">WebSocket connection in progress...</h3>

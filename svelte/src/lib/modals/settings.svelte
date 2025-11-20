@@ -1,13 +1,8 @@
 <script lang="js">
   import { run } from 'svelte/legacy';
-
-  import { getModalStore, LightSwitch } from "@skeletonlabs/skeleton";
   import { onMount } from "svelte";
 
   import { settings } from "$lib/stores";
-
-
-  import { modeUserPrefers } from "@skeletonlabs/skeleton";
   let { parent } = $props();
 
 
@@ -26,7 +21,7 @@
   });
 </script>
 
-<div class="container mx-small p-8 space-y-8 variant-filled-surface rounded-sm w-auto">
+<div class="container mx-small p-8 space-y-8 preset-filled-surface-500 rounded-sm w-auto">
   <h1 class="h1">Einstellungen</h1>
 
   <div class="space-y-1">
@@ -58,7 +53,7 @@
   </div>
 
   <div class="space-y-8 flex flex-col items-center">
-    <button type="button" class="btn variant-filled-tertiary" onclick={() => modalStore.clear()}>Close</button>
+    <button type="button" class="btn preset-filled-tertiary-500" onclick={() => modalStore.clear()}>Close</button>
   </div>
 
 </div>

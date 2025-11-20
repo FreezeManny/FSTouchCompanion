@@ -59,14 +59,14 @@
     <!-- Floating Zoom Controls -->
     <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
       <button
-        class="btn variant-filled-primary w-12 h-12 rounded-full shadow-lg"
+        class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
         on:click={increaseFontSize}
         title="Increase font size"
       >
         +
       </button>
       <button
-        class="btn variant-filled-primary w-12 h-12 rounded-full shadow-lg"
+        class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
         on:click={decreaseFontSize}
         title="Decrease font size"
       >
@@ -75,7 +75,7 @@
     </div>
   </div>
 {:else}
-  <aside class="alert variant-filled-warning m-5">
+  <aside class="alert preset-filled-warning-500 m-5">
     <!-- Message -->
     <div class="alert-message">
       <h3 class="h3">Load a valid Flightplan</h3>

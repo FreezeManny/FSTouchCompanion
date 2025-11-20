@@ -1,11 +1,9 @@
 <!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
-  import { TabGroup, Tab } from "@skeletonlabs/skeleton";
+  import { Tab, Tabs } from "@skeletonlabs/skeleton-svelte";
   import { onMount, afterUpdate } from "svelte";
   import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
-  import { popup } from "@skeletonlabs/skeleton";
-
   const popupFeatured = {
     // Represents the type of event that opens/closed the popup
     event: "click",
@@ -106,7 +104,7 @@
   }
 </script>
 
-<TabGroup justify="justify-center" class="pt-4">
+<Tabs justify="justify-center" class="pt-4">
   {#each Object.entries(atcDisplay) as [key, display]}
     <Tab bind:group={tabSet} name={key} value={key}>{display.name}</Tab>
   {/each}
@@ -129,7 +127,7 @@
                 <h3 class="h3 text-right">{controller.frequency}</h3>
 
                 <button
-                  class="btn variant-filled"
+                  class="btn preset-filled"
                   use:popup={{
                     ...popupFeatured,
                     event: "click",
@@ -142,13 +140,13 @@
                 >
                   <button
                     type="button"
-                    class="btn variant-filled"
+                    class="btn preset-filled"
                     on:click={() =>
                       setCom1Callback(formatFrequency(controller.frequency))}
                     >COM1</button>
                   <button
                     type="button"
-                    class="btn variant-filled"
+                    class="btn preset-filled"
                     on:click={() =>
                       setCom2Callback(formatFrequency(controller.frequency))}
                     >COM2</button>
@@ -164,4 +162,4 @@
       {/if}
     </div>
   </svelte:fragment>
-</TabGroup>
+</Tabs>

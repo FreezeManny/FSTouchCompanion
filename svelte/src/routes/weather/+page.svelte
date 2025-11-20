@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
   import { selectedAirports, settings, simbriefData } from "$lib/stores";
-  import { getToastStore } from "@skeletonlabs/skeleton";
   const toastStore = getToastStore();
 
   type SimbriefError = {
@@ -15,7 +14,7 @@
     message: message,
     timeout: 5000,
     hoverable: true,
-    background: "variant-filled-error",
+    background: "preset-filled-error-500",
   });
 
   // VATSIM URLs
@@ -177,8 +176,8 @@
     </div>
   </div>
   <div class="grid grid-cols-2">
-    <button type="button" class="btn variant-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
-    <button type="button" class="btn variant-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
+    <button type="button" class="btn preset-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
+    <button type="button" class="btn preset-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

@@ -34,7 +34,7 @@
   <!-- Departure / Arrival Section -->
   <div class="flex items-center justify-between mb-4">
     <!-- Departure Info -->
-    <div class="card p-4 variant-filled-tertiary">
+    <div class="card p-4 preset-filled-tertiary-500">
 
     <div class="text-center">
       <div class="text-lg font-bold">{departure.code}</div>
@@ -43,7 +43,7 @@
     </div>
 
     <!-- Arrival Info -->
-    <div class="card p-4 variant-filled-tertiary">
+    <div class="card p-4 preset-filled-tertiary-500">
       <div class="text-center">
         <div class="text-lg font-bold">{arrival.code}</div>
         <div class="text-surface text-sm">{arrival.city}</div>
@@ -58,7 +58,7 @@
 
   <!-- Action Buttons -->
   <div class="flex justify-around">
-    <button class="btn variant-filled">Load Flightplan</button>
-    <button class="btn variant-filled">View Flightplan</button>
+    <button class="btn preset-filled">Load Flightplan</button>
+    <button class="btn preset-filled">View Flightplan</button>
   </div>
 </div>

@@ -3,8 +3,7 @@
 
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
-  import { popup } from "@skeletonlabs/skeleton";
-  import type { PopupSettings } from "@skeletonlabs/skeleton";
+  import type { PopupSettings } from "@skeletonlabs/skeleton-svelte";
 
   // Load and sort aircraft data
   const modules = import.meta.glob("./aircraft/*.json", { eager: true });
@@ -135,7 +134,7 @@
   </label>
 
   <div class="grow"></div>
-  <button type="button" class="btn variant-filled" use:popup={popupReset}>Reset</button>
+  <button type="button" class="btn preset-filled" use:popup={popupReset}>Reset</button>
   
   <div class="card p-4 w-60 shadow-xl z-50" data-popup="popupReset">
     <nav class="list-nav">
@@ -148,7 +147,7 @@
         </li>
       </ul>
     </nav>
-    <div class="arrow bg-surface-100-800-token"></div>
+    <div class="arrow bg-surface-100-900"></div>
   </div>
 </div>
 
@@ -185,10 +184,10 @@
 <!-- Floating Bottom Button -->
 <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10">
   {#if !allSelected}
-    <button type="button" class="btn variant-filled px-8 shadow-lg" onclick={checkNext}>Check</button>
+    <button type="button" class="btn preset-filled px-8 shadow-lg" onclick={checkNext}>Check</button>
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
-    <button type="button" class="btn variant-filled-success px-8 shadow-lg" onclick={nextSection}>Next Checklist</button>
+    <button type="button" class="btn preset-filled-success-500 px-8 shadow-lg" onclick={nextSection}>Next Checklist</button>
   {:else}
-    <button type="button" class="btn variant-filled-error px-8 shadow-lg" onclick={resetAircraft}>Reset all</button>
+    <button type="button" class="btn preset-filled-error-500 px-8 shadow-lg" onclick={resetAircraft}>Reset all</button>
   {/if}
 </div>

@@ -2,7 +2,6 @@
   import { run } from 'svelte/legacy';
 
   import { settings, simbriefData } from "$lib/stores";
-  import { getToastStore } from "@skeletonlabs/skeleton";
   import { goto } from "$app/navigation";
   import { isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
 
@@ -23,7 +22,7 @@
     message,
     timeout: 5000,
     hoverable: true,
-    background: "variant-filled-error",
+    background: "preset-filled-error-500",
   });
 
   async function getFlightPlan(): Promise<void> {
@@ -81,20 +80,20 @@
       <div class="relative">
         {#if $isWebSocketOpen}
           {#if $fsData.Connected}
-            <span class="badge variant-filled-success">●</span>
+            <span class="badge preset-filled-success-500">●</span>
             <span class="ml-2">Flight Sim Connected</span>
           {:else}
-            <span class="badge variant-filled-warning">●</span>
+            <span class="badge preset-filled-warning-500">●</span>
             <span class="ml-2">WebSocket Connected (Waiting for Flight Sim)</span>
           {/if}
         {:else}
-          <span class="badge variant-filled-error">●</span>
+          <span class="badge preset-filled-error-500">●</span>
           <span class="ml-2">Not Connected</span>
         {/if}
       </div>
     </div>
     {#if !$isWebSocketOpen}
-      <button class="btn btn-sm variant-filled-primary" onclick={handleRetryConnection}>
+      <button class="btn btn-sm preset-filled-primary-500" onclick={handleRetryConnection}>
         Retry
       </button>
     {/if}
@@ -122,7 +121,7 @@
     <!-- Departure / Arrival Section -->
     <div class="flex items-center justify-between mb-4">
       <!-- Departure Info -->
-      <div class="card p-4 variant-filled-tertiary">
+      <div class="card p-4 preset-filled-tertiary-500">
         <div class="text-center">
           <div class="text-lg font-bold">{departure.code}</div>
           <div class="text-surface text-sm">{departure.name}</div>
@@ -130,7 +129,7 @@
       </div>
 
       <!-- Arrival Info -->
-      <div class="card p-4 variant-filled-tertiary">
+      <div class="card p-4 preset-filled-tertiary-500">
         <div class="text-center">
           <div class="text-lg font-bold">{arrival.code}</div>
           <div class="text-surface text-sm">{arrival.name}</div>
@@ -146,7 +145,7 @@
       </div>
     </div>
   {:else}
-    <aside class="alert variant-filled-warning m-5">
+    <aside class="alert preset-filled-warning-500 m-5">
       <!-- Message -->
       <div class="alert-message">
         <h3 class="h3">Load a valid Flightplan</h3>
@@ -156,7 +155,7 @@
 
   <!-- Action Buttons -->
   <div class="flex justify-around">
-    <button class="btn variant-filled" onclick={getFlightPlan}>Load Flightplan</button>
-    <button class="btn variant-filled" onclick={() => goto("/flightplan")}>View Flightplan</button>
+    <button class="btn preset-filled" onclick={getFlightPlan}>Load Flightplan</button>
+    <button class="btn preset-filled" onclick={() => goto("/flightplan")}>View Flightplan</button>
   </div>
 </div>
