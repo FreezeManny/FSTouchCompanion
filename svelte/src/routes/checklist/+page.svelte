@@ -3,7 +3,6 @@
 
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
-  import type { PopupSettings } from "@skeletonlabs/skeleton-svelte";
 
   // Load and sort aircraft data
   const modules = import.meta.glob("./aircraft/*.json", { eager: true });
@@ -85,12 +84,6 @@
     }
   }
 
-  const popupReset: PopupSettings = {
-    event: 'click',
-    target: 'popupReset',
-    placement: 'bottom'
-  };
-
   function checkNext() {
     if (nextItemIndex !== -1) {
       checkboxStates[nextItemIndex] = true;
@@ -134,7 +127,7 @@
   </label>
 
   <div class="grow"></div>
-  <button type="button" class="btn preset-filled" use:popup={popupReset}>Reset</button>
+  <button type="button" class="btn preset-filled" data-popup-target="popupReset">Reset</button>
   
   <div class="card p-4 w-60 shadow-xl z-50" data-popup="popupReset">
     <nav class="list-nav">
