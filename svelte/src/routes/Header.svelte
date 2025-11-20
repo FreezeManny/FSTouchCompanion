@@ -1,7 +1,7 @@
 <script lang="js">
   import { run } from 'svelte/legacy';
 
-  import { AppBar, Segment } from "@skeletonlabs/skeleton-svelte";
+  import { AppBar, SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import { } from "@skeletonlabs/skeleton-svelte";
   import { page } from "$app/stores";
 
@@ -46,7 +46,7 @@
   <AppBar>
     {#snippet lead()}
       
-        <Segment bind:group={valueSingle}>
+        <SegmentedControl bind:group={valueSingle}>
           <Segment.Item bind:group={valueSingle} name="justify" value={"/"} on:change={() => goto("/")}
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +143,7 @@
               />
             </svg>
           </Segment.Item>
-        </Segment>
+        </SegmentedControl>
       
       {/snippet}
 

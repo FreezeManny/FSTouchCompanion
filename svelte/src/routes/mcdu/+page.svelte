@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { ProgressRing } from "@skeletonlabs/skeleton-svelte";
+  import { Progress } from "@skeletonlabs/skeleton-svelte";
   import { settings } from "$lib/stores";
 
   let responseStatus: number = $state(200);
@@ -30,7 +30,7 @@
 {:else}
   <div class="h-full flex items-center justify-center">
     <div class="flex flex-col items-center">
-      <ProgressRing class="w-56 pb-5" />
+      <Progress class="w-56 pb-5" />
       <h1 class="h1">Connecting....</h1>
       <p>Make sure the Fenix Aircraft is running</p>
       <p>Response Status: {responseStatus}</p>
