@@ -1,16 +1,15 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   import { simbriefData, flightplanSettings } from "$lib/stores";
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount } from "svelte";
 
-  let scrollContainer: HTMLElement;
-  let hasRestored = false;
+  let scrollContainer = $state<HTMLElement>();
+  let hasRestored = $state(false);
 
   onMount(() => {
     restoreScroll();
   });
 
-  afterUpdate(() => {
+  $effect(() => {
     if (!hasRestored) {
       restoreScroll();
     }
@@ -48,7 +47,7 @@
 </script>
 
 {#if $simbriefData}
-  <div class="flex flex-col items-center m-1 h-screen overflow-y-auto" bind:this={scrollContainer} on:scroll={handleScroll}>
+  <div class="flex flex-col items-center m-1 h-screen overflow-y-auto" bind:this={scrollContainer} onscroll={handleScroll}>
     <div class="card inline-block">
       <!-- Centered OFP Content -->
       <div class="px-1 py-5">
@@ -60,14 +59,14 @@
     <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
       <button
         class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
-        on:click={increaseFontSize}
+        onclick={increaseFontSize}
         title="Increase font size"
       >
         +
       </button>
       <button
         class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
-        on:click={decreaseFontSize}
+        onclick={decreaseFontSize}
         title="Decrease font size"
       >
         -

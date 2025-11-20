@@ -1,21 +1,12 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
-  import { Tab, Tabs } from "@skeletonlabs/skeleton-svelte";
-  import { onMount, afterUpdate } from "svelte";
   import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
-  const popupFeatured = {
-    // Represents the type of event that opens/closed the popup
-    event: "click",
-    // Matches the data-popup value on your popup element
-    target: "popupFeatured",
-    // Defines which side of your trigger the popup will appear
-    placement: "left" as any,
-  };
 
-  let tabSet: keyof typeof atcDisplay = "all";
+  let tabSet: keyof typeof atcDisplay = $state("all");
 
-  let atcControllers: AtcData[] = [];
+  let atcControllers: AtcData[] = $state([]);
+  
+  let openPopup: string | null = $state(null);
 
   const atcDisplay = {
     all: {
@@ -57,11 +48,12 @@
     },
   };
 
-  export let long: number;
-  export let lat: number;
-
-  export let setCom1Callback: (frequency: number) => void;
-  export let setCom2Callback: (frequency: number) => void;
+  let { long, lat, setCom1Callback, setCom2Callback }: {
+    long: number;
+    lat: number;
+    setCom1Callback: (frequency: number) => void;
+    setCom2Callback: (frequency: number) => void;
+  } = $props();
 
   const loadControllers = () => {
     loadAtc(lat, long, $settings.atcPlatform)
@@ -73,29 +65,10 @@
       });
   };
 
-  let prevLat: number | undefined;
-  let prevLong: number | undefined;
-  let prevPlatform: string | undefined;
-
-  onMount(() => {
-    loadControllers();
-    prevLat = lat;
-    prevLong = long;
-    prevPlatform = $settings.atcPlatform;
-  });
-
-  afterUpdate(() => {
-    if (
-      lat !== prevLat ||
-      long !== prevLong ||
-      $settings.atcPlatform !== prevPlatform
-    ) {
-      if (lat && long && $settings.atcPlatform) {
-        loadControllers();
-      }
-      prevLat = lat;
-      prevLong = long;
-      prevPlatform = $settings.atcPlatform;
+  // Use $effect to replace afterUpdate - reactively load controllers when dependencies change
+  $effect(() => {
+    if (lat && long && $settings.atcPlatform) {
+      loadControllers();
     }
   });
 
@@ -104,13 +77,22 @@
   }
 </script>
 
-<Tabs justify="justify-center" class="pt-4">
-  {#each Object.entries(atcDisplay) as [key, display]}
-    <Tab bind:group={tabSet} name={key} value={key}>{display.name}</Tab>
-  {/each}
-  <!-- Tab Panels --->
-  <svelte:fragment slot="panel">
-    <div>
+<div class="w-full">
+  <!-- Tab Navigation -->
+  <div class="flex justify-center pt-4 border-b border-surface-500/30">
+    {#each Object.entries(atcDisplay) as [key, display]}
+      <button
+        type="button"
+        class="px-4 py-2 transition-colors {tabSet === key ? 'border-b-2 border-primary-500 text-primary-500' : 'text-surface-600 hover:text-surface-900'}"
+        onclick={() => tabSet = key as keyof typeof atcDisplay}
+      >
+        {display.name}
+      </button>
+    {/each}
+  </div>
+  
+  <!-- Tab Panel -->
+  <div>
       {#if atcControllers.some( (controller) => Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type) )}
         {#each atcControllers as controller}
           {#if Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type)}
@@ -123,34 +105,35 @@
                   )?.[0]}
                 </p>
               </div>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 relative">
                 <h3 class="h3 text-right">{controller.frequency}</h3>
 
                 <button
+                  type="button"
                   class="btn preset-filled"
-                  use:popup={{
-                    ...popupFeatured,
-                    event: "click",
-                    target: `popupFeatured-${controller.callsign}`,
-                  }}>Set</button>
+                  onclick={() => openPopup = openPopup === controller.callsign ? null : controller.callsign}
+                >Set</button>
 
-                <div
-                  class="card p-4 shadow-xl"
-                  data-popup={`popupFeatured-${controller.callsign}`}
-                >
-                  <button
-                    type="button"
-                    class="btn preset-filled"
-                    on:click={() =>
-                      setCom1Callback(formatFrequency(controller.frequency))}
+                {#if openPopup === controller.callsign}
+                  <div class="card p-4 shadow-xl absolute right-0 top-full mt-2 z-10 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      class="btn preset-filled"
+                      onclick={() => {
+                        setCom1Callback(formatFrequency(controller.frequency));
+                        openPopup = null;
+                      }}
                     >COM1</button>
-                  <button
-                    type="button"
-                    class="btn preset-filled"
-                    on:click={() =>
-                      setCom2Callback(formatFrequency(controller.frequency))}
+                    <button
+                      type="button"
+                      class="btn preset-filled"
+                      onclick={() => {
+                        setCom2Callback(formatFrequency(controller.frequency));
+                        openPopup = null;
+                      }}
                     >COM2</button>
-                </div>
+                  </div>
+                {/if}
               </div>
             </div>
           {/if}
@@ -161,5 +144,4 @@
         </div>
       {/if}
     </div>
-  </svelte:fragment>
-</Tabs>
+</div>

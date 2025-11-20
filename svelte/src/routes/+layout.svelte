@@ -1,28 +1,7 @@
 <script lang="ts">
 import "../app.css";
 
-// Floating UI for Popups
-import { computePosition, autoUpdate, flip, shift, offset, arrow } from "@floating-ui/dom";
-storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-
 import Header from "./Header.svelte";
-
-// Modal Component
-import { ToastProvider } from "@skeletonlabs/skeleton-svelte";
-
-initializeStores();
-
-import settingsModal from "$lib/modals/settings.svelte";
-import radioModal from "$lib/modals/radioKeypad.svelte";
-
-type ModalRegistry = {
-  [key: string]: { ref: typeof settingsModal | typeof radioModal };
-};
-
-const modalRegistry: ModalRegistry = {
-  settingsModal: { ref: settingsModal },
-  radioModal: { ref: radioModal },
-};
 
 // WebSocket Management
 import { onMount, onDestroy } from "svelte";
@@ -164,20 +143,11 @@ onDestroy(() => {
 });
 </script>
 
-<Modal components={modalRegistry}></Modal>
-<ToastProvider></ToastProvider>
-
-
-<AppShell>
-  {#snippet header()}
+<div class="h-full w-full flex flex-col overflow-hidden">
+  <header class="flex-none">
     <Header></Header>
-  {/snippet}
-  <!-- (sidebarLeft) -->
-  <!-- (sidebarRight) -->
-  <!-- (pageHeader) -->
-  <!-- Router Slot -->
-  {@render children?.()}
-  <!-- ---- / ---- -->
-  <!-- (pageFooter) -->
-  <!-- (footer) -->
-</AppShell>
+  </header>
+  <div class="flex-auto overflow-y-auto">
+    {@render children?.()}
+  </div>
+</div>
