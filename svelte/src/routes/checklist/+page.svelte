@@ -97,7 +97,16 @@
     const idx = sectionNames.indexOf($checklistState.section);
     if (idx >= 0 && idx < sectionNames.length - 1) $checklistState.section = sectionNames[idx + 1];
   }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if ((e.code === 'Space' || e.code === 'Enter') && nextItemIndex !== -1) {
+      e.preventDefault();
+      checkNext();
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <!-- Top Bar -->
 <div class="flex space-x-2 p-4">
