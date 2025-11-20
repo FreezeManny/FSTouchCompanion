@@ -138,7 +138,7 @@
 </div>
 
 <!-- Content -->
-<div class="p-4">
+<div class="p-4 pb-24">
   {#if items.length > 0}
     {#each items as item, index}
       {#if item.type === "break"}
@@ -167,13 +167,13 @@
   {/if}
 </div>
 
-<!-- Bottom Bar -->
-<div class="p-4 w-full">
+<!-- Floating Bottom Button -->
+<div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10">
   {#if !allSelected}
-    <button type="button" class="btn variant-filled w-full" on:click={checkNext}>Check</button>
+    <button type="button" class="btn variant-filled px-8 shadow-lg" on:click={checkNext}>Check</button>
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
-    <button type="button" class="btn variant-filled-success w-full" on:click={nextSection}>Next Checklist</button>
+    <button type="button" class="btn variant-filled-success px-8 shadow-lg" on:click={nextSection}>Next Checklist</button>
   {:else}
-    <button type="button" class="btn variant-filled-error w-full" on:click={resetAircraft}>Reset all</button>
+    <button type="button" class="btn variant-filled-error px-8 shadow-lg" on:click={resetAircraft}>Reset all</button>
   {/if}
 </div>
