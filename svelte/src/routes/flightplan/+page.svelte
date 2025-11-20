@@ -1,5 +1,32 @@
 <script lang="ts">
   import { simbriefData, flightplanSettings } from "$lib/stores";
+  import { onMount, afterUpdate } from "svelte";
+
+  let scrollContainer: HTMLElement;
+  let hasRestored = false;
+
+  onMount(() => {
+    restoreScroll();
+  });
+
+  afterUpdate(() => {
+    if (!hasRestored) {
+      restoreScroll();
+    }
+  });
+
+  function restoreScroll() {
+    if (scrollContainer && $flightplanSettings.scrollPosition && !hasRestored) {
+      scrollContainer.scrollTop = $flightplanSettings.scrollPosition;
+      hasRestored = true;
+    }
+  }
+
+  function handleScroll() {
+    if (scrollContainer) {
+      $flightplanSettings.scrollPosition = scrollContainer.scrollTop;
+    }
+  }
 
   function processHtml(html: string, fontSizeValue: number) {
     // Remove all hyperlinks
@@ -20,7 +47,7 @@
 </script>
 
 {#if $simbriefData}
-  <div class="flex flex-col items-center m-1">
+  <div class="flex flex-col items-center m-1 h-screen overflow-y-auto" bind:this={scrollContainer} on:scroll={handleScroll}>
     <div class="card inline-block">
       <!-- Centered OFP Content -->
       <div class="px-1 py-5">
