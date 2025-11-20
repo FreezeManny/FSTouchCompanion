@@ -1,9 +1,9 @@
-<script lang="js">
+<script lang="ts">
   import { run } from 'svelte/legacy';
 
   import { AppBar, SegmentedControl } from "@skeletonlabs/skeleton-svelte";
   import { } from "@skeletonlabs/skeleton-svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
 
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
@@ -20,7 +20,7 @@
 
   // Set activePath and valueSingle reactively
   run(() => {
-    activePath = $page.route.id;
+    activePath = page.route.id;
     valueSingle = activePath;
   });
 
