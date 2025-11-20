@@ -101,10 +101,12 @@
 
     </AppBar.Lead>
 
+<AppBar.Headline class="flex justify-center">
+		</AppBar.Headline>
     <!-- AppBar trail content -->
       <AppBar.Trail class="justify-end">
       <!-- Open native dialog by ID -->
-      <button type="button" class="btn-icon preset-filled" onclick={() => (document.getElementById('settingsModal') as HTMLDialogElement | null)?.showModal()} aria-label="Open Settings">
+      <button type="button" class="btn-icon preset-filled" onclick={() => console.log("openSettings")} aria-label="Open Settings">
         <Settings />
       </button>
     </AppBar.Trail>
