@@ -42,7 +42,7 @@
   };
 </script>
 
-<hr class="!border-t-8" />
+<hr class="border-t-8!" />
 <AppBar
   gridColumns="grid-cols-3"
   slotDefault="place-self-center"
@@ -123,7 +123,7 @@
   {/snippet}
 </AppBar>
 
-<hr class="!border-t-8" />
+<hr class="border-t-8!" />
 
 <AppBar
   gridColumns="grid-cols-3"

@@ -18,14 +18,12 @@
     "@tailwindcss/typography": "^0.5.14",
     "@types/node": "^24.10.1",
     "autoprefixer": "^10.4.20",
-    "postcss": "8.4.45",
     "svelte": "^5.0.0",
     "svelte-preprocess": "^6.0.3",
-    "tailwindcss": "^3.4.9",
+    "tailwindcss": "^4.1.17",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "vite": "^5.4.4",
-    "vite-plugin-tailwind-purgecss": "0.3.3"
+    "vite": "^5.4.4"
   },
   "type": "module",
   "dependencies": {

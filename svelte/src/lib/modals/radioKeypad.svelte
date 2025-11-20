@@ -126,10 +126,10 @@
   }
 </script>
 
-<div class="container mx-small p-8 space-y-8 variant-filled-surface rounded w-auto">
+<div class="container mx-small p-8 space-y-8 variant-filled-surface rounded-sm w-auto">
   <h1 class="h1">{$modalStore[0]?.title}</h1>
 
-  <div class="container variant-filled mx-auto p-8 space-y-8 text-center bg-gray-800 text-white rounded">
+  <div class="container variant-filled mx-auto p-8 space-y-8 text-center bg-gray-800 text-white rounded-sm">
     <h1 class="h1">{frequency}</h1>
   </div>
 

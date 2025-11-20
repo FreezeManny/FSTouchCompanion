@@ -43,7 +43,7 @@
       com2EntryCallback={com2Entry}
     />
 
-    <hr class="!border-t-8" />
+    <hr class="border-t-8!" />
 
     {#if $fsData.Position.Lat != 0.0 && $fsData.Position.Lon != 0.0}
       <VatsimFreqSelector
@@ -67,7 +67,7 @@
     <div class="alert-message">
       <h3 class="h3">WebSocket connection in progress...</h3>
       {#if $connectionError}
-        <p class="mt-2 text-sm font-mono bg-surface-900/50 p-2 rounded">{$connectionError}</p>
+        <p class="mt-2 text-sm font-mono bg-surface-900/50 p-2 rounded-sm">{$connectionError}</p>
       {/if}
     </div>
   </aside>

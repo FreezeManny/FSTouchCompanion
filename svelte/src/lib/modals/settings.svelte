@@ -26,7 +26,7 @@
   });
 </script>
 
-<div class="container mx-small p-8 space-y-8 variant-filled-surface rounded w-auto">
+<div class="container mx-small p-8 space-y-8 variant-filled-surface rounded-sm w-auto">
   <h1 class="h1">Einstellungen</h1>
 
   <div class="space-y-1">

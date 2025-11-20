@@ -134,7 +134,7 @@
     </select>
   </label>
 
-  <div class="flex-grow"></div>
+  <div class="grow"></div>
   <button type="button" class="btn variant-filled" use:popup={popupReset}>Reset</button>
   
   <div class="card p-4 w-60 shadow-xl z-50" data-popup="popupReset">
@@ -159,9 +159,9 @@
       {#if item.type === "break"}
         <hr class="my-4 opacity-50" />
       {:else}
-        <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded cursor-pointer {index === nextItemIndex ? 'ring-2 ring-primary-500' : ''}">
+        <label class="flex items-start space-x-3 p-2 hover:bg-surface-500/10 rounded-sm cursor-pointer {index === nextItemIndex ? 'ring-2 ring-primary-500' : ''}">
           <input class="checkbox mt-1" type="checkbox" bind:checked={checkboxStates[index]} onchange={saveState} />
-          <div class="flex-grow">
+          <div class="grow">
             <div class="flex justify-between w-full">
               <span>{item.label}</span>
               {#if item.value}<span class="font-bold text-right">{item.value}</span>{/if}
