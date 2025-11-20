@@ -5,8 +5,9 @@
   function processHtml(html: string, fontSizeValue: number) {
     // Remove all hyperlinks
     let cleanedHtml = html.replace(/<a[^>]*>(.*?)<\/a>/gi, "$1");
-    // Set custom font size
+    // Set custom font size and ensure monospace font
     cleanedHtml = cleanedHtml.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSizeValue}px`);
+    cleanedHtml = cleanedHtml.replace(/<pre>/gi, `<pre style="font-family: 'Courier New', Courier, monospace; font-size: ${fontSizeValue}px; line-height: 1.2;">`);
     return cleanedHtml;
   }
 
