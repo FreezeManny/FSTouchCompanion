@@ -28,6 +28,7 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "^1.6.10",
+    "@tailwindcss/vite": "^4.1.17",
     "@types/express": "^5.0.5",
     "@types/request": "^2.48.13",
     "highlight.js": "11.10.0",
