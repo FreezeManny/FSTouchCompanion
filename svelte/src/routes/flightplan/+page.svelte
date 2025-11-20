@@ -30,7 +30,7 @@
           on:click={decreaseFontSize}
           title="Decrease font size"
         >
-          −
+          -
         </button>
         <span class="flex items-center px-2 text-sm">Font Size: {fontSize}px</span>
         <button
