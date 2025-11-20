@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { simbriefData } from "$lib/stores";
-  let fontSize = 15; // Base font size in pixels
+  import { simbriefData, flightplanSettings } from "$lib/stores";
 
   function processHtml(html: string, fontSizeValue: number) {
     // Remove all hyperlinks
@@ -12,11 +11,11 @@
   }
 
   function increaseFontSize() {
-    fontSize = Math.min(fontSize + 1, 30); // Max 30px
+    $flightplanSettings.fontSize = Math.min($flightplanSettings.fontSize + 1, 30); // Max 30px
   }
 
   function decreaseFontSize() {
-    fontSize = Math.max(fontSize - 1, 8); // Min 8px
+    $flightplanSettings.fontSize = Math.max($flightplanSettings.fontSize - 1, 8); // Min 8px
   }
 </script>
 
@@ -25,7 +24,7 @@
     <div class="card inline-block">
       <!-- Centered OFP Content -->
       <div class="px-1 py-5">
-        {@html processHtml($simbriefData.text.plan_html, fontSize)}
+        {@html processHtml($simbriefData.text.plan_html, $flightplanSettings.fontSize)}
       </div>
     </div>
     

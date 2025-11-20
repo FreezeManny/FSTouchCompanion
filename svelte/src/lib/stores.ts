@@ -27,6 +27,10 @@ export interface SimbriefData {
     [key: string]: any; // TODO: Define proper Simbrief data structure
 }
 
+export interface FlightplanSettings {
+    fontSize: number;
+}
+
 // Create a writable store that persists to localStorage
 export const selectedAirports: Writable<SelectedAirports> = persisted("selectedAirports", {
     dep: "XXXX",
@@ -50,3 +54,7 @@ export const settings: Writable<Settings> = persisted("settings", {
 });
 
 export const simbriefData: Writable<SimbriefData | null> = persisted("simbriefData", null);
+
+export const flightplanSettings: Writable<FlightplanSettings> = persisted("flightplanSettings", {
+    fontSize: 15
+});
