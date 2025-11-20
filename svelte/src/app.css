@@ -1,3 +1,20 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+html, body { @apply h-full overflow-hidden; }
+
+/* Prevent double-tap zoom on all interactive elements */
+button, a, input, select, textarea, [role="button"], [tabindex] {
+  touch-action: manipulation;
+}
+
+/* Prevent double-tap zoom globally while allowing single-finger pan */
+* {
+  touch-action: pan-x pan-y;
+}
+
+/* Re-apply manipulation to interactive elements (more specific) */
+button, a, input, select, textarea, .btn, [role="button"] {
+  touch-action: manipulation !important;
+}

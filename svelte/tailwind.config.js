@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
-import { skeleton } from '@skeletonlabs/tw-plugin';
+//import { skeleton } from '@skeletonlabs/tw-plugin';
 
 // Resolve __dirname equivalent in ESM
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +20,7 @@ export default {
 	plugins: [
 		forms,
 		typography,
+		/*
 		skeleton({
 			themes: {
 				preset: [
@@ -30,5 +31,6 @@ export default {
 				],
 			},
 		}),
+		*/
 	],
 };
