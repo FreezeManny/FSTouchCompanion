@@ -23,29 +23,28 @@
 {#if $simbriefData}
   <div class="flex flex-col items-center m-1">
     <div class="card inline-block">
-      <!-- Font Size Controls -->
-      <div class="flex justify-center gap-2 pt-4 pb-2">
-        <button
-          class="btn variant-filled-primary"
-          on:click={decreaseFontSize}
-          title="Decrease font size"
-        >
-          -
-        </button>
-        <span class="flex items-center px-2 text-sm">Font Size: {fontSize}px</span>
-        <button
-          class="btn variant-filled-primary"
-          on:click={increaseFontSize}
-          title="Increase font size"
-        >
-          +
-        </button>
-      </div>
-      
       <!-- Centered OFP Content -->
       <div class="px-1 py-5">
         {@html processHtml($simbriefData.text.plan_html, fontSize)}
       </div>
+    </div>
+    
+    <!-- Floating Zoom Controls -->
+    <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+      <button
+        class="btn variant-filled-primary w-12 h-12 rounded-full shadow-lg"
+        on:click={increaseFontSize}
+        title="Increase font size"
+      >
+        +
+      </button>
+      <button
+        class="btn variant-filled-primary w-12 h-12 rounded-full shadow-lg"
+        on:click={decreaseFontSize}
+        title="Decrease font size"
+      >
+        -
+      </button>
     </div>
   </div>
 {:else}
