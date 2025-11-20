@@ -1,14 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { AppBar, SegmentedControl } from "@skeletonlabs/skeleton-svelte";
-    import { House, RadioTower, Tablet, CloudSunRain,FileText, ListTodo, Settings} from '@lucide/svelte';
+  import { House, RadioTower, Tablet, CloudSunRain, FileText, ListTodo } from '@lucide/svelte';
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { settings } from "$lib/stores";
+  import SettingsModal from "$lib/modals/settings.svelte";
 
   // Use the page store correctly and track active path.
   let activePath = "";
   let valueSingle: string = "";
+  let settingsOpen = false;
 
   $: activePath = $page.url.pathname;
   $: valueSingle = activePath;
@@ -105,11 +107,10 @@
 		</AppBar.Headline>
     <!-- AppBar trail content -->
       <AppBar.Trail class="justify-end">
-      <!-- Open native dialog by ID -->
-      <button type="button" class="btn-icon preset-filled" onclick={() => console.log("openSettings")} aria-label="Open Settings">
-        <Settings />
-      </button>
+      <SettingsModal bind:open={settingsOpen} />
     </AppBar.Trail>
    </AppBar.Toolbar> 
   </AppBar>
 </header>
+
+

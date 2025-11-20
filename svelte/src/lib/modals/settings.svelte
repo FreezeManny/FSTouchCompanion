@@ -1,67 +1,56 @@
 <script lang="ts">
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { settings } from "$lib/stores";
+  import { Settings } from '@lucide/svelte';
 
-  let open = false;
+  export let open = false;
 
-  // Ensure theme toggles safely when $settings changes
-  $: if (typeof document !== "undefined") {
-    if ($settings.appearance === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }
 </script>
 
 <Dialog {open} onOpenChange={(details) => (open = details.open)}>
-  <Dialog.Trigger>
-    <button type="button" class="btn preset-filled-primary-500">
-      Settings
-    </button>
+  <Dialog.Trigger class="btn btn-icon preset-filled">
+    <Settings /> 
   </Dialog.Trigger>
 
   <Portal>
-    <Dialog.Backdrop class="bg-surface-50/75 dark:bg-surface-950/75" />
-    <Dialog.Positioner>
-      <Dialog.Content class="rounded-container bg-surface-100-900 text-inherit max-w-[640px] p-4 space-y-4">
-        <div class="container mx-small p-8 space-y-8 preset-filled-surface-500 rounded-sm w-auto">
-          <Dialog.Title class="h1">Einstellungen</Dialog.Title>
+    <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50/75 dark:bg-surface-950/75" />
+    <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+      <Dialog.Content class="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-full max-w-lg">
+          <Dialog.Title class="h3">Einstellungen</Dialog.Title>
 
-          <div class="space-y-1">
-            <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-              <div class="input-group-shim">Appearance:</div>
-              <select class="select" bind:value={$settings.appearance}>
-                <option value="light">Light Mode</option>
-                <option value="dark">Dark Mode</option>
-              </select>
-            </div>
+            <form class="w-full max-w-md space-y-4 p-4">
+            <fieldset class="space-y-4">
 
-            <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-              <div class="input-group-shim">Simbrief Username:</div>
-              <input type="text" bind:value={$settings.simbriefUsername} />
-            </div>
+              <!-- Simbrief Username Input -->
+              <label class="label">
+                <span class="label-text">Simbrief Username:</span>
+                <input class="input" type="text" bind:value={$settings.simbriefUsername} placeholder="Enter username" />
+              </label>
 
-            <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-              <div class="input-group-shim">Flight Sim PC Address:</div>
-              <input type="text" bind:value={$settings.flightSimAddress} />
-            </div>
-          </div>
+              <!-- Flight Sim PC Address Input -->
+              <label class="label">
+                <span class="label-text">Flight Sim PC Address:</span>
+                <input class="input" type="text" bind:value={$settings.flightSimAddress} placeholder="Enter address" />
+              </label>
 
-          <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-            <div class="input-group-shim">ATC-Platform:</div>
-            <select class="select" bind:value={$settings.atcPlatform}>
-              <option value="VATSIM">Vatsim</option>
-              <option value="IVAO">Ivao</option>
-            </select>
-          </div>
+              <!-- ATC Platform Select -->
+              <label class="label">
+                <span class="label-text">ATC-Platform:</span>
+                <select class="select" bind:value={$settings.atcPlatform}>
+                  <option value="VATSIM">Vatsim</option>
+                  <option value="IVAO">Ivao</option>
+                </select>
+              </label>
+            </fieldset>
 
-          <div class="space-y-8 flex flex-col items-center">
-            <Dialog.CloseTrigger class="btn preset-filled-tertiary-500">
-              Close
-            </Dialog.CloseTrigger>
-          </div>
-        </div>
+
+
+            <fieldset class="flex justify-center pt-4">
+              <Dialog.CloseTrigger class="btn preset-filled-tertiary-500">
+                Close
+              </Dialog.CloseTrigger>
+            </fieldset>
+
       </Dialog.Content>
     </Dialog.Positioner>
   </Portal>
