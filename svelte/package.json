@@ -1,5 +1,5 @@
 {
-  "name": "FSTouchCompanion",
+  "name": "fstouchcompanion",
   "version": "0.5",
   "private": true,
   "scripts": {
@@ -27,10 +27,10 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "^1.6.10",
+    "@skeletonlabs/skeleton-svelte": "^4.4.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/express": "^5.0.5",
     "@types/request": "^2.48.13",
-    "highlight.js": "11.10.0",
     "svelte-persisted-store": "^0.11.0",
     "sveltekit-io": "^1.0.11",
     "sveltekit-sse": "^0.13.5",
