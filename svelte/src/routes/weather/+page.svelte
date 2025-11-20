@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
   import { selectedAirports, settings, simbriefData } from "$lib/stores";
-  const toastStore = getToastStore();
+  import { createToaster } from "@skeletonlabs/skeleton-svelte";
 
   type SimbriefError = {
     message: string;
@@ -154,6 +154,34 @@
     if ($selectedAirports.dep.length === 4) fetchAirportData(fetchMode.DEP);
     if ($selectedAirports.arr.length === 4) fetchAirportData(fetchMode.ARR);
   });
+
+  // provide a tiny wrapper so existing toastStore.trigger(...) usage continues to work
+  function getToastStore() {
+    const toaster = createToaster({});
+    return {
+      // support the current call pattern toastStore.trigger(simbriefError(...))
+      trigger: (payload: SimbriefError) => {
+        // Map the SimbriefError into the toaster API
+        toaster.error({
+          title: payload.message,
+          // the original code only sets a message; keep description empty
+          description: "",
+          // Move timeout to meta to avoid passing invalid properties to the toaster API
+          meta: {
+            timeout: payload.timeout,
+            hoverable: payload.hoverable,
+            background: payload.background,
+          },
+        });
+      },
+      // keep convenience methods available if needed elsewhere
+      info: (opts: any) => toaster.info(opts),
+      success: (opts: any) => toaster.success(opts),
+      warning: (opts: any) => toaster.warning(opts),
+    };
+  }
+
+  const toastStore = getToastStore();
 </script>
 
 <div class="grid grid-cols-3 p-2">

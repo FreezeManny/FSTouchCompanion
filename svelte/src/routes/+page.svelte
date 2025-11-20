@@ -1,11 +1,10 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
+  import { createToaster } from "@skeletonlabs/skeleton-svelte";
 
   import { settings, simbriefData } from "$lib/stores";
   import { goto } from "$app/navigation";
   import { isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
-
-  const toastStore = getToastStore();
 
   type SimbriefData = {
     atc: { callsign: string };
@@ -18,12 +17,42 @@
 
   type DepartureArrival = { code: string; name: string };
 
-  const simbriefError = (message: string) => ({
+  type SimbriefError = {
+    message: string;
+    timeout: number;
+    hoverable: boolean;
+    background: string;
+  };
+
+  const simbriefError = (message: string): SimbriefError => ({
     message,
     timeout: 5000,
     hoverable: true,
     background: "preset-filled-error-500",
   });
+
+  // provide a tiny wrapper so existing toastStore.trigger(...) usage continues to work
+  function getToastStore() {
+    const toaster = createToaster({});
+    return {
+      trigger: (payload: SimbriefError) =>
+        toaster.error({
+          title: payload.message,
+          description: "",
+          // Move timeout into meta to avoid passing unknown properties to the toaster API
+          meta: {
+            timeout: payload.timeout,
+            hoverable: payload.hoverable,
+            background: payload.background,
+          },
+        }),
+      info: (opts: any) => toaster.info(opts),
+      success: (opts: any) => toaster.success(opts),
+      warning: (opts: any) => toaster.warning(opts),
+    };
+  }
+
+  const toastStore = getToastStore();
 
   async function getFlightPlan(): Promise<void> {
     console.log("Fetching flight plan...");
