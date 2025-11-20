@@ -15,8 +15,8 @@
   import { modeUserPrefers } from "@skeletonlabs/skeleton";
 
   const settingsModal = {
-    type: "component",
-    component: "settingsModal",
+    type: /** @type {'component'} */ ('component'),
+    component: 'settingsModal',
   };
 
   let activePath = $state();
@@ -154,7 +154,7 @@
 
     {#snippet trail()}
       
-        <button type="button" class="btn-icon variant-filled" onclick={() => modalStore.trigger(settingsModal)}>
+        <button type="button" class="btn-icon variant-filled" onclick={() => modalStore.trigger(settingsModal)} aria-label="Open Settings">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

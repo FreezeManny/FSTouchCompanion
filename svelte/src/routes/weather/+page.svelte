@@ -178,8 +178,8 @@
   </div>
   <div class="grid grid-cols-2">
     <button type="button" class="btn variant-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
-    <button type="button" class="btn variant-filled mx-1" onclick={updateButtonHandler}
-      ><svg
+    <button type="button" class="btn variant-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
+      <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

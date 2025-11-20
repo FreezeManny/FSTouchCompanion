@@ -71,6 +71,7 @@
       type="button"
       class="btn btn-lg variant-filled-primary mx-1"
       onclick={com1SwitchCallback}
+      aria-label="Switch COM1"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -101,6 +102,7 @@
         type="button"
         class="btn btn-lg variant-filled-primary"
         onclick={() => modalStore.trigger(COM1_Modal)}
+        aria-label="Open COM1 Modal"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -151,6 +153,7 @@
       type="button"
       class="btn btn-lg variant-filled-primary mx-1"
       onclick={com2SwitchCallback}
+      aria-label="Switch COM2"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -181,6 +184,7 @@
         type="button"
         class="btn btn-lg variant-filled-primary"
         onclick={() => modalStore.trigger(COM2_Modal)}
+        aria-label="Open COM2 Modal"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

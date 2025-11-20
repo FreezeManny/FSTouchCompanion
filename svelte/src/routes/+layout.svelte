@@ -185,7 +185,7 @@ onDestroy(() => {
 });
 </script>
 
-<Modal components="{modalRegistry}"></Modal>
+<Modal components={modalRegistry}></Modal>
 <Toast></Toast>
 
 
