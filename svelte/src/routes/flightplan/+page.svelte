@@ -1,20 +1,50 @@
 <script lang="ts">
   import { simbriefData } from "$lib/stores";
-  let customFontSize = "15px"; // Your custom font size
+  let fontSize = 15; // Base font size in pixels
 
-  function processHtml(html: string, fontSize: string) {
+  function processHtml(html: string, fontSizeValue: number) {
     // Remove all hyperlinks
     let cleanedHtml = html.replace(/<a[^>]*>(.*?)<\/a>/gi, "$1");
     // Set custom font size
-    cleanedHtml = cleanedHtml.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSize}`);
+    cleanedHtml = cleanedHtml.replace(/font-size:\s*[\d.]+px/gi, `font-size: ${fontSizeValue}px`);
     return cleanedHtml;
+  }
+
+  function increaseFontSize() {
+    fontSize = Math.min(fontSize + 1, 30); // Max 30px
+  }
+
+  function decreaseFontSize() {
+    fontSize = Math.max(fontSize - 1, 8); // Min 8px
   }
 </script>
 
 {#if $simbriefData}
-  <div class="card m-1">
-    <div class="px-1 py-5">
-      {@html processHtml($simbriefData.text.plan_html, customFontSize)}
+  <div class="flex flex-col items-center m-1">
+    <div class="card inline-block">
+      <!-- Font Size Controls -->
+      <div class="flex justify-center gap-2 pt-4 pb-2">
+        <button
+          class="btn variant-filled-primary"
+          on:click={decreaseFontSize}
+          title="Decrease font size"
+        >
+          −
+        </button>
+        <span class="flex items-center px-2 text-sm">Font Size: {fontSize}px</span>
+        <button
+          class="btn variant-filled-primary"
+          on:click={increaseFontSize}
+          title="Increase font size"
+        >
+          +
+        </button>
+      </div>
+      
+      <!-- Centered OFP Content -->
+      <div class="px-1 py-5">
+        {@html processHtml($simbriefData.text.plan_html, fontSize)}
+      </div>
     </div>
   </div>
 {:else}
