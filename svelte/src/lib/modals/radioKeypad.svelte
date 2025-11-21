@@ -146,23 +146,25 @@
   <Portal>
     <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
     <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
-      <Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-0 space-y-0 shadow-xl {animation}">
-        <div class="container mx-small rounded w-auto overflow-hidden">
-            <!-- Header: primary -->
-            <header class="flex justify-between items-center p-6 preset-filled-primary-500 text-on-primary">
-              <Dialog.Title class="h1 m-0">{title}</Dialog.Title>
+      <Dialog.Content class="card preset-filled-surface-100-900 w-full max-w-xl p-0 space-y-0 shadow-xl {animation}">
+        <div class="rounded w-auto overflow-hidden">
+            <!-- Header -->
+            <header class="flex justify-between items-center p-4 border-b border-surface-200-800">
+              <Dialog.Title class="h2 m-0 font-bold">{title}</Dialog.Title>
               <Dialog.CloseTrigger class="btn btn-icon preset-filled-warning-500" aria-label="Close">
                 <XIcon />
               </Dialog.CloseTrigger>
             </header>
 
-            <!-- Frequency display: white background and black text -->
-            <div class="mx-auto my-6 p-8 text-center bg-white text-black rounded-md shadow-sm">
-              <h1 class="h1 m-0 font-mono text-black">{frequency}</h1>
+            <!-- Frequency display: using badge styling like RadioDisplay -->
+            <div class="flex justify-center my-6 px-4">
+              <span class="badge preset-filled p-6">
+                <h1 class="h1 m-0 font-mono">{frequency}</h1>
+              </span>
             </div>
 
             <!-- Keypad grid -->
-            <div class="grid grid-cols-3 gap-2 rounded-xl max-w-sm mx-auto mt-6 p-4">
+            <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mb-6 px-4">
               <KeypadButton label="1" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")} />
               <KeypadButton label="2" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")} />
               <KeypadButton label="3" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")} />
@@ -174,7 +176,7 @@
               <KeypadButton label="9" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")} />
               <KeypadButton label="Remove" onclick={onRemove} disabled={frequency == "XXX.XXX"} color="preset-filled-warning-500" />
               <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
-              <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-accept-500" />
+              <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="success-500" />
             </div>
         </div>
       </Dialog.Content>
