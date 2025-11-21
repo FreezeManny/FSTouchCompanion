@@ -7,7 +7,7 @@
   const animation =
   	'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
 
-  let { title = "Radio Keypad", onSubmit, open = $bindable(false) }: { title?: string; onSubmit?: (value: number) => void, open?: boolean } = $props();
+  let { title, onSubmit, open = $bindable(false) }: { title?: string; onSubmit?: (value: number) => void, open?: boolean } = $props();
 
   let frequency = $state<string>("XXX.XXX");
   // validFrequencies is constant data, no need for $state

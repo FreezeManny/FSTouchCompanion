@@ -28,6 +28,7 @@
 
   let keypadOpen = $state(false);
   let selectedCom: "COM1" | "COM2" = $state("COM1");
+  let keypadTitle = $derived(`${selectedCom} - STBY Frequency`);
 
   function openKeypad(com: "COM1" | "COM2") {
     selectedCom = com;
@@ -149,5 +150,6 @@
 
 <RadioKeypad 
   bind:open={keypadOpen} 
+  title={keypadTitle}
   onSubmit={handleKeypadSubmit}
 />
