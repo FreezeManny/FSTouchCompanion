@@ -32,25 +32,31 @@
 
 {#if $isWebSocketOpen}
   {#if $fsData.Connected}
-    <RadioDisplay
-      COM1_ACT_FREQ={$fsData.Com1Act}
-      COM1_STBY_FREQ={$fsData.Com1Stby}
-      COM2_ACT_FREQ={$fsData.Com2Act}
-      COM2_STBY_FREQ={$fsData.Com2Stby}
-      com1SwitchCallback={com1Switch}
-      com2SwitchCallback={com2Switch}
-      com1EntryCallback={com1Entry}
-      com2EntryCallback={com2Entry}
-    />
+    <div class="h-full flex flex-col overflow-hidden">
+      <div class="flex-none">
+        <RadioDisplay
+          COM1_ACT_FREQ={$fsData.Com1Act}
+          COM1_STBY_FREQ={$fsData.Com1Stby}
+          COM2_ACT_FREQ={$fsData.Com2Act}
+          COM2_STBY_FREQ={$fsData.Com2Stby}
+          com1SwitchCallback={com1Switch}
+          com2SwitchCallback={com2Switch}
+          com1EntryCallback={com1Entry}
+          com2EntryCallback={com2Entry}
+        />
+      </div>
 
-    {#if $fsData.Position.Lat != 0.0 && $fsData.Position.Lon != 0.0}
-      <VatsimFreqSelector
-        lat={$fsData.Position.Lat}
-        long={$fsData.Position.Lon}
-        setCom1Callback={com1Entry}
-        setCom2Callback={com2Entry}
-      />
-    {/if}
+      <div class="flex-auto overflow-y-auto">
+        {#if $fsData.Position.Lat != 0.0 && $fsData.Position.Lon != 0.0}
+          <VatsimFreqSelector
+            lat={$fsData.Position.Lat}
+            long={$fsData.Position.Lon}
+            setCom1Callback={com1Entry}
+            setCom2Callback={com2Entry}
+          />
+        {/if}
+      </div>
+    </div>
   {:else}
     <aside class="alert preset-filled-warning-500 m-5">
       <!-- Message -->
