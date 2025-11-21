@@ -154,7 +154,7 @@
         </div>
 
         <div class="container preset-filled mx-auto p-8 space-y-8 text-center bg-gray-800 text-white rounded-sm">
-          <h1 class="h1">{frequency}</h1>
+          <h1 class="h1 font-mono">{frequency}</h1>
         </div>
 
         <div class="flex flex-wrap rounded-xl max-w-sm mx-auto mt-24">

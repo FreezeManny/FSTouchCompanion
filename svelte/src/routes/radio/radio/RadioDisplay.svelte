@@ -60,7 +60,7 @@ import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
 
     <AppBar.Headline class="flex justify-center">
       <span class="badge preset-filled p-4">
-        <h1 class="h1">
+        <h1 class="h1 font-mono">
           {formatFrequency(typeof COM1_ACT_FREQ === 'string' ? Number(COM1_ACT_FREQ) : COM1_ACT_FREQ)}
         </h1>
       </span>
@@ -75,7 +75,7 @@ import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
       </button>
 
       <span class="badge preset-filled p-4">
-        <h1 class="h1">
+        <h1 class="h1 font-mono">
           {formatFrequency(typeof COM1_STBY_FREQ === 'string' ? Number(COM1_STBY_FREQ) : COM1_STBY_FREQ)}
         </h1>
       </span>
@@ -110,7 +110,7 @@ import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
 
     <AppBar.Headline class="flex justify-center">
       <span class="badge preset-filled p-4">
-        <h1 class="h1">
+        <h1 class="h1 font-mono">
           {formatFrequency(typeof COM2_ACT_FREQ === 'string' ? Number(COM2_ACT_FREQ) : COM2_ACT_FREQ)}
         </h1>
       </span>
@@ -125,7 +125,7 @@ import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
       </button>
 
       <span class="badge preset-filled p-4">
-        <h1 class="h1">
+        <h1 class="h1 font-mono">
           {formatFrequency(typeof COM2_STBY_FREQ === 'string' ? Number(COM2_STBY_FREQ) : COM2_STBY_FREQ)}
         </h1>
       </span>
