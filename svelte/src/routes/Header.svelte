@@ -107,10 +107,18 @@
 		</AppBar.Headline>
     <!-- AppBar trail content -->
       <AppBar.Trail class="justify-end">
-      <SettingsModal bind:open={settingsOpen} />
+
     </AppBar.Trail>
    </AppBar.Toolbar> 
   </AppBar>
 </header>
 
 
+      <SettingsModal
+        bind:open={settingsOpen}
+        on:save={(e) => {
+          settings.update(s => ({ ...s, ...e.detail }));
+          settingsOpen = false;
+        }}
+        on:cancel={() => { settingsOpen = false; }}
+      />
