@@ -6,6 +6,12 @@
 @import '@skeletonlabs/skeleton/themes/cerberus'; /* @import '@skeletonlabs/skeleton'; */
 @import '@skeletonlabs/skeleton/themes/crimson';
 
+/* Ensure full viewport height */
+html, body {
+	height: 100%;
+	overflow: hidden;
+}
+
 /* Disable double-tap zoom */
 * {
 	touch-action: manipulation;
