@@ -108,11 +108,12 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<!-- Top Bar (Weather style, with minimal Popover for Reset) -->
-<div class="grid grid-cols-3 p-2">
-  <div class="mx-3">
+
+
+<div class="flex flex-wrap items-center p-2 gap-2">
+  <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
-      <div class="ig-cell preset-tonal">Aircraft</div>
+      <div class="ig-cell mx-0 preset-tonal">Aircraft</div>
       <select
         class="ig-input border border-neutral-700"
         bind:value={$checklistState.aircraft}
@@ -125,7 +126,8 @@
       </select>
     </div>
   </div>
-  <div class="mx-3">
+  
+  <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
       <div class="ig-cell preset-tonal">Section</div>
       <select
@@ -140,7 +142,8 @@
       </select>
     </div>
   </div>
-  <div class="flex items-center justify-end">
+
+  <div class="ml-auto flex items-center justify-end">
     <Popover>
       <Popover.Trigger class="btn preset-filled mx-1">Reset</Popover.Trigger>
       <Portal>
