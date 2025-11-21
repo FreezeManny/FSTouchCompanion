@@ -48,7 +48,7 @@
 
 {#if $simbriefData}
   <div class="flex flex-col items-center m-1 h-screen overflow-y-auto" bind:this={scrollContainer} onscroll={handleScroll}>
-    <div class="card inline-block">
+    <div class="card inline-block preset-filled-surface-100-900">
       <!-- Centered OFP Content -->
       <div class="px-1 py-5">
         {@html processHtml($simbriefData.text.plan_html, $flightplanSettings.fontSize)}
@@ -58,14 +58,14 @@
     <!-- Floating Zoom Controls -->
     <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
       <button
-        class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
+        class="btn preset-filled w-12 h-12 rounded-full shadow-lg"
         onclick={increaseFontSize}
         title="Increase font size"
       >
         +
       </button>
       <button
-        class="btn preset-filled-primary-500 w-12 h-12 rounded-full shadow-lg"
+        class="btn preset-filled w-12 h-12 rounded-full shadow-lg"
         onclick={decreaseFontSize}
         title="Decrease font size"
       >
