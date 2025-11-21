@@ -1,6 +1,6 @@
 {
   "name": "fstouchcompanion",
-  "version": "1.0.0",
+  "version": "0.5",
   "private": true,
   "scripts": {
     "dev": "vite dev --host",
