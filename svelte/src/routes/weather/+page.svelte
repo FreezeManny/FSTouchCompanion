@@ -209,7 +209,7 @@
 </div>
 
 <div class="flex flex-col p-2">
-  <div class="card my-1">
+  <div class="card my-1 preset-filled-surface-100-900">
     <header class="card-header">
       Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}
     </header>
@@ -229,7 +229,7 @@
       </div>
     </section>
   </div>
-  <div class="card my-1">
+  <div class="card my-1 preset-filled-surface-100-900 ">
     <header class="card-header">
       Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}
     </header>

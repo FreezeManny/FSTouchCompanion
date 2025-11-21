@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
   import { toaster } from "$lib/toaster";
 
   import { settings, simbriefData } from "$lib/stores";
@@ -50,7 +49,7 @@
   let aircraft: string = $state("");
   let date: string = $state("");
 
-  run(() => {
+  $effect(() => {
     if ($simbriefData) {
       flightNumber = $simbriefData.atc.callsign;
       departure = { code: $simbriefData.origin.icao_code, name: $simbriefData.origin.name };
