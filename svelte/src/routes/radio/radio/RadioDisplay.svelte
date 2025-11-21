@@ -43,104 +43,109 @@
   }
 </script>
 
-<hr class="border-t-8!" />
-<AppBar>
-  <AppBar.Toolbar class="grid-cols-[auto_1fr_auto]">
-    <AppBar.Lead>
-      <button
-        type="button"
-        id="btn_COM1"
-        class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
-      >
-        COM1
-      </button>
-    </AppBar.Lead>
+<div class="flex flex-col p-2">
+  <div class="card my-2 preset-filled-surface-100-900">
+    <section class="p-2">
+      <AppBar>
+        <AppBar.Toolbar class="grid-cols-[auto_1fr_auto]">
+          <AppBar.Lead>
+            <button
+              type="button"
+              id="btn_COM1"
+              class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
+            >
+              COM1
+            </button>
+          </AppBar.Lead>
 
-    <AppBar.Headline class="flex justify-center">
-      <span class="badge preset-filled p-4">
-        <h1 class="h1 font-mono">
-          {formatFrequency(typeof COM1_ACT_FREQ === 'string' ? Number(COM1_ACT_FREQ) : COM1_ACT_FREQ)}
-        </h1>
-      </span>
+          <AppBar.Headline class="flex justify-center">
+            <span class="badge preset-filled p-4">
+              <h1 class="h1 font-mono">
+                {formatFrequency(typeof COM1_ACT_FREQ === 'string' ? Number(COM1_ACT_FREQ) : COM1_ACT_FREQ)}
+              </h1>
+            </span>
 
-      <button
-        type="button"
-        class="btn btn-lg preset-filled-primary-500 mx-1"
-        onclick={com1SwitchCallback}
-        aria-label="Switch COM1"
-      >
-        <ArrowLeftRight />
-      </button>
+            <button
+              type="button"
+              class="btn btn-lg preset-filled-primary-500 mx-1"
+              onclick={com1SwitchCallback}
+              aria-label="Switch COM1"
+            >
+              <ArrowLeftRight />
+            </button>
 
-      <span class="badge preset-filled p-4">
-        <h1 class="h1 font-mono">
-          {formatFrequency(typeof COM1_STBY_FREQ === 'string' ? Number(COM1_STBY_FREQ) : COM1_STBY_FREQ)}
-        </h1>
-      </span>
-    </AppBar.Headline>
+            <span class="badge preset-filled p-4">
+              <h1 class="h1 font-mono">
+                {formatFrequency(typeof COM1_STBY_FREQ === 'string' ? Number(COM1_STBY_FREQ) : COM1_STBY_FREQ)}
+              </h1>
+            </span>
+          </AppBar.Headline>
 
-    <AppBar.Trail class="justify-end">
-      <button
-        type="button"
-        class="btn btn-lg preset-filled-primary-500"
-        onclick={() => openKeypad("COM1")}
-        aria-label="Open COM1 Modal"
-      >
-       <Grid2x2 /> 
-      </button>
-    </AppBar.Trail>
-  </AppBar.Toolbar>
-</AppBar>
+          <AppBar.Trail class="justify-end">
+            <button
+              type="button"
+              class="btn btn-lg preset-filled-primary-500"
+              onclick={() => openKeypad("COM1")}
+              aria-label="Open COM1 Modal"
+            >
+             <Grid2x2 /> 
+            </button>
+          </AppBar.Trail>
+        </AppBar.Toolbar>
+      </AppBar>
 
-<hr class="border-t-8!" />
+      <hr class="border-t-4 my-2" />
 
-<AppBar>
-  <AppBar.Toolbar class="grid-cols-[auto_1fr_auto]">
-    <AppBar.Lead>
-      <button
-        type="button"
-        id="btn_COM2"
-        class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
-      >
-        COM2
-      </button>
-    </AppBar.Lead>
+      <AppBar>
+        <AppBar.Toolbar class="grid-cols-[auto_1fr_auto]">
+          <AppBar.Lead>
+            <button
+              type="button"
+              id="btn_COM2"
+              class="btn btn-lg preset-filled-primary-500 px-2 font-bold"
+            >
+              COM2
+            </button>
+          </AppBar.Lead>
 
-    <AppBar.Headline class="flex justify-center">
-      <span class="badge preset-filled p-4">
-        <h1 class="h1 font-mono">
-          {formatFrequency(typeof COM2_ACT_FREQ === 'string' ? Number(COM2_ACT_FREQ) : COM2_ACT_FREQ)}
-        </h1>
-      </span>
+          <AppBar.Headline class="flex justify-center">
+            <span class="badge preset-filled p-4">
+              <h1 class="h1 font-mono">
+                {formatFrequency(typeof COM2_ACT_FREQ === 'string' ? Number(COM2_ACT_FREQ) : COM2_ACT_FREQ)}
+              </h1>
+            </span>
 
-      <button
-        type="button"
-        class="btn btn-lg preset-filled-primary-500 mx-1"
-        onclick={com2SwitchCallback}
-        aria-label="Switch COM2"
-      >
-        <ArrowLeftRight />
-      </button>
+            <button
+              type="button"
+              class="btn btn-lg preset-filled-primary-500 mx-1"
+              onclick={com2SwitchCallback}
+              aria-label="Switch COM2"
+            >
+              <ArrowLeftRight />
+            </button>
 
-      <span class="badge preset-filled p-4">
-        <h1 class="h1 font-mono">
-          {formatFrequency(typeof COM2_STBY_FREQ === 'string' ? Number(COM2_STBY_FREQ) : COM2_STBY_FREQ)}
-        </h1>
-      </span>
-    </AppBar.Headline>
+            <span class="badge preset-filled p-4">
+              <h1 class="h1 font-mono">
+                {formatFrequency(typeof COM2_STBY_FREQ === 'string' ? Number(COM2_STBY_FREQ) : COM2_STBY_FREQ)}
+              </h1>
+            </span>
+          </AppBar.Headline>
 
-    <AppBar.Trail class="justify-end">
-      <button
-        type="button"
-        class="btn btn-lg preset-filled-primary-500"
-        onclick={() => openKeypad("COM2")}
-        aria-label="Open COM2 Modal"
-      >
-       <Grid2x2 /> 
-      </button>
-    </AppBar.Trail>
-  </AppBar.Toolbar>
-</AppBar>
+          <AppBar.Trail class="justify-end">
+            <button
+              type="button"
+              class="btn btn-lg preset-filled-primary-500"
+              onclick={() => openKeypad("COM2")}
+              aria-label="Open COM2 Modal"
+            >
+             <Grid2x2 /> 
+            </button>
+          </AppBar.Trail>
+        </AppBar.Toolbar>
+      </AppBar>
+    </section>
+  </div>
+</div>
 
 <RadioKeypad 
   bind:open={keypadOpen} 
