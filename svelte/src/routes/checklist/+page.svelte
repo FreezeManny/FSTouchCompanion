@@ -145,29 +145,25 @@
       <Popover.Trigger class="btn preset-filled mx-1">Reset</Popover.Trigger>
       <Portal>
         <Popover.Positioner class="z-20!">
-          <Popover.Content class="rounded-lg shadow-xl bg-neutral-900 border border-neutral-700 p-0 min-w-[220px]">
-            <nav>
-              <ul class="flex flex-col py-2">
-                <li>
-                  <button
-                    type="button"
-                    class="w-full text-left px-4 py-3 text-base text-white hover:bg-neutral-800 transition"
-                    onclick={resetSection}
-                  >
-                    Reset Section
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    class="w-full text-left px-4 py-3 text-base text-white hover:bg-neutral-800 transition"
-                    onclick={resetAircraft}
-                  >
-                    Reset Entire Aircraft
-                  </button>
-                </li>
-              </ul>
-            </nav>
+          <Popover.Content class="rounded-lg shadow-xl bg-neutral-900 border border-neutral-700 p-0 min-w-[0] w-fit">
+            <div class="flex flex-col">
+              <button
+                type="button"
+                class="w-full text-left px-3 py-2 text-base text-white border-b border-neutral-700 hover:bg-neutral-800 transition"
+                style="border-radius: 8px 8px 0 0;"
+                onclick={resetSection}
+              >
+                Reset Section
+              </button>
+              <button
+                type="button"
+                class="w-full text-left px-3 py-2 text-base text-white border-t border-neutral-700 hover:bg-neutral-800 transition"
+                style="border-radius: 0 0 8px 8px;"
+                onclick={resetAircraft}
+              >
+                Reset Entire Aircraft
+              </button>
+            </div>
             <Popover.Arrow style="--arrow-size: 10px; --arrow-background: #171923;">
               <Popover.ArrowTip />
             </Popover.Arrow>
