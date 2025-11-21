@@ -178,13 +178,14 @@
         bind:value={$selectedAirports.dep}
         oninput={updateDeparture}
         maxlength="4"
+        class="ml-2 mb-2 px-2 py-1"
       />
     </div>
   </div>
   <div class="mx-3">
     <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <div class="input-group-shim">Arr</div>
-      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} oninput={updateArrival} maxlength="4" />
+      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} oninput={updateArrival} maxlength="4" class="ml-2 mb-2 px-2 py-1" />
     </div>
   </div>
   <div class="grid grid-cols-2">
@@ -208,44 +209,44 @@
   </div>
 </div>
 
-<div class="flex flex-col p-2">
-  <div class="card my-1 preset-filled-surface-100-900">
-    <header class="card-header">
-      Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}
+<div class="flex flex-col p-1">
+  <div class="card my-2 preset-filled-surface-100-900">
+    <header class="card-header p-3">
+      <span class="ml-1">Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}</span>
     </header>
-    <section class="p-4">
-      <div class="card mb-2">
-        <header class="card-header">
-          ATIS
+    <section class="p-2">
+      <div class="card mb-2 border border-surface-300 p-2">
+        <header class="card-header mb-1">
+          <span class="ml-1">ATIS</span>
           {#if dep.atisCode}
-            Code: {dep.atisCode}
+            <span class="ml-1">Code: {dep.atisCode}</span>
           {/if}
         </header>
-        <section class="p-4">{@html dep.atisText}</section>
+        <section class="p-2 ml-1">{@html dep.atisText}</section>
       </div>
-      <div class="card">
-        <header class="card-header">METAR</header>
-        <section class="p-4">{dep.metar}</section>
+      <div class="card border border-surface-300 p-2 mb-1">
+        <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
+        <section class="p-2 ml-1">{dep.metar}</section>
       </div>
     </section>
   </div>
-  <div class="card my-1 preset-filled-surface-100-900 ">
-    <header class="card-header">
-      Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}
+  <div class="card my-2 preset-filled-surface-100-900 ">
+    <header class="card-header p-3">
+      <span class="ml-1">Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}</span>
     </header>
-    <section class="p-4">
-      <div class="card mb-2">
-        <header class="card-header">
-          ATIS
+    <section class="p-2">
+      <div class="card mb-2 border border-surface-300 p-2">
+        <header class="card-header mb-1">
+          <span class="ml-1">ATIS</span>
           {#if arr.atisCode}
-            Code: {arr.atisCode}
+            <span class="ml-1">Code: {arr.atisCode}</span>
           {/if}
         </header>
-        <section class="p-4">{@html arr.atisText}</section>
+        <section class="p-2 ml-1">{@html arr.atisText}</section>
       </div>
-      <div class="card">
-        <header class="card-header">METAR</header>
-        <section class="p-4">{arr.metar}</section>
+      <div class="card border border-surface-300 p-2 mb-1">
+        <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
+        <section class="p-2 ml-1">{arr.metar}</section>
       </div>
     </section>
   </div>
