@@ -1,11 +1,9 @@
 <script lang="ts">
   import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
-  import { Tabs } from "@skeletonlabs/skeleton-svelte";
+  import { Tabs, Popover, Portal } from "@skeletonlabs/skeleton-svelte";
 
   let atcControllers: AtcData[] = $state([]);
-  
-  let openPopup: string | null = $state(null);
 
   const atcDisplay = {
     all: {
@@ -101,35 +99,37 @@
                         )?.[0]}
                       </p>
                     </div>
-                    <div class="flex items-center gap-2 relative">
+                    <div class="flex items-center gap-2">
                       <h3 class="h3 text-right">{controller.frequency}</h3>
 
-                      <button
-                        type="button"
-                        class="btn preset-filled"
-                        onclick={() => openPopup = openPopup === controller.callsign ? null : controller.callsign}
-                      >Set</button>
-
-                      {#if openPopup === controller.callsign}
-                        <div class="card p-4 shadow-xl absolute right-0 top-full mt-2 z-10 flex flex-col gap-2">
-                          <button
-                            type="button"
-                            class="btn preset-filled"
-                            onclick={() => {
-                              setCom1Callback(formatFrequency(controller.frequency));
-                              openPopup = null;
-                            }}
-                          >COM1</button>
-                          <button
-                            type="button"
-                            class="btn preset-filled"
-                            onclick={() => {
-                              setCom2Callback(formatFrequency(controller.frequency));
-                              openPopup = null;
-                            }}
-                          >COM2</button>
-                        </div>
-                      {/if}
+                      <Popover positioning={{ placement: 'left' }}>
+                        <Popover.Trigger class="btn preset-filled">Set</Popover.Trigger>
+                        <Portal>
+                          <Popover.Positioner>
+                            <Popover.Content class="card border border-neutral-700 p-4 bg-surface-100-900 shadow-xl">
+                              <div class="flex gap-2">
+                                <button
+                                  type="button"
+                                  class="btn preset-filled"
+                                  onclick={() => {
+                                    setCom1Callback(formatFrequency(controller.frequency));
+                                  }}
+                                >COM1</button>
+                                <button
+                                  type="button"
+                                  class="btn preset-filled"
+                                  onclick={() => {
+                                    setCom2Callback(formatFrequency(controller.frequency));
+                                  }}
+                                >COM2</button>
+                              </div>
+                              <Popover.Arrow style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-100-900);">
+                                <Popover.ArrowTip />
+                              </Popover.Arrow>
+                            </Popover.Content>
+                          </Popover.Positioner>
+                        </Portal>
+                      </Popover>
                     </div>
                   </div>
                 {/if}
