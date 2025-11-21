@@ -1,5 +1,6 @@
 <script lang="ts">
   import { toaster } from "$lib/toaster";
+  import { onMount } from "svelte";
 
   import { settings, simbriefData } from "$lib/stores";
   import { goto } from "$app/navigation";
@@ -15,6 +16,19 @@
   };
 
   type DepartureArrival = { code: string; name: string };
+
+  // Browser-only values
+  let userAgent = $state("");
+  let platform = $state("");
+  let isOnline = $state(false);
+  let protocol = $state("");
+
+  onMount(() => {
+    userAgent = navigator.userAgent;
+    platform = navigator.platform;
+    isOnline = navigator.onLine;
+    protocol = window.location.protocol;
+  });
 
 
   async function getFlightPlan(): Promise<void> {
@@ -102,6 +116,21 @@
         {$connectionError}
       </div>
     {/if}
+  
+  <!-- Debug Information -->
+  <div class="mt-4 p-3 bg-surface-200-800 rounded text-xs font-mono">
+    <div class="font-bold mb-2">Debug Info:</div>
+    <div>User Agent: {userAgent || 'Loading...'}</div>
+    <div>Platform: {platform || 'Loading...'}</div>
+    <div>Online: {isOnline ? 'Yes' : 'No'}</div>
+    <div>Protocol: {protocol || 'Loading...'}</div>
+    <div>Target Server: {$settings.flightSimAddress}:8080</div>
+    <div>WebSocket Open: {$isWebSocketOpen ? 'Yes' : 'No'}</div>
+    <div>FS Connected: {$fsData.Connected ? 'Yes' : 'No'}</div>
+    <div>Connection Error: {$connectionError || 'None'}</div>
+    <div>COM1 Act: {$fsData.Com1Act}</div>
+    <div>COM1 Stby: {$fsData.Com1Stby}</div>
+  </div>
 </div>
 
 <div class="card preset-filled-surface-100-900 p-6 max-w-md mx-auto my-5">
