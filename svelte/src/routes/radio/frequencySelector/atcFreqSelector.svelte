@@ -108,20 +108,24 @@
                           <Popover.Positioner>
                             <Popover.Content class="card border border-neutral-700 p-4 bg-surface-100-900 shadow-xl">
                               <div class="flex gap-2">
-                                <button
-                                  type="button"
-                                  class="btn preset-filled"
-                                  onclick={() => {
-                                    setCom1Callback(formatFrequency(controller.frequency));
-                                  }}
-                                >COM1</button>
-                                <button
-                                  type="button"
-                                  class="btn preset-filled"
-                                  onclick={() => {
-                                    setCom2Callback(formatFrequency(controller.frequency));
-                                  }}
-                                >COM2</button>
+                                <Popover.CloseTrigger>
+                                  <button
+                                    type="button"
+                                    class="btn preset-filled"
+                                    onclick={() => {
+                                      setCom1Callback(formatFrequency(controller.frequency));
+                                    }}
+                                  >COM1</button>
+                                </Popover.CloseTrigger>
+                                <Popover.CloseTrigger>
+                                  <button
+                                    type="button"
+                                    class="btn preset-filled"
+                                    onclick={() => {
+                                      setCom2Callback(formatFrequency(controller.frequency));
+                                    }}
+                                  >COM2</button>
+                                </Popover.CloseTrigger>
                               </div>
                               <Popover.Arrow style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-100-900);">
                                 <Popover.ArrowTip />
