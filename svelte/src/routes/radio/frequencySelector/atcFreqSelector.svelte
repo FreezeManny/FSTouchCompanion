@@ -1,8 +1,7 @@
 <script lang="ts">
   import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
   import { settings } from "$lib/stores";
-
-  let tabSet: keyof typeof atcDisplay = $state("all");
+  import { Tabs } from "@skeletonlabs/skeleton-svelte";
 
   let atcControllers: AtcData[] = $state([]);
   
@@ -77,71 +76,72 @@
   }
 </script>
 
-<div class="w-full">
-  <!-- Tab Navigation -->
-  <div class="flex justify-center pt-4 border-b border-surface-500/30">
-    {#each Object.entries(atcDisplay) as [key, display]}
-      <button
-        type="button"
-        class="px-4 py-2 transition-colors {tabSet === key ? 'border-b-2 border-primary-500 text-primary-500' : 'text-surface-600 hover:text-surface-900'}"
-        onclick={() => tabSet = key as keyof typeof atcDisplay}
-      >
-        {display.name}
-      </button>
-    {/each}
-  </div>
-  
-  <!-- Tab Panel -->
-  <div>
-      {#if atcControllers.some( (controller) => Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type) )}
-        {#each atcControllers as controller}
-          {#if Array.from(atcDisplay[tabSet].atcTypes).map(Number).includes(controller.type)}
-            <div class="card p-4 m-4 flex justify-between items-center">
-              <div class="flex flex-col items-start">
-                <h3 class="h3 text-left">{controller.callsign}</h3>
-                <p class="text-left">
-                  {Object.entries(AtcType).find(
-                    ([, value]) => value === controller.type
-                  )?.[0]}
-                </p>
-              </div>
-              <div class="flex items-center gap-2 relative">
-                <h3 class="h3 text-right">{controller.frequency}</h3>
+<div class="flex flex-col p-2">
+  <div class="card my-2 preset-filled-surface-100-900">
+    <section class="p-2">
+      <Tabs defaultValue="all">
+        <Tabs.List>
+          {#each Object.entries(atcDisplay) as [key, display]}
+            <Tabs.Trigger value={key}>{display.name}</Tabs.Trigger>
+          {/each}
+          <Tabs.Indicator />
+        </Tabs.List>
+        
+        {#each Object.entries(atcDisplay) as [key, display]}
+          <Tabs.Content value={key}>
+            {#if atcControllers.some( (controller) => Array.from(display.atcTypes).map(Number).includes(controller.type) )}
+              {#each atcControllers as controller}
+                {#if Array.from(display.atcTypes).map(Number).includes(controller.type)}
+                  <div class="card border border-neutral-700 p-4 m-2 flex justify-between items-center">
+                    <div class="flex flex-col items-start">
+                      <h3 class="h3 text-left">{controller.callsign}</h3>
+                      <p class="text-left">
+                        {Object.entries(AtcType).find(
+                          ([, value]) => value === controller.type
+                        )?.[0]}
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-2 relative">
+                      <h3 class="h3 text-right">{controller.frequency}</h3>
 
-                <button
-                  type="button"
-                  class="btn preset-filled"
-                  onclick={() => openPopup = openPopup === controller.callsign ? null : controller.callsign}
-                >Set</button>
+                      <button
+                        type="button"
+                        class="btn preset-filled"
+                        onclick={() => openPopup = openPopup === controller.callsign ? null : controller.callsign}
+                      >Set</button>
 
-                {#if openPopup === controller.callsign}
-                  <div class="card p-4 shadow-xl absolute right-0 top-full mt-2 z-10 flex flex-col gap-2">
-                    <button
-                      type="button"
-                      class="btn preset-filled"
-                      onclick={() => {
-                        setCom1Callback(formatFrequency(controller.frequency));
-                        openPopup = null;
-                      }}
-                    >COM1</button>
-                    <button
-                      type="button"
-                      class="btn preset-filled"
-                      onclick={() => {
-                        setCom2Callback(formatFrequency(controller.frequency));
-                        openPopup = null;
-                      }}
-                    >COM2</button>
+                      {#if openPopup === controller.callsign}
+                        <div class="card p-4 shadow-xl absolute right-0 top-full mt-2 z-10 flex flex-col gap-2">
+                          <button
+                            type="button"
+                            class="btn preset-filled"
+                            onclick={() => {
+                              setCom1Callback(formatFrequency(controller.frequency));
+                              openPopup = null;
+                            }}
+                          >COM1</button>
+                          <button
+                            type="button"
+                            class="btn preset-filled"
+                            onclick={() => {
+                              setCom2Callback(formatFrequency(controller.frequency));
+                              openPopup = null;
+                            }}
+                          >COM2</button>
+                        </div>
+                      {/if}
+                    </div>
                   </div>
                 {/if}
+              {/each}
+            {:else}
+              <div class="card border border-neutral-700 p-4 m-2 flex justify-center items-center">
+                <p>No Station in range</p>
               </div>
-            </div>
-          {/if}
+            {/if}
+          </Tabs.Content>
         {/each}
-      {:else}
-        <div class="card p-4 m-4 flex justify-center items-center">
-          <p>No Station in range</p>
-        </div>
-      {/if}
-    </div>
+      </Tabs>
+    </section>
+  </div>
 </div>
