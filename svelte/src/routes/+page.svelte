@@ -17,42 +17,8 @@
 
   type DepartureArrival = { code: string; name: string };
 
-  type SimbriefError = {
-    message: string;
-    timeout: number;
-    hoverable: boolean;
-    background: string;
-  };
-
-  const simbriefError = (message: string): SimbriefError => ({
-    message,
-    timeout: 5000,
-    hoverable: true,
-    background: "preset-filled-error-500",
-  });
-
-  // provide a tiny wrapper so existing toastStore.trigger(...) usage continues to work
-  function getToastStore() {
-    const toaster = createToaster({});
-    return {
-      trigger: (payload: SimbriefError) =>
-        toaster.error({
-          title: payload.message,
-          description: "",
-          // Move timeout into meta to avoid passing unknown properties to the toaster API
-          meta: {
-            timeout: payload.timeout,
-            hoverable: payload.hoverable,
-            background: payload.background,
-          },
-        }),
-      info: (opts: any) => toaster.info(opts),
-      success: (opts: any) => toaster.success(opts),
-      warning: (opts: any) => toaster.warning(opts),
-    };
-  }
-
-  const toastStore = getToastStore();
+  // Create the toaster instance
+  const toaster = createToaster();
 
   async function getFlightPlan(): Promise<void> {
     console.log("Fetching flight plan...");
@@ -66,10 +32,17 @@
         $simbriefData = data;
       } else {
         $simbriefData = null;
-        toastStore.trigger(simbriefError("Simbrief: " + data.fetch.status));
+        // Use the new toast API
+        toaster.error({
+          title: "Simbrief Error",
+          description: data.fetch.status,
+        });
       }
     } catch (error) {
-      // Optionally handle error
+      toaster.error({
+        title: "Failed to fetch flight plan",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+      });
     }
   }
 
