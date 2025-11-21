@@ -109,13 +109,12 @@
 <svelte:window onkeydown={handleKeydown} />
 
 
-
 <div class="flex flex-wrap items-center p-2 gap-2">
   <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
       <div class="ig-cell mx-0 preset-tonal">Aircraft</div>
       <select
-        class="ig-input border border-neutral-700"
+        class="ig-input border border-neutral-700 pr-9"
         bind:value={$checklistState.aircraft}
         onchange={() => $checklistState.manualAircraftOverride = true}
       >
@@ -125,13 +124,13 @@
         {/each}
       </select>
     </div>
-  </div>
+    </div>
   
   <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
       <div class="ig-cell preset-tonal">Section</div>
       <select
-        class="ig-input border border-neutral-700"
+        class="ig-input border border-neutral-700 pr-9"
         bind:value={$checklistState.section}
         disabled={!$checklistState.aircraft}
       >
