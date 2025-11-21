@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import { get } from "svelte/store";
-  import { selectedAirports, settings, simbriefData } from "$lib/stores";
+  import { onMount } from "svelte";
+  import { selectedAirports, simbriefData } from "$lib/stores";
   import { RefreshCcw } from "@lucide/svelte";
   import { toaster } from "$lib/toaster";
 
@@ -165,34 +164,39 @@
     if ($selectedAirports.arr.length === 4) fetchAirportData(fetchMode.ARR);
   });
 
-  // provide a tiny wrapper so existing toastStore.trigger(...) usage continues to work
-  // The getToastStore function and toastStore variable are no longer needed
 </script>
 
 <div class="grid grid-cols-3 p-2">
   <div class="mx-3">
-    <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-      <div class="input-group-shim">Dep</div>
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell preset-tonal">Dep</div>
       <input
+        class="ig-input border border-neutral-700"
         type="text"
         placeholder="EDDS"
         bind:value={$selectedAirports.dep}
         oninput={updateDeparture}
         maxlength="4"
-        class="ml-2 mb-2 px-2 py-1"
       />
     </div>
   </div>
   <div class="mx-3">
-    <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-      <div class="input-group-shim">Arr</div>
-      <input type="text" placeholder="EDDS" bind:value={$selectedAirports.arr} oninput={updateArrival} maxlength="4" class="ml-2 mb-2 px-2 py-1" />
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell preset-tonal">Arr</div>
+      <input
+        class="ig-input border border-neutral-700"
+        type="text"
+        placeholder="EDDS"
+        bind:value={$selectedAirports.arr}
+        oninput={updateArrival}
+        maxlength="4"
+      />
     </div>
   </div>
   <div class="grid grid-cols-2">
     <button type="button" class="btn preset-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
     <button type="button" class="btn preset-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
-        <RefreshCcw />
+      <RefreshCcw />
     </button>
   </div>
 </div>
