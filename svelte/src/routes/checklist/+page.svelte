@@ -209,10 +209,10 @@
 <!-- Floating Bottom Button -->
 <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10">
   {#if !allSelected}
-    <button type="button" class="btn preset-filled px-8 shadow-lg" onclick={checkNext}>Check</button>
+    <button type="button" class="btn preset-filled px-12 shadow-lg" onclick={checkNext}>Check</button>
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
-    <button type="button" class="btn preset-filled-success-500 px-8 shadow-lg" onclick={nextSection}>Next Checklist</button>
+    <button type="button" class="btn preset-filled-success-500 px-12 shadow-lg" onclick={nextSection}>Next Checklist</button>
   {:else}
-    <button type="button" class="btn preset-filled-error-500 px-8 shadow-lg" onclick={resetAircraft}>Reset all</button>
+    <button type="button" class="btn preset-filled-error-500 px-12 shadow-lg" onclick={resetAircraft}>Reset all</button>
   {/if}
 </div>
