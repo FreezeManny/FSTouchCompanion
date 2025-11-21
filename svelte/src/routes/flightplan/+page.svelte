@@ -42,11 +42,13 @@
 </script>
 
 {#if $simbriefData}
-  <div class="flex flex-col items-center m-1 h-screen overflow-y-auto" bind:this={scrollContainer} onscroll={handleScroll}>
-    <div class="card inline-block preset-filled-surface-100-900">
-      <!-- Centered OFP Content -->
-      <div class="px-1 py-5">
-        {@html processHtml($simbriefData.text.plan_html, $flightplanSettings.fontSize)}
+  <div class="h-full overflow-y-auto" bind:this={scrollContainer} onscroll={handleScroll}>
+    <div class="flex flex-col items-center m-1">
+      <div class="card inline-block preset-filled-surface-100-900">
+        <!-- Centered OFP Content -->
+        <div class="px-1 py-5">
+          {@html processHtml($simbriefData.text.plan_html, $flightplanSettings.fontSize)}
+        </div>
       </div>
     </div>
     

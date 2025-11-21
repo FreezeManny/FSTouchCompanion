@@ -163,42 +163,46 @@
   });
 </script>
 
-<div class="grid grid-cols-3 p-2">
-  <div class="mx-3">
-    <div class="input-group grid-cols-[auto_1fr]">
-      <div class="ig-cell preset-tonal">Dep</div>
-      <input
-        class="ig-input border border-neutral-700"
-        type="text"
-        placeholder="EDDS"
-        bind:value={$selectedAirports.dep}
-        oninput={updateDeparture}
-        maxlength="4"
-      />
+<div class="h-full flex flex-col overflow-hidden">
+  <div class="flex-none">
+    <div class="grid grid-cols-3 p-2">
+      <div class="mx-3">
+        <div class="input-group grid-cols-[auto_1fr]">
+          <div class="ig-cell preset-tonal">Dep</div>
+          <input
+            class="ig-input border border-neutral-700"
+            type="text"
+            placeholder="EDDS"
+            bind:value={$selectedAirports.dep}
+            oninput={updateDeparture}
+            maxlength="4"
+          />
+        </div>
+      </div>
+      <div class="mx-3">
+        <div class="input-group grid-cols-[auto_1fr]">
+          <div class="ig-cell preset-tonal">Arr</div>
+          <input
+            class="ig-input border border-neutral-700"
+            type="text"
+            placeholder="EDDS"
+            bind:value={$selectedAirports.arr}
+            oninput={updateArrival}
+            maxlength="4"
+          />
+        </div>
+      </div>
+      <div class="grid grid-cols-2">
+        <button type="button" class="btn preset-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
+        <button type="button" class="btn preset-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
+          <RefreshCcw />
+        </button>
+      </div>
     </div>
   </div>
-  <div class="mx-3">
-    <div class="input-group grid-cols-[auto_1fr]">
-      <div class="ig-cell preset-tonal">Arr</div>
-      <input
-        class="ig-input border border-neutral-700"
-        type="text"
-        placeholder="EDDS"
-        bind:value={$selectedAirports.arr}
-        oninput={updateArrival}
-        maxlength="4"
-      />
-    </div>
-  </div>
-  <div class="grid grid-cols-2">
-    <button type="button" class="btn preset-filled mx-1" onclick={simbriefButtonHandler}>Simbrief</button>
-    <button type="button" class="btn preset-filled mx-1" onclick={updateButtonHandler} aria-label="Update Weather">
-      <RefreshCcw />
-    </button>
-  </div>
-</div>
 
-<div class="flex flex-col p-2">
+  <div class="flex-auto overflow-y-auto">
+    <div class="flex flex-col p-2">
   <div class="card my-2 preset-filled-surface-100-900">
     <header class="card-header p-3">
       <span class="ml-1">Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}</span>
@@ -238,5 +242,7 @@
         <section class="p-2 ml-1">{arr.metar}</section>
       </div>
     </section>
+  </div>
+    </div>
   </div>
 </div>
