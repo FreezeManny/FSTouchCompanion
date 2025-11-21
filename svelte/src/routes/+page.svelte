@@ -1,6 +1,5 @@
 <script lang="ts">
   import { toaster } from "$lib/toaster";
-  import { onMount } from "svelte";
 
   import { settings, simbriefData } from "$lib/stores";
   import { goto } from "$app/navigation";
@@ -17,22 +16,8 @@
 
   type DepartureArrival = { code: string; name: string };
 
-  // Browser-only values
-  let userAgent = $state("");
-  let platform = $state("");
-  let isOnline = $state(false);
-  let protocol = $state("");
-
-  onMount(() => {
-    userAgent = navigator.userAgent;
-    platform = navigator.platform;
-    isOnline = navigator.onLine;
-    protocol = window.location.protocol;
-  });
-
 
   async function getFlightPlan(): Promise<void> {
-    console.log("Fetching flight plan...");
     const fetchURL =
       "https://www.simbrief.com/api/xml.fetcher.php?username=" + $settings.simbriefUsername + "&json=1";
     try {
@@ -43,7 +28,6 @@
         $simbriefData = data;
       } else {
         $simbriefData = null;
-        // Use the new toast API
         toaster.error({
           title: "Simbrief Error",
           description: data.fetch.status,
@@ -107,30 +91,15 @@
     </div>
     {#if !$isWebSocketOpen}
       <button class="btn btn-sm preset-filled-primary-500 btn-primary" onclick={handleRetryConnection}>
-        Retry
+        {$connectionError.includes("Click") ? "Connect" : "Retry"}
       </button>
     {/if}
   </div>
     {#if $connectionError && !$isWebSocketOpen}
-      <div class="text-sm mt-2 text-error-500">
+      <div class="text-sm mt-2" class:text-error-500={!$connectionError.includes("Click")} class:text-surface-600-400={$connectionError.includes("Click")}>
         {$connectionError}
       </div>
     {/if}
-  
-  <!-- Debug Information -->
-  <div class="mt-4 p-3 bg-surface-200-800 rounded text-xs font-mono">
-    <div class="font-bold mb-2">Debug Info:</div>
-    <div>User Agent: {userAgent || 'Loading...'}</div>
-    <div>Platform: {platform || 'Loading...'}</div>
-    <div>Online: {isOnline ? 'Yes' : 'No'}</div>
-    <div>Protocol: {protocol || 'Loading...'}</div>
-    <div>Target Server: {$settings.flightSimAddress}:8080</div>
-    <div>WebSocket Open: {$isWebSocketOpen ? 'Yes' : 'No'}</div>
-    <div>FS Connected: {$fsData.Connected ? 'Yes' : 'No'}</div>
-    <div>Connection Error: {$connectionError || 'None'}</div>
-    <div>COM1 Act: {$fsData.Com1Act}</div>
-    <div>COM1 Stby: {$fsData.Com1Stby}</div>
-  </div>
 </div>
 
 <div class="card preset-filled-surface-100-900 p-6 max-w-md mx-auto my-5">
