@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { get } from "svelte/store";
   import { selectedAirports, settings, simbriefData } from "$lib/stores";
-  import { createToaster } from "@skeletonlabs/skeleton-svelte";
+  import { toaster } from "$lib/toaster";
 
   type SimbriefError = {
     message: string;
@@ -140,7 +140,16 @@
       fetchAirportData(fetchMode.DEP);
       fetchAirportData(fetchMode.ARR);
     } else {
-      toastStore.trigger(simbriefError("Simbrief Flightplan not Loaded"));
+        const err = simbriefError("Simbrief Flightplan not Loaded");
+        toaster. warning({
+          title: err.message,
+          description: "",
+          meta: {
+            timeout: err.timeout,
+            hoverable: err.hoverable,
+            background: err.background,
+          },
+        });
     }
   }
 
@@ -156,32 +165,7 @@
   });
 
   // provide a tiny wrapper so existing toastStore.trigger(...) usage continues to work
-  function getToastStore() {
-    const toaster = createToaster({});
-    return {
-      // support the current call pattern toastStore.trigger(simbriefError(...))
-      trigger: (payload: SimbriefError) => {
-        // Map the SimbriefError into the toaster API
-        toaster.error({
-          title: payload.message,
-          // the original code only sets a message; keep description empty
-          description: "",
-          // Move timeout to meta to avoid passing invalid properties to the toaster API
-          meta: {
-            timeout: payload.timeout,
-            hoverable: payload.hoverable,
-            background: payload.background,
-          },
-        });
-      },
-      // keep convenience methods available if needed elsewhere
-      info: (opts: any) => toaster.info(opts),
-      success: (opts: any) => toaster.success(opts),
-      warning: (opts: any) => toaster.warning(opts),
-    };
-  }
-
-  const toastStore = getToastStore();
+  // The getToastStore function and toastStore variable are no longer needed
 </script>
 
 <div class="grid grid-cols-3 p-2">
