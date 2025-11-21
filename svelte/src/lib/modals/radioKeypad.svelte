@@ -176,7 +176,7 @@
               <KeypadButton label="9" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")} />
               <KeypadButton label="Remove" onclick={onRemove} disabled={frequency == "XXX.XXX"} color="preset-filled-warning-500" />
               <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
-              <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="success-500" />
+              <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-success-500" />
             </div>
         </div>
       </Dialog.Content>
