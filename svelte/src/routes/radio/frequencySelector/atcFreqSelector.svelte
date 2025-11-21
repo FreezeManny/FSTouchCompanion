@@ -78,7 +78,7 @@
   <div class="card my-2 preset-filled-surface-100-900">
     <section class="p-2">
       <Tabs defaultValue="all">
-        <Tabs.List>
+        <Tabs.List class="flex justify-center">
           {#each Object.entries(atcDisplay) as [key, display]}
             <Tabs.Trigger value={key}>{display.name}</Tabs.Trigger>
           {/each}
