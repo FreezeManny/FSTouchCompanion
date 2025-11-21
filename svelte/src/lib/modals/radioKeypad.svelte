@@ -142,13 +142,12 @@
   }
 </script>
 
-{#if open}
-  <Dialog>
-    <Portal>
-      <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
-      <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
-        <Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-0 space-y-0 shadow-xl {animation}">
-          <div class="container mx-small rounded w-auto overflow-hidden">
+<Dialog {open} onOpenChange={(details) => (open = details.open)}>
+  <Portal>
+    <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+    <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+      <Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-0 space-y-0 shadow-xl {animation}">
+        <div class="container mx-small rounded w-auto overflow-hidden">
             <!-- Header: primary -->
             <header class="flex justify-between items-center p-6 preset-filled-primary-500 text-on-primary">
               <Dialog.Title class="h1 m-0">{title}</Dialog.Title>
@@ -177,10 +176,8 @@
               <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
               <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-accept-500" />
             </div>
-          </div>
-        </Dialog.Content>
-      </Dialog.Positioner>
-    </Portal>
-  </Dialog>
-{/if}
-
+        </div>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Portal>
+</Dialog>
