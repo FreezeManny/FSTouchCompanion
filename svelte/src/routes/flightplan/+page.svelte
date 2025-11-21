@@ -55,14 +55,14 @@
     <!-- Floating Zoom Controls -->
     <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
       <button
-        class="btn preset-filled w-9 h-9 shadow-lg"
+        class="btn preset-filled w-11 h-11 shadow-lg"
         onclick={increaseFontSize}
         title="Increase font size"
       >
         +
       </button>
       <button
-        class="btn preset-filled w-9 h-9 shadow-lg"
+        class="btn preset-filled w-11 h-11 shadow-lg"
         onclick={decreaseFontSize}
         title="Decrease font size"
       >
