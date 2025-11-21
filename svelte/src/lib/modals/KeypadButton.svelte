@@ -6,10 +6,10 @@
 		onclick?: () => void;
 	}
 
-	let { label, disabled = false, color = "preset-filled", onclick }: Props = $props();
+	let { label, disabled = false, color = "preset-filled-primary-500", onclick }: Props = $props();
 </script>
 
-<div class="w-1/3 px-2 py-2">
+<div class="p-1">
 	<button
 		class="btn {color} w-full h-20 text-2xl"
 		{onclick}

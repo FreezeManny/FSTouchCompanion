@@ -1,25 +1,24 @@
 <script lang="ts">
   import KeypadButton from "./KeypadButton.svelte";
+  import { XIcon } from '@lucide/svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+
+  // Optional animation helper used on Dialog.Content
+  const animation =
+  	'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
 
   let { title = "Radio Keypad", onSubmit, open = $bindable(false) }: { title?: string; onSubmit?: (value: number) => void, open?: boolean } = $props();
 
-  let dialogElement: HTMLDialogElement;
   let frequency = $state<string>("XXX.XXX");
   // validFrequencies is constant data, no need for $state
   const validFrequencies = generateValidFrequencies();
   // buttonsEnabled is derived from frequency, no need to manually update it
   let buttonsEnabled = $derived(getPossibleNumbers(frequency, validFrequencies));
 
+  // Reset display when opened (use $effect instead of $: in runes mode)
   $effect(() => {
     if (open) {
-      if (dialogElement && !dialogElement.open) {
-        frequency = "XXX.XXX";
-        dialogElement.showModal();
-      }
-    } else {
-      if (dialogElement && dialogElement.open) {
-        dialogElement.close();
-      }
+      frequency = "XXX.XXX";
     }
   });
 
@@ -143,35 +142,45 @@
   }
 </script>
 
-<dialog
-  bind:this={dialogElement}
-  onclose={() => (open = false)}
-  class="rounded-container-token bg-surface-100-900 text-inherit max-w-[640px] p-0 space-y-0 z-10 backdrop:bg-surface-50/75 dark:backdrop:bg-surface-950/75"
->
-  <div class="container mx-small p-8 space-y-8 preset-filled-surface-500 rounded-sm w-auto">
-    <div class="flex justify-between items-center">
-      <h1 class="h1">{title}</h1>
-      <button type="button" class="btn-icon preset-tonal" onclick={onCancel} aria-label="Close">✕</button>
-    </div>
+{#if open}
+  <Dialog>
+    <Portal>
+      <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+      <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+        <Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-0 space-y-0 shadow-xl {animation}">
+          <div class="container mx-small rounded w-auto overflow-hidden">
+            <!-- Header: primary -->
+            <header class="flex justify-between items-center p-6 preset-filled-primary-500 text-on-primary">
+              <Dialog.Title class="h1 m-0">{title}</Dialog.Title>
+              <Dialog.CloseTrigger class="btn btn-icon preset-filled-warning-500" aria-label="Close">
+                <XIcon />
+              </Dialog.CloseTrigger>
+            </header>
 
-    <div class="container preset-filled mx-auto p-8 space-y-8 text-center bg-gray-800 text-white rounded-sm">
-      <h1 class="h1">{frequency}</h1>
-    </div>
+            <!-- Frequency display: white background and black text -->
+            <div class="mx-auto my-6 p-8 text-center bg-white text-black rounded-md shadow-sm">
+              <h1 class="h1 m-0 font-mono text-black">{frequency}</h1>
+            </div>
 
-    <div class="flex flex-wrap rounded-xl max-w-sm mx-auto mt-24">
-      <KeypadButton label="1" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")} />
-      <KeypadButton label="2" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")} />
-      <KeypadButton label="3" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")} />
-      <KeypadButton label="4" onclick={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")} />
-      <KeypadButton label="5" onclick={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")} />
-      <KeypadButton label="6" onclick={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")} />
-      <KeypadButton label="7" onclick={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")} />
-      <KeypadButton label="8" onclick={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")} />
-      <KeypadButton label="9" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")} />
-      <KeypadButton label="Remove" onclick={onRemove} disabled={frequency == "XXX.XXX"} color="preset-filled-error-500" />
-      <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
-      <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-success-500" />
-    </div>
-  </div>
-</dialog>
+            <!-- Keypad grid -->
+            <div class="grid grid-cols-3 gap-2 rounded-xl max-w-sm mx-auto mt-6 p-4">
+              <KeypadButton label="1" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")} />
+              <KeypadButton label="2" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")} />
+              <KeypadButton label="3" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")} />
+              <KeypadButton label="4" onclick={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")} />
+              <KeypadButton label="5" onclick={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")} />
+              <KeypadButton label="6" onclick={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")} />
+              <KeypadButton label="7" onclick={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")} />
+              <KeypadButton label="8" onclick={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")} />
+              <KeypadButton label="9" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")} />
+              <KeypadButton label="Remove" onclick={onRemove} disabled={frequency == "XXX.XXX"} color="preset-filled-warning-500" />
+              <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
+              <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-accept-500" />
+            </div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Portal>
+  </Dialog>
+{/if}
 
