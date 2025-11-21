@@ -209,22 +209,22 @@
   </div>
 </div>
 
-<div class="flex flex-col p-1">
+<div class="flex flex-col p-2">
   <div class="card my-2 preset-filled-surface-100-900">
     <header class="card-header p-3">
       <span class="ml-1">Departure Airport: {$selectedAirports.dep.length === 4 ? $selectedAirports.dep : "Enter a valid ICAO"}</span>
     </header>
     <section class="p-2">
-      <div class="card mb-2 border border-surface-300 p-2">
+      <div class="card mb-2 border border-neutral-700 p-2">
         <header class="card-header mb-1">
           <span class="ml-1">ATIS</span>
           {#if dep.atisCode}
             <span class="ml-1">Code: {dep.atisCode}</span>
           {/if}
         </header>
-        <section class="p-2 ml-1">{@html dep.atisText}</section>
+          <section class="p-2 ml-1">{@html dep.atisText}</section>
       </div>
-      <div class="card border border-surface-300 p-2 mb-1">
+        <div class="card border border-neutral-700 p-2 mb-1">
         <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
         <section class="p-2 ml-1">{dep.metar}</section>
       </div>
@@ -235,7 +235,7 @@
       <span class="ml-1">Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}</span>
     </header>
     <section class="p-2">
-      <div class="card mb-2 border border-surface-300 p-2">
+        <div class="card mb-2 border border-neutral-700 p-2">
         <header class="card-header mb-1">
           <span class="ml-1">ATIS</span>
           {#if arr.atisCode}
@@ -244,7 +244,7 @@
         </header>
         <section class="p-2 ml-1">{@html arr.atisText}</section>
       </div>
-      <div class="card border border-surface-300 p-2 mb-1">
+        <div class="card border border-neutral-700 p-2 mb-1">
         <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
         <section class="p-2 ml-1">{arr.metar}</section>
       </div>
