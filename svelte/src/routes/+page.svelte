@@ -103,44 +103,44 @@
 </script>
 
 <!-- WebSocket Connection Status -->
-<div class="card p-4 max-w-md mx-auto mt-5">
+<div class="card preset-filled-surface-100-900 p-4 max-w-md mx-auto mt-5">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div class="relative">
-        {#if $isWebSocketOpen}
-          {#if $fsData.Connected}
-            <span class="badge preset-filled-success-500">●</span>
-            <span class="ml-2">Flight Sim Connected</span>
+          {#if $isWebSocketOpen}
+            {#if $fsData.Connected}
+              <span class="badge bg-success-500 text-white rounded-full px-2 py-1">●</span>
+              <span class="ml-2">Flight Sim Connected</span>
+            {:else}
+              <span class="badge bg-warning-500 text-white rounded-full px-2 py-1">●</span>
+              <span class="ml-2">WebSocket Connected (Waiting for Flight Sim)</span>
+            {/if}
           {:else}
-            <span class="badge preset-filled-warning-500">●</span>
-            <span class="ml-2">WebSocket Connected (Waiting for Flight Sim)</span>
+            <span class="badge bg-error-500 text-white rounded-full px-2 py-1">●</span>
+            <span class="ml-2">Not Connected</span>
           {/if}
-        {:else}
-          <span class="badge preset-filled-error-500">●</span>
-          <span class="ml-2">Not Connected</span>
-        {/if}
       </div>
     </div>
     {#if !$isWebSocketOpen}
-      <button class="btn btn-sm preset-filled-primary-500" onclick={handleRetryConnection}>
+      <button class="btn btn-sm preset-filled-primary-500 btn-primary" onclick={handleRetryConnection}>
         Retry
       </button>
     {/if}
   </div>
-  {#if $connectionError && !$isWebSocketOpen}
-    <div class="text-sm text-error-500 mt-2">
-      {$connectionError}
-    </div>
-  {/if}
+    {#if $connectionError && !$isWebSocketOpen}
+      <div class="text-sm mt-2 text-error-500">
+        {$connectionError}
+      </div>
+    {/if}
 </div>
 
-<div class="card p-6 max-w-md mx-auto my-5">
+<div class="card preset-filled-surface-100-900 p-6 max-w-md mx-auto my-5">
   {#if $simbriefData}
     <!-- Date -->
     <div>
       <div class="flex items-center justify-between mb-4">
-        <div class="text-left text-surface text-sm mb-2">Latest Flight Plan:</div>
-        <div class="text-right text-surface text-sm mb-2">{date}</div>
+        <div class="text-left text-sm mb-2">Latest Flight Plan:</div>
+        <div class="text-right text-sm mb-2">{date}</div>
       </div>
     </div>
 
@@ -150,31 +150,31 @@
     <!-- Departure / Arrival Section -->
     <div class="flex items-center justify-between mb-4">
       <!-- Departure Info -->
-      <div class="card p-4 preset-filled-tertiary-500">
+      <div class="card preset-filled-primary-500 p-4">
         <div class="text-center">
           <div class="text-lg font-bold">{departure.code}</div>
-          <div class="text-surface text-sm">{departure.name}</div>
+          <div class="text-sm">{departure.name}</div>
         </div>
       </div>
 
       <!-- Arrival Info -->
-      <div class="card p-4 preset-filled-tertiary-500">
+      <div class="card preset-filled-primary-500 reset-filled-primary-500 p-4">
         <div class="text-center">
           <div class="text-lg font-bold">{arrival.code}</div>
-          <div class="text-surface text-sm">{arrival.name}</div>
+          <div class="text-sm">{arrival.name}</div>
         </div>
       </div>
     </div>
 
     <!-- Aircraft Type -->
     <div class="flex flex-col items-center justify-center my-5">
-      <div class="text-surface text-sm mb-1">Aircraft Type:</div>
+      <div class="text-sm mb-1">Aircraft Type:</div>
       <div class="text-center text-lg">
         {aircraft}
       </div>
     </div>
   {:else}
-    <aside class="alert preset-filled-warning-500 m-5">
+    <aside class="alert m-5">
       <!-- Message -->
       <div class="alert-message">
         <h3 class="h3">Load a valid Flightplan</h3>
@@ -185,6 +185,6 @@
   <!-- Action Buttons -->
   <div class="flex justify-around">
     <button class="btn preset-filled" onclick={getFlightPlan}>Load Flightplan</button>
-    <button class="btn preset-filled" onclick={() => goto("/flightplan")}>View Flightplan</button>
+    <button class="btn preset-filled secondary-500" onclick={() => goto("/flightplan")}>View Flightplan</button>
   </div>
 </div>
