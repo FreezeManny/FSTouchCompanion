@@ -1,6 +1,6 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
-  import { createToaster } from "@skeletonlabs/skeleton-svelte";
+  import { toaster } from "$lib/toaster";
 
   import { settings, simbriefData } from "$lib/stores";
   import { goto } from "$app/navigation";
@@ -17,8 +17,6 @@
 
   type DepartureArrival = { code: string; name: string };
 
-  // Create the toaster instance
-  const toaster = createToaster();
 
   async function getFlightPlan(): Promise<void> {
     console.log("Fetching flight plan...");

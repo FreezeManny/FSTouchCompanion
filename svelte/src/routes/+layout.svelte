@@ -2,6 +2,9 @@
 	import './layout.css';
 	import Header from "./Header.svelte";
 
+import { Toast } from '@skeletonlabs/skeleton-svelte';
+import { toaster } from '$lib/toaster';
+
 	// WebSocket Management
 	import { onMount, onDestroy } from "svelte";
 	import { settings } from "$lib/stores";
@@ -154,6 +157,19 @@ onDestroy(() => {
     <Header></Header>
   </header>
   <div class="flex-auto overflow-y-auto">
-    {@render children()}
+    {#if children}
+      {@render children()}
+    {/if}
   </div>
+  <Toast.Group {toaster}>
+    {#snippet children(toast)}
+      <Toast {toast}>
+        <Toast.Message>
+          <Toast.Title>{toast.title}</Toast.Title>
+          <Toast.Description>{toast.description}</Toast.Description>
+        </Toast.Message>
+        <Toast.CloseTrigger />
+      </Toast>
+    {/snippet}
+  </Toast.Group>
 </div>
