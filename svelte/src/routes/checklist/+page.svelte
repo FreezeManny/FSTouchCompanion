@@ -45,14 +45,19 @@
   }));
 
   let stateKey = $derived($checklistState.aircraft && $checklistState.section ? `${$checklistState.aircraft}|${$checklistState.section}` : null);
-  let allSelected = $derived(items.length > 0 && items.every((item, i) => item.type === "break" || checkboxStates[i]));
-  let nextItemIndex = $derived(checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break"));
 
-  // Restore state when selection changes
+  // Guarded derived computations to avoid accessing items[i] when undefined
+  let allSelected = $derived(items.length > 0 && items.every((item, i) => item.type === "break" || !!checkboxStates[i]));
+  let nextItemIndex = $derived(checkboxStates.findIndex((checked, i) => !checked && items[i] && items[i].type !== "break"));
+
+  // Restore / sync state when selection or items change
   $effect(() => {
+    // Always make sure checkboxStates matches items length to prevent undefined indexing
     if (stateKey) {
       const saved = $checklistState.statesMap?.[stateKey];
       checkboxStates = saved?.length === items.length ? saved : new Array(items.length).fill(false);
+    } else if (checkboxStates.length !== items.length) {
+      checkboxStates = new Array(items.length).fill(false);
     }
   });
 
