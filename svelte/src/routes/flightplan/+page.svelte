@@ -1,13 +1,8 @@
 <script lang="ts">
   import { simbriefData, flightplanSettings } from "$lib/stores";
-  import { onMount } from "svelte";
 
   let scrollContainer = $state<HTMLElement>();
   let hasRestored = $state(false);
-
-  onMount(() => {
-    restoreScroll();
-  });
 
   $effect(() => {
     if (!hasRestored) {
