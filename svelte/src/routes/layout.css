@@ -6,6 +6,11 @@
 @import '@skeletonlabs/skeleton/themes/cerberus'; /* @import '@skeletonlabs/skeleton'; */
 @import '@skeletonlabs/skeleton/themes/crimson';
 
+/* Disable double-tap zoom */
+* {
+	touch-action: manipulation;
+}
+
 /* TMP WINDOWS FIX 
 */
 .select,
