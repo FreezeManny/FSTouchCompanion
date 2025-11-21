@@ -43,8 +43,6 @@
       com2EntryCallback={com2Entry}
     />
 
-    <hr class="border-t-8!" />
-
     {#if $fsData.Position.Lat != 0.0 && $fsData.Position.Lon != 0.0}
       <VatsimFreqSelector
         lat={$fsData.Position.Lat}
