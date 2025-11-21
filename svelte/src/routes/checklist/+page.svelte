@@ -1,5 +1,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { XIcon } from '@lucide/svelte';
 
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
@@ -106,41 +108,73 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<!-- Top Bar -->
-<div class="flex space-x-2 p-4">
-  <label class="label">
-    <select class="select" bind:value={$checklistState.aircraft} onchange={() => $checklistState.manualAircraftOverride = true}>
-      <option value="" disabled selected>Select Aircraft</option>
-      {#each aircraftList as aircraft}
-        <option value={aircraft.info.name}>{aircraft.info.name}</option>
-      {/each}
-    </select>
-  </label>
-
-  <label class="label">
-    <select class="select" bind:value={$checklistState.section} disabled={!$checklistState.aircraft}>
-      <option value="" disabled selected>Select Section</option>
-      {#each sectionNames as section}
-        <option value={section}>{section}</option>
-      {/each}
-    </select>
-  </label>
-
-  <div class="grow"></div>
-  <button type="button" class="btn preset-filled" data-popup-target="popupReset">Reset</button>
-  
-  <div class="card p-4 w-60 shadow-xl z-50" data-popup="popupReset">
-    <nav class="list-nav">
-      <ul>
-        <li>
-          <button type="button" class="w-full text-left" onclick={resetSection}>Reset Section</button>
-        </li>
-        <li>
-          <button type="button" class="w-full text-left" onclick={resetAircraft}>Reset Entire Aircraft</button>
-        </li>
-      </ul>
-    </nav>
-    <div class="arrow bg-surface-100-900"></div>
+<!-- Top Bar (Weather style, with minimal Popover for Reset) -->
+<div class="grid grid-cols-3 p-2">
+  <div class="mx-3">
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell preset-tonal">Aircraft</div>
+      <select
+        class="ig-input border border-neutral-700"
+        bind:value={$checklistState.aircraft}
+        onchange={() => $checklistState.manualAircraftOverride = true}
+      >
+        <option value="" disabled selected>Select Aircraft</option>
+        {#each aircraftList as aircraft}
+          <option value={aircraft.info.name}>{aircraft.info.name}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
+  <div class="mx-3">
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell preset-tonal">Section</div>
+      <select
+        class="ig-input border border-neutral-700"
+        bind:value={$checklistState.section}
+        disabled={!$checklistState.aircraft}
+      >
+        <option value="" disabled selected>Select Section</option>
+        {#each sectionNames as section}
+          <option value={section}>{section}</option>
+        {/each}
+      </select>
+    </div>
+  </div>
+  <div class="flex items-center justify-end">
+    <Popover>
+      <Popover.Trigger class="btn preset-filled mx-1">Reset</Popover.Trigger>
+      <Portal>
+        <Popover.Positioner class="z-20!">
+          <Popover.Content class="rounded-lg shadow-xl bg-neutral-900 border border-neutral-700 p-0 min-w-[220px]">
+            <nav>
+              <ul class="flex flex-col py-2">
+                <li>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-base text-white hover:bg-neutral-800 transition"
+                    onclick={resetSection}
+                  >
+                    Reset Section
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-3 text-base text-white hover:bg-neutral-800 transition"
+                    onclick={resetAircraft}
+                  >
+                    Reset Entire Aircraft
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <Popover.Arrow style="--arrow-size: 10px; --arrow-background: #171923;">
+              <Popover.ArrowTip />
+            </Popover.Arrow>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
   </div>
 </div>
 
