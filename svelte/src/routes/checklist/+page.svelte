@@ -220,6 +220,6 @@
   {:else if sectionNames.indexOf($checklistState.section) != sectionNames.length - 1}
     <button type="button" class="btn preset-filled-success-500 px-12 shadow-lg" onclick={nextSection}>Next Checklist</button>
   {:else}
-    <button type="button" class="btn preset-filled-error-500 px-12 shadow-lg" onclick={resetAircraft}>Reset all</button>
+    <button type="button" class="btn preset-filled-error-500 px-12 shadow-lg" onclick={resetAircraft}>Reset Entire Aircraft</button>
   {/if}
 </div>
