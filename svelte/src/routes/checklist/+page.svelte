@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { XIcon } from '@lucide/svelte';
 
   import { checklistState, simbriefData } from "$lib/stores";
   import type { ChecklistData } from "../../types/checklist";
@@ -12,7 +10,8 @@
     .map((m: any) => m.default || m)
     .sort((a, b) => a.info.name.localeCompare(b.info.name)) as ChecklistData[];
 
-  run(() => {
+  // Watch for Simbrief data changes and update aircraft selection
+  $effect(() => {
     if ($simbriefData && $simbriefData.params) {
       const currentSimbriefId = $simbriefData.params.time_generated;
       
@@ -24,14 +23,14 @@
         if (simbriefICAO) {
           const match = aircraftList.find(a => a.info.codes && a.info.codes.includes(simbriefICAO));
           if (match) {
-              $checklistState.aircraft = match.info.name;
+            $checklistState.aircraft = match.info.name;
           }
         }
       }
     }
   });
 
-  let checkboxStates: boolean[] = $state([]);
+  let checkboxStates = $state<boolean[]>([]);
 
   // Derived Data
   let currentAircraft = $derived(aircraftList.find((a) => a.info.name === $checklistState.aircraft));
@@ -50,7 +49,7 @@
   let nextItemIndex = $derived(checkboxStates.findIndex((checked, i) => !checked && items[i].type !== "break"));
 
   // Restore state when selection changes
-  run(() => {
+  $effect(() => {
     if (stateKey) {
       const saved = $checklistState.statesMap?.[stateKey];
       checkboxStates = saved?.length === items.length ? saved : new Array(items.length).fill(false);
@@ -108,7 +107,6 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-
 <div class="flex flex-wrap items-center p-2 gap-2">
   <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
@@ -124,7 +122,7 @@
         {/each}
       </select>
     </div>
-    </div>
+  </div>
   
   <div class="mx-1">
     <div class="input-group grid-cols-[auto_1fr]">
