@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { selectedAirports, simbriefData } from "$lib/stores";
   import { RefreshCcw } from "@lucide/svelte";
   import { toaster } from "$lib/toaster";
@@ -36,8 +35,6 @@
   };
   let dep: AirportData = $state({ atisCode: "", atisText: "", metar: "" });
   let arr: AirportData = $state({ atisCode: "", atisText: "", metar: "" });
-
-  // Local storage for airport selections
 
   // Fetch airport data (ATIS and METAR)
   async function fetchAirportData(mode: FetchMode) {
@@ -77,12 +74,12 @@
     try {
       const response = await fetch(VATSIMDATAURL);
       const data = await response.json();
-  const atisList = data.atis.filter((element: any) => element.callsign.includes(airport));
+      const atisList = data.atis.filter((element: any) => element.callsign.includes(airport));
 
       if (atisList.length) {
-  let atisCodeList = atisList.map((item: any) => item.atis_code);
-  const atisCode = atisCodeList.every((code: any) => code === atisCodeList[0]) ? atisCodeList[0] : [];
-  const atisTexts = atisList.map((item: any) => item.text_atis).join("<br><br>");
+        let atisCodeList = atisList.map((item: any) => item.atis_code);
+        const atisCode = atisCodeList.every((code: any) => code === atisCodeList[0]) ? atisCodeList[0] : null;
+        const atisTexts = atisList.map((item: any) => item.text_atis).join("<br><br>");
 
         if (mode === fetchMode.DEP) {
           dep.atisCode = atisCode;
@@ -121,6 +118,7 @@
       setDefaultMetar(fetchMode.DEP);
     }
   }
+  
   // Handle airport input changes
   function updateArrival() {
     $selectedAirports.arr = $selectedAirports.arr.toUpperCase();
@@ -140,16 +138,16 @@
       fetchAirportData(fetchMode.DEP);
       fetchAirportData(fetchMode.ARR);
     } else {
-        const err = simbriefError("Simbrief Flightplan not Loaded");
-        toaster. warning({
-          title: err.message,
-          description: "",
-          meta: {
-            timeout: err.timeout,
-            hoverable: err.hoverable,
-            background: err.background,
-          },
-        });
+      const err = simbriefError("Simbrief Flightplan not Loaded");
+      toaster.warning({
+        title: err.message,
+        description: "",
+        meta: {
+          timeout: err.timeout,
+          hoverable: err.hoverable,
+          background: err.background,
+        },
+      });
     }
   }
 
@@ -158,12 +156,11 @@
     fetchAirportData(fetchMode.ARR);
   }
 
-  // Lifecycle methods
-  onMount(() => {
+  // Load initial data when component mounts
+  $effect(() => {
     if ($selectedAirports.dep.length === 4) fetchAirportData(fetchMode.DEP);
     if ($selectedAirports.arr.length === 4) fetchAirportData(fetchMode.ARR);
   });
-
 </script>
 
 <div class="grid grid-cols-3 p-2">
@@ -214,20 +211,20 @@
             <span class="ml-1">Code: {dep.atisCode}</span>
           {/if}
         </header>
-          <section class="p-2 ml-1">{@html dep.atisText}</section>
+        <section class="p-2 ml-1">{@html dep.atisText}</section>
       </div>
-        <div class="card border border-neutral-700 p-2 mb-1">
+      <div class="card border border-neutral-700 p-2 mb-1">
         <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
         <section class="p-2 ml-1">{dep.metar}</section>
       </div>
     </section>
   </div>
-  <div class="card my-2 preset-filled-surface-100-900 ">
+  <div class="card my-2 preset-filled-surface-100-900">
     <header class="card-header p-3">
       <span class="ml-1">Arrival Airport: {$selectedAirports.arr.length === 4 ? $selectedAirports.arr : "Enter a valid ICAO"}</span>
     </header>
     <section class="p-2">
-        <div class="card mb-2 border border-neutral-700 p-2">
+      <div class="card mb-2 border border-neutral-700 p-2">
         <header class="card-header mb-1">
           <span class="ml-1">ATIS</span>
           {#if arr.atisCode}
@@ -236,7 +233,7 @@
         </header>
         <section class="p-2 ml-1">{@html arr.atisText}</section>
       </div>
-        <div class="card border border-neutral-700 p-2 mb-1">
+      <div class="card border border-neutral-700 p-2 mb-1">
         <header class="card-header mb-1"><span class="ml-1">METAR</span></header>
         <section class="p-2 ml-1">{arr.metar}</section>
       </div>
