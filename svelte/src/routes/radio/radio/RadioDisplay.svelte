@@ -1,10 +1,8 @@
 <script lang="ts">
   import { AppBar } from "@skeletonlabs/skeleton-svelte";
-  import { onMount, onDestroy } from "svelte";
   import { formatFrequency, isBase64, processData } from "../utils";
   import RadioKeypad from "$lib/modals/radioKeypad.svelte";
-import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
-
+  import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
 
   interface Props {
     COM1_ACT_FREQ: number | string;

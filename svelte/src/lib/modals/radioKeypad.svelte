@@ -1,22 +1,19 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import KeypadButton from "./KeypadButton.svelte";
 
   let { title = "Radio Keypad", onSubmit, open = $bindable(false) }: { title?: string; onSubmit?: (value: number) => void, open?: boolean } = $props();
 
   let dialogElement: HTMLDialogElement;
   let frequency = $state<string>("XXX.XXX");
-  let buttonsEnabled = $state<string>("1");
-  let validFrequencies = $state<string[]>([""]);
-
-  onMount(() => {
-    validFrequencies = generateValidFrequencies();
-  });
+  // validFrequencies is constant data, no need for $state
+  const validFrequencies = generateValidFrequencies();
+  // buttonsEnabled is derived from frequency, no need to manually update it
+  let buttonsEnabled = $derived(getPossibleNumbers(frequency, validFrequencies));
 
   $effect(() => {
     if (open) {
       if (dialogElement && !dialogElement.open) {
         frequency = "XXX.XXX";
-        buttonsEnabled = getPossibleNumbers(frequency, validFrequencies);
         dialogElement.showModal();
       }
     } else {
@@ -129,13 +126,11 @@
   function onNumberInput(value: string): void {
     //console.log(value);
     addDigit(value);
-    buttonsEnabled = getPossibleNumbers(frequency, validFrequencies);
   }
 
   function onRemove(): void {
     console.log("Remove");
     removeLastDigit();
-    buttonsEnabled = getPossibleNumbers(frequency, validFrequencies);
   }
 
   function onEnter(): void {
@@ -164,88 +159,19 @@
     </div>
 
     <div class="flex flex-wrap rounded-xl max-w-sm mx-auto mt-24">
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")}>
-          1
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")}>
-          2
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")}>
-          3
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")}>
-          4
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")}>
-          5
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")}>
-          6
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")}>
-          7
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")}>
-          8
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")}>
-          9
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled-error-500 w-full h-20 text-2xl" onclick={() => onRemove()} disabled={frequency == "XXX.XXX"}> Remove </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled w-full h-20 text-2xl" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")}>
-          0
-        </button>
-      </div>
-      <div class="w-1/3 px-2 py-2">
-        <button class="btn preset-filled-success-500 w-full h-20 text-2xl" onclick={() => onEnter()} disabled={!validFrequencies.includes(frequency)}>
-          Enter
-        </button>
-      </div>
+      <KeypadButton label="1" onclick={() => onNumberInput("1")} disabled={!buttonsEnabled.includes("1")} />
+      <KeypadButton label="2" onclick={() => onNumberInput("2")} disabled={!buttonsEnabled.includes("2")} />
+      <KeypadButton label="3" onclick={() => onNumberInput("3")} disabled={!buttonsEnabled.includes("3")} />
+      <KeypadButton label="4" onclick={() => onNumberInput("4")} disabled={!buttonsEnabled.includes("4")} />
+      <KeypadButton label="5" onclick={() => onNumberInput("5")} disabled={!buttonsEnabled.includes("5")} />
+      <KeypadButton label="6" onclick={() => onNumberInput("6")} disabled={!buttonsEnabled.includes("6")} />
+      <KeypadButton label="7" onclick={() => onNumberInput("7")} disabled={!buttonsEnabled.includes("7")} />
+      <KeypadButton label="8" onclick={() => onNumberInput("8")} disabled={!buttonsEnabled.includes("8")} />
+      <KeypadButton label="9" onclick={() => onNumberInput("9")} disabled={!buttonsEnabled.includes("9")} />
+      <KeypadButton label="Remove" onclick={onRemove} disabled={frequency == "XXX.XXX"} color="preset-filled-error-500" />
+      <KeypadButton label="0" onclick={() => onNumberInput("0")} disabled={!buttonsEnabled.includes("0")} />
+      <KeypadButton label="Enter" onclick={onEnter} disabled={!validFrequencies.includes(frequency)} color="preset-filled-success-500" />
     </div>
   </div>
 </dialog>
 
-<style>
-  dialog,
-  dialog::backdrop {
-    --anim-duration: 250ms;
-    transition:
-      display var(--anim-duration) allow-discrete,
-      overlay var(--anim-duration) allow-discrete,
-      opacity var(--anim-duration);
-    opacity: 0;
-  }
-  /* Animate In */
-  dialog[open],
-  dialog[open]::backdrop {
-    opacity: 1;
-  }
-  /* Animate Out */
-  @starting-style {
-    dialog[open],
-    dialog[open]::backdrop {
-      opacity: 0;
-    }
-  }
-</style>
