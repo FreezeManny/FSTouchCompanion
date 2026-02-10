@@ -53,7 +53,7 @@
     <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
       <Dialog.Content class="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-full max-w-lg">
           <header class="flex justify-between items-center">
-            <Dialog.Title class="h3">Einstellungen</Dialog.Title>
+            <Dialog.Title class="h3">Einstellungen - Thomas Test</Dialog.Title>
             <!-- Use a plain button to avoid TS typing issue on CloseTrigger events -->
             <button type="button" class="btn-icon hover:preset-tonal" on:click={onCancel} aria-label="Close">
               <XIcon class="size-4" />
@@ -95,3 +95,4 @@
     </Dialog.Positioner>
   </Portal>
 </Dialog>
+
