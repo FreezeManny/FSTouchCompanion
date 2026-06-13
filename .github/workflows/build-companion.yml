@@ -1,0 +1,42 @@
+name: Build Companion
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-companion:
+    name: Build Windows companion
+    # Release Please tags companion releases as "companion-vX.Y.Z".
+    # The companion is a Wails desktop app that talks to MSFS via SimConnect,
+    # so it is built on Windows and attached to the GitHub release.
+    if: startsWith(github.event.release.tag_name, 'companion-v')
+    runs-on: windows-latest
+    permissions:
+      contents: write  # upload the built binary as a release asset
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: fsConnect/go.mod
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.2
+
+      - name: Build companion
+        working-directory: fsConnect
+        run: wails build -platform windows/amd64
+
+      - name: Upload binary to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: fsConnect/build/bin/fsConnect.exe
