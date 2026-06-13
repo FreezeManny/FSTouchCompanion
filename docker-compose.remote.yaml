@@ -1,0 +1,7 @@
+services:
+  svelte:
+    image: ghcr.io/freezemanny/fstouchcompanion:latest
+    container_name: fst-frontend
+    restart: always
+    ports:
+      - "5001:80" # Expose Svelte on HTTP port
