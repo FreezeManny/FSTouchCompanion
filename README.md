@@ -59,6 +59,3 @@ The web interface will be available on port `5001`.
 - Microsoft Flight Simulator 2020/2024 (via SimConnect)
 - X-Plane 12 (via UDP)
 
-## License
-
-MIT – see [LICENSE](LICENSE) for details.
