@@ -75,6 +75,20 @@ jobs:
         with:
           node-version: "20"
 
+      # main.go embeds the SvelteKit output with `//go:embed all:frontend/build`,
+      # and frontend/build is generated, so it is absent on a fresh checkout.
+      # Without it the Go toolchain cannot even load the package -- `go vet` and
+      # `go test` fail with "pattern all:frontend/build: no matching files
+      # found" before any check runs. So build the frontend first.
+      # `npm install`, not `npm ci`: package-lock.json is gitignored, so there is
+      # no lockfile on the runner -- and the same reason rules out caching npm
+      # by lockfile hash. This mirrors wails.json's "frontend:install".
+      - name: Build frontend
+        working-directory: fsConnect/frontend
+        run: |
+          npm install
+          npm run build
+
       # Same pinned version as build-companion.yml — a Wails bump should break
       # a PR, not a release.
       - name: Install Wails CLI
