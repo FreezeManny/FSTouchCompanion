@@ -1,0 +1,101 @@
+name: Test
+
+on:
+  # The pull request is the gate: every change reaches main through one, so
+  # testing pull requests tests everything that can land. A bare `push:` would
+  # just run the same job a second time before the PR is even open.
+  pull_request:
+  # For re-running against a branch without pushing an empty commit.
+  workflow_dispatch:
+
+# A newer push to the same PR makes an in-flight run obsolete — drop it rather
+# than pay for a result nobody will read.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only: this workflow never publishes anything. docker-publish.yml and
+# build-companion.yml are the only places that need write access.
+permissions:
+  contents: read
+
+# Both jobs run on every PR, deliberately unfiltered by path. The two halves
+# share the SvelteKit UI conventions and the websocket protocol, so a change
+# under svelte/ can break the companion's frontend and vice versa. Path filters
+# would also make either job unusable as a required check: a required check that
+# is filtered out never reports, and the PR waits on it forever.
+jobs:
+  # Named `web` because the branch ruleset on main requires that check by name;
+  # renaming the job silently un-gates the branch.
+  web:
+    name: web
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Build the image rather than running `npm ci && npm run build` directly:
+      # Dockerfile.svelte.prod already does exactly that, and this way the PR
+      # checks the artifact that actually ships instead of an approximation of
+      # it. `push: false` — nothing leaves the runner.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.svelte.prod
+          push: false
+          # Same cache scope as docker-publish.yml, so the release build reuses
+          # the layers this PR already paid for.
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+  # Named `companion` because the branch ruleset on main requires that check by
+  # name; renaming the job silently un-gates the branch.
+  companion:
+    name: companion
+    # Windows, like build-companion.yml: the companion talks to MSFS through
+    # SimConnect, which only builds on Windows. Cross-compiling on ubuntu would
+    # not catch what a release build hits.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          # Pinned to the file rather than a literal that would drift from it.
+          go-version-file: fsConnect/go.mod
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Same pinned version as build-companion.yml — a Wails bump should break
+      # a PR, not a release.
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.2
+
+      - name: Check formatting
+        working-directory: fsConnect
+        run: |
+          $unformatted = gofmt -l .
+          if ($unformatted) { $unformatted; exit 1 }
+
+      - name: Vet
+        working-directory: fsConnect
+        run: go vet ./...
+
+      - name: Test
+        working-directory: fsConnect
+        run: go test ./...
+
+      # The full release build: it also installs and builds the embedded
+      # SvelteKit frontend, so a broken UI dependency surfaces here.
+      - name: Build companion
+        working-directory: fsConnect
+        run: wails build -platform windows/amd64

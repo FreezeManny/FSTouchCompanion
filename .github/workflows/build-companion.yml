@@ -3,14 +3,25 @@ name: Build Companion
 on:
   release:
     types: [published]
+  # For rebuilding without cutting a release. There is no release to attach to
+  # on a manual run, so it only proves the build still works.
+  workflow_dispatch:
+
+# Two releases published close together must not race to upload the same asset;
+# an in-flight upload is never cancelled half-way.
+concurrency:
+  group: build-companion
+  cancel-in-progress: false
 
 jobs:
   build-companion:
     name: Build Windows companion
-    # Release Please tags companion releases as "companion-vX.Y.Z".
+    # Release Please tags companion releases as "companion-vX.Y.Z", and a web
+    # release must not trigger a companion build. On a manual run there is no
+    # release event to match, so let it through unconditionally.
     # The companion is a Wails desktop app that talks to MSFS via SimConnect,
     # so it is built on Windows and attached to the GitHub release.
-    if: startsWith(github.event.release.tag_name, 'companion-v')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'companion-v')
     runs-on: windows-latest
     permissions:
       contents: write  # upload the built binary as a release asset
@@ -37,6 +48,8 @@ jobs:
         run: wails build -platform windows/amd64
 
       - name: Upload binary to release
+        # Nothing to attach on a manual run.
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: fsConnect/build/bin/fsConnect.exe
