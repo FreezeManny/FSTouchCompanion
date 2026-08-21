@@ -9,7 +9,7 @@ func NewFsConnector(sim string, app FsDataInterface) (FsConnector, error) {
 	case "xplane12":
 		return NewXPlane12Connector(app)
 	case "msfs":
-		return NewMsfsConnector (app)
+		return NewMsfsConnector(app)
 	}
 	return nil, errors.New("Not implemented")
 }
