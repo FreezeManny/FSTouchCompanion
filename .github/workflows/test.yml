@@ -89,10 +89,15 @@ jobs:
           npm install
           npm run build
 
-      # Same pinned version as build-companion.yml — a Wails bump should break
-      # a PR, not a release.
+      # The CLI version is read from go.mod rather than pinned here: a hardcoded
+      # pin silently drifts from the library, and building an old CLI with the
+      # newer toolchain go.mod asks for fails to compile.
       - name: Install Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.2
+        working-directory: fsConnect
+        run: |
+          $wails = go list -m -f '{{.Version}}' github.com/wailsapp/wails/v2
+          if (-not $wails) { throw "could not resolve the Wails version from go.mod" }
+          go install "github.com/wailsapp/wails/v2/cmd/wails@$wails"
 
       - name: Check formatting
         working-directory: fsConnect

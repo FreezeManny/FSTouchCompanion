@@ -40,8 +40,13 @@ jobs:
         with:
           node-version: "20"
 
+      # Kept in lockstep with go.mod, like test.yml -- see the comment there.
       - name: Install Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.9.2
+        working-directory: fsConnect
+        run: |
+          $wails = go list -m -f '{{.Version}}' github.com/wailsapp/wails/v2
+          if (-not $wails) { throw "could not resolve the Wails version from go.mod" }
+          go install "github.com/wailsapp/wails/v2/cmd/wails@$wails"
 
       - name: Build companion
         working-directory: fsConnect
