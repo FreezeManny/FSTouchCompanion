@@ -1,0 +1,87 @@
+# Keeps dependencies up to date.
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Two things here are deliberate rather than cosmetic:
+#
+# `commit-message.prefix` decides whether a bump reaches the changelog and cuts
+# a release. The rule is "does this change what users install?" —
+#   yes -> `fix`, so release-please opens a release PR with a visible entry
+#   no  -> `chore`, hidden from the changelog and never a release on its own
+# Stated explicitly rather than left to Dependabot's inference from commit
+# history, which now contains `fix(deps)` commits too.
+#
+# `groups:` — without it Dependabot opens one PR per dependency, which is a
+# Monday review queue of a dozen near-identical PRs. Grouped, each ecosystem
+# gives one PR that either goes green or does not.
+#
+# release-please-config.json is a monorepo config keyed on `svelte/` and
+# `fsConnect/`, so a bump only ever affects the component whose directory it
+# touches — and a bump at the repo root affects neither.
+version: 2
+updates:
+  # Workflow actions are pinned to floating major tags, so without this they
+  # drift silently and never surface a PR.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    # CI-only: never a release on its own.
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # The SvelteKit web app. Everything in this manifest — including the
+  # devDependencies — is part of the build that produces the published image,
+  # so `fix` across the board rather than splitting by dependency-type: bumping
+  # @sveltejs/kit or vite changes the bundle users get just as much as bumping
+  # `ws` does.
+  - package-ecosystem: "npm"
+    directory: "/svelte"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+    groups:
+      web:
+        patterns: ["*"]
+
+  # The companion's Go backend. Compiled into the released .exe.
+  - package-ecosystem: "gomod"
+    directory: "/fsConnect"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+    groups:
+      companion-go:
+        patterns: ["*"]
+
+  # The companion's embedded Wails frontend — a second, separate manifest from
+  # /svelte, and just as much part of the shipped binary.
+  - package-ecosystem: "npm"
+    directory: "/fsConnect/frontend"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+    groups:
+      companion-web:
+        patterns: ["*"]
+
+  # The `node:20` base image in Dockerfile.svelte.prod. `chore`, because the
+  # file sits at the repo root: it belongs to neither release-please package, so
+  # a commit touching it cannot cut a release whatever it is called. The bump
+  # ships with the next web release instead.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore"
+      include: "scope"

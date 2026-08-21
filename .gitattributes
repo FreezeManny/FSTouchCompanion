@@ -1,0 +1,6 @@
+# gofmt treats CRLF files as unformatted, and the CI format check runs on a
+# Windows runner (SimConnect only builds there). Pin Go sources to LF so
+# checkout doesn't reintroduce CRLF via core.autocrlf.
+*.go text eol=lf
+go.mod text eol=lf
+go.sum text eol=lf

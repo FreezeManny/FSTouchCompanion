@@ -15,7 +15,7 @@ import (
 	dataTypes "fsConnector/backend/Types"
 )
 
-type MsfsConnector  struct {
+type MsfsConnector struct {
 	app        FsDataInterface
 	simConnect *simconnect.SimConnect
 
@@ -34,8 +34,8 @@ type MsfsConnector  struct {
 	groupID    simconnect.DWord
 
 	// Cached position values (not sent with every update)
-	currentLat        float64
-	currentLon        float64
+	currentLat          float64
+	currentLon          float64
 	positionInitialized bool
 }
 
@@ -45,8 +45,8 @@ type SimVar struct {
 	Name, Unit string
 }
 
-func NewMsfsConnector (app FsDataInterface) (FsConnector, error) {
-	connector := &MsfsConnector {app: app}
+func NewMsfsConnector(app FsDataInterface) (FsConnector, error) {
+	connector := &MsfsConnector{app: app}
 	connector.updateConnection(false)
 
 	// Initialize SimConnect with path to executable directory
@@ -57,7 +57,7 @@ func NewMsfsConnector (app FsDataInterface) (FsConnector, error) {
 	}
 	additionalSearchPath := filepath.Dir(exePath)
 	log.Printf("MSFS: Using SimConnect search path: %s", additionalSearchPath)
-	
+
 	if err := simconnect.Initialize(additionalSearchPath); err != nil {
 		log.Printf("MSFS: Failed to initialize SimConnect: %v", err)
 		return nil, err
@@ -99,7 +99,7 @@ func NewMsfsConnector (app FsDataInterface) (FsConnector, error) {
 	return connector, nil
 }
 
-func (m *MsfsConnector ) subscribeToData() {
+func (m *MsfsConnector) subscribeToData() {
 	if m.subscribed {
 		return
 	}
@@ -147,15 +147,15 @@ func (m *MsfsConnector ) subscribeToData() {
 	log.Printf("MSFS: Subscribed to %d SimVars", len(m.simVars))
 }
 
-func (m *MsfsConnector ) GetConnectionStatus() bool {
+func (m *MsfsConnector) GetConnectionStatus() bool {
 	return m.FsData.Connected
 }
 
-func (m *MsfsConnector ) GetAircraftName() string {
+func (m *MsfsConnector) GetAircraftName() string {
 	return strings.TrimSpace(m.FsData.AircraftName)
 }
 
-func (m *MsfsConnector ) SwitchCom1() error {
+func (m *MsfsConnector) SwitchCom1() error {
 	// Parse current frequencies
 	activeFloat, err := strconv.ParseFloat(m.FsData.Com1Act, 64)
 	if err != nil {
@@ -165,54 +165,54 @@ func (m *MsfsConnector ) SwitchCom1() error {
 	if err != nil {
 		return fmt.Errorf("invalid standby frequency format: %v", err)
 	}
-	
+
 	// Send swapped frequencies to sim (convert from KHz to Hz)
 	// Set new active (was standby)
 	freqHz := uint32((standbyFloat / 1000) * 1000000)
 	if err := m.triggerEventWithData("COM_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
 		return err
 	}
-	
+
 	// Set new standby (was active)
 	freqHz = uint32((activeFloat / 1000) * 1000000)
 	if err := m.triggerEventWithData("COM_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
 		return err
 	}
-	
+
 	log.Printf("MSFS: Swapped COM1 - New Active: %.3f MHz, New Standby: %.3f MHz", standbyFloat/1000, activeFloat/1000)
 	return nil
 }
 
-func (m *MsfsConnector ) SwitchCom2() error {
-    // Parse current frequencies
-    activeFloat, err := strconv.ParseFloat(m.FsData.Com2Act, 64)
-    if err != nil {
-        return fmt.Errorf("invalid active frequency format: %v", err)
-    }
-    standbyFloat, err := strconv.ParseFloat(m.FsData.Com2Stby, 64)
-    if err != nil {
-        return fmt.Errorf("invalid standby frequency format: %v", err)
-    }
-    
-    // Use COM_RADIO_SET with index 2 for COM2
-    // Send swapped frequencies to sim (convert from KHz to Hz)
-    // Set new active (was standby)
-    freqHz := uint32((standbyFloat / 1000) * 1000000)
-    if err := m.triggerEventWithData("COM2_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
-        return err
-    }
-    
-    // Set new standby (was active)
-    freqHz = uint32((activeFloat / 1000) * 1000000)
-    if err := m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
-        return err
-    }
-    
-    log.Printf("MSFS: Swapped COM2 - New Active: %.3f MHz, New Standby: %.3f MHz", standbyFloat/1000, activeFloat/1000)
-    return nil
+func (m *MsfsConnector) SwitchCom2() error {
+	// Parse current frequencies
+	activeFloat, err := strconv.ParseFloat(m.FsData.Com2Act, 64)
+	if err != nil {
+		return fmt.Errorf("invalid active frequency format: %v", err)
+	}
+	standbyFloat, err := strconv.ParseFloat(m.FsData.Com2Stby, 64)
+	if err != nil {
+		return fmt.Errorf("invalid standby frequency format: %v", err)
+	}
+
+	// Use COM_RADIO_SET with index 2 for COM2
+	// Send swapped frequencies to sim (convert from KHz to Hz)
+	// Set new active (was standby)
+	freqHz := uint32((standbyFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM2_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+
+	// Set new standby (was active)
+	freqHz = uint32((activeFloat / 1000) * 1000000)
+	if err := m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz)); err != nil {
+		return err
+	}
+
+	log.Printf("MSFS: Swapped COM2 - New Active: %.3f MHz, New Standby: %.3f MHz", standbyFloat/1000, activeFloat/1000)
+	return nil
 }
 
-func (m *MsfsConnector ) SetCom1Stby(frequency string) error {
+func (m *MsfsConnector) SetCom1Stby(frequency string) error {
 	freqFloat, err := strconv.ParseFloat(frequency, 64)
 	if err != nil {
 		return fmt.Errorf("invalid frequency format: %v", err)
@@ -223,20 +223,20 @@ func (m *MsfsConnector ) SetCom1Stby(frequency string) error {
 	return m.triggerEventWithData("COM_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
 }
 
-func (m *MsfsConnector ) SetCom2Stby(frequency string) error {
-    freqFloat, err := strconv.ParseFloat(frequency, 64)
-    if err != nil {
-        return fmt.Errorf("invalid frequency format: %v", err)
-    }
-    // Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
-    // Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
-    freqHz := uint32((freqFloat / 1000) * 1000000)
-    return m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
+func (m *MsfsConnector) SetCom2Stby(frequency string) error {
+	freqFloat, err := strconv.ParseFloat(frequency, 64)
+	if err != nil {
+		return fmt.Errorf("invalid frequency format: %v", err)
+	}
+	// Frequency comes in as KHz without decimal (e.g., "122800" for 122.800 MHz)
+	// Convert to MHz by dividing by 1000, then to Hz by multiplying by 1000000
+	freqHz := uint32((freqFloat / 1000) * 1000000)
+	return m.triggerEventWithData("COM2_STBY_RADIO_SET_HZ", simconnect.DWord(freqHz))
 }
 
 // ----------------- MSFS specific methods -----------------
 
-func (m *MsfsConnector ) HandleEvents() {
+func (m *MsfsConnector) HandleEvents() {
 	defer func() {
 		if m.simConnect != nil {
 			m.simConnect.Close()
@@ -282,7 +282,7 @@ func (m *MsfsConnector ) HandleEvents() {
 			case simconnect.RecvIDException:
 				recvException := *(*simconnect.RecvException)(ppData)
 				exceptionName := m.getExceptionName(recvException.Exception)
-				log.Printf("MSFS: SimConnect Exception %d (%s) - SendID: %d, Index: %d", 
+				log.Printf("MSFS: SimConnect Exception %d (%s) - SendID: %d, Index: %d",
 					recvException.Exception, exceptionName, recvException.SendID, recvException.Index)
 
 			case simconnect.RecvIDSimobjectData:
@@ -297,7 +297,7 @@ func (m *MsfsConnector ) HandleEvents() {
 	}
 }
 
-func (m *MsfsConnector ) processSimObjectData(ppData unsafe.Pointer, defineID simconnect.DWord) {
+func (m *MsfsConnector) processSimObjectData(ppData unsafe.Pointer, defineID simconnect.DWord) {
 	if simVar, exists := m.simVarLookup[defineID]; exists {
 		// Calculate data offset - skip the RecvSimObjectData header
 		dataOffset := unsafe.Sizeof(simconnect.RecvSimObjectData{})
@@ -378,7 +378,7 @@ func (m *MsfsConnector ) processSimObjectData(ppData unsafe.Pointer, defineID si
 	}
 }
 
-func (m *MsfsConnector ) UpdatePosition() {
+func (m *MsfsConnector) UpdatePosition() {
 	ticker := time.NewTicker(120 * time.Second)
 	defer ticker.Stop()
 
@@ -395,7 +395,7 @@ func (m *MsfsConnector ) UpdatePosition() {
 	}
 }
 
-func (m *MsfsConnector ) triggerEvent(eventName string) error {
+func (m *MsfsConnector) triggerEvent(eventName string) error {
 	// Get or create event ID for this event name
 	eventID, exists := m.eventCache[eventName]
 	if !exists {
@@ -421,7 +421,7 @@ func (m *MsfsConnector ) triggerEvent(eventName string) error {
 	return nil
 }
 
-func (m *MsfsConnector ) triggerEventWithData(eventName string, data simconnect.DWord) error {
+func (m *MsfsConnector) triggerEventWithData(eventName string, data simconnect.DWord) error {
 	// Get or create event ID for this event name
 	eventID, exists := m.eventCache[eventName]
 	if !exists {
@@ -447,13 +447,13 @@ func (m *MsfsConnector ) triggerEventWithData(eventName string, data simconnect.
 	return nil
 }
 
-func (m *MsfsConnector ) updateConnection(connected bool) {
+func (m *MsfsConnector) updateConnection(connected bool) {
 	m.FsData.Connected = connected
 	m.app.SetFsData(m.FsData)
 	m.app.SetConnectionStatus(connected)
 }
 
-func (m *MsfsConnector ) getExceptionName(exception simconnect.DWord) string {
+func (m *MsfsConnector) getExceptionName(exception simconnect.DWord) string {
 	names := map[simconnect.DWord]string{
 		0:  "NONE",
 		1:  "ERROR",
