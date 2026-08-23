@@ -45,6 +45,10 @@ updates:
     commit-message:
       prefix: "fix"
       include: "scope"
+    # block major, as svelte does not yet support TS7
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       web:
         patterns: ["*"]
