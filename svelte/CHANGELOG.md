@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/FreezeManny/FSTouchCompanion/compare/web-v0.1.0...web-v0.1.1) (2026-08-23)
+
+
+### Bug Fixes
+
+* update frontend preferences ([#16](https://github.com/FreezeManny/FSTouchCompanion/issues/16)) ([fcc63ad](https://github.com/FreezeManny/FSTouchCompanion/commit/fcc63adbd16a31cfe57f7c76815d6c79b2e7f49e))
+
 ## [0.1.0](https://github.com/FreezeManny/FSTouchCompanion/compare/web-v1.0.0...web-v0.1.0) (2026-06-13)
 
 
