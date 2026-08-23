@@ -1,25 +1,22 @@
 <script lang="ts">
-	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import '../app.css';
 
-	export const prerender = true;
-	export const ssr = false;
-	
+	let { children } = $props();
 </script>
 
-<!-- App Shell -->
-<AppShell>
-	<svelte:fragment slot="header">
-		<!-- App Bar -->
-		<AppBar>
-			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">fsConnector</strong>
-			</svelte:fragment>
-			<svelte:fragment slot="trail">
-				
-			</svelte:fragment>
-		</AppBar>
-	</svelte:fragment>
-	<!-- Page Route Content -->
-	<slot />
-</AppShell>
+<!--
+	Skeleton 3 removed AppShell and AppBar, so the shell is plain markup now.
+	AppShell was a full-height flex column holding a fixed header above a
+	scrolling content region; AppBar was a padded row with lead/trail regions.
+	Only the lead was ever filled in here, so the trail is dropped rather than
+	carried over as an empty element.
+-->
+<div class="flex h-screen flex-col">
+	<header class="preset-filled-surface-100-900 flex items-center gap-4 p-4">
+		<strong class="text-xl uppercase">fsConnector</strong>
+	</header>
+
+	<main class="flex-1 overflow-y-auto">
+		{@render children?.()}
+	</main>
+</div>
