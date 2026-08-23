@@ -1,0 +1,31 @@
+/*
+	Tailwind 4 is configured in CSS rather than in tailwind.config.js, which no
+	longer exists. `source()` pins content detection to src/ -- without it
+	Tailwind walks up looking for a project root and would find the repository
+	root, scanning the unrelated /svelte app as well.
+*/
+@import 'tailwindcss' source('../');
+
+/*
+	app.html hard-codes class="dark" on <html> to force dark mode. Tailwind 4's
+	built-in `dark:` variant follows prefers-color-scheme, so that class alone
+	would do nothing -- this points the variant back at it. Declared before the
+	Skeleton import, whose utilities are built on top of the dark variant.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+	Skeleton 5 ships as plain CSS: the core stylesheet plus one theme, imported
+	here. @skeletonlabs/tw-plugin -- the Tailwind-plugin form this used to take
+	-- was discontinued after Skeleton 2. The theme is still keyed on
+	[data-theme='modern'] in app.html.
+*/
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/themes/modern';
+
+/* Self-hosted, since the modern theme's font stack asks for Quicksand. */
+@font-face {
+	font-family: 'Quicksand';
+	src: url('/fonts/Quicksand.ttf');
+	font-display: swap;
+}
