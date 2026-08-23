@@ -167,10 +167,10 @@
   <div class="flex-none">
     <div class="grid grid-cols-3 p-2">
       <div class="mx-3">
-        <div class="input-group grid-cols-[auto_1fr]">
-          <div class="ig-cell preset-tonal">Dep</div>
+        <div class="field-group grid-cols-[auto_1fr]">
+          <div class="label preset-tonal">Dep</div>
           <input
-            class="ig-input border border-neutral-700"
+            class="input border border-neutral-700"
             type="text"
             placeholder="EDDS"
             bind:value={$selectedAirports.dep}
@@ -180,10 +180,10 @@
         </div>
       </div>
       <div class="mx-3">
-        <div class="input-group grid-cols-[auto_1fr]">
-          <div class="ig-cell preset-tonal">Arr</div>
+        <div class="field-group grid-cols-[auto_1fr]">
+          <div class="label preset-tonal">Arr</div>
           <input
-            class="ig-input border border-neutral-700"
+            class="input border border-neutral-700"
             type="text"
             placeholder="EDDS"
             bind:value={$selectedAirports.arr}
