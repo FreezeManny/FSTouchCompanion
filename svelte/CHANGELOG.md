@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2](https://github.com/FreezeManny/FSTouchCompanion/compare/web-v0.1.1...web-v0.1.2) (2026-09-06)
+
+
+### Bug Fixes
+
+* **deps:** bump the web group in /svelte with 2 updates ([#22](https://github.com/FreezeManny/FSTouchCompanion/issues/22)) ([321dd53](https://github.com/FreezeManny/FSTouchCompanion/commit/321dd535f0466bef7aa704a5247b33e945454c70))
+* **deps:** bump the web group in /svelte with 3 updates ([#24](https://github.com/FreezeManny/FSTouchCompanion/issues/24)) ([ddf2bfb](https://github.com/FreezeManny/FSTouchCompanion/commit/ddf2bfb4f1b346a7919621766eb08601fca7c916))
+
 ## [0.1.1](https://github.com/FreezeManny/FSTouchCompanion/compare/web-v0.1.0...web-v0.1.1) (2026-08-23)
 
 
