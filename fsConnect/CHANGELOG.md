@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/FreezeManny/FSTouchCompanion/compare/companion-v0.1.1...companion-v0.1.2) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** bump github.com/wailsapp/wails/v2 from 2.15.0 to 2.16.0 in /fsConnect in the companion-go group ([#27](https://github.com/FreezeManny/FSTouchCompanion/issues/27)) ([0aff2da](https://github.com/FreezeManny/FSTouchCompanion/commit/0aff2dadd806ae33ec6b12679dae4d39c792f932))
+
 ## [0.1.1](https://github.com/FreezeManny/FSTouchCompanion/compare/companion-v0.1.0...companion-v0.1.1) (2026-08-23)
 
 
