@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { EventsOn } from '$lib/wailsjs/runtime/runtime';
-	import { ChangeFlightSim, ReconnectFlightSim } from '$lib/wailsjs/go/main/App';
+	import { EventsOn } from '#lib/wailsjs/runtime/runtime.js';
+	import { ChangeFlightSim, ReconnectFlightSim } from '#lib/wailsjs/go/main/App.js';
 
 	// Plain `let` under Svelte 5 runes is not reactive, so every value the Wails
 	// event callbacks below write to has to be $state. These were a mix of
