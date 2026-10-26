@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AppBar } from "@skeletonlabs/skeleton-svelte";
   import { formatFrequency, isBase64, processData } from "../utils";
-  import RadioKeypad from "$lib/modals/radioKeypad.svelte";
+  import RadioKeypad from "#lib/modals/radioKeypad.svelte";
   import { ArrowLeftRight , Grid2x2 } from '@lucide/svelte';
 
   interface Props {

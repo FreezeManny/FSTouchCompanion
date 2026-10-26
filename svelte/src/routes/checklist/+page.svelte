@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
 
-  import { checklistState, simbriefData } from "$lib/stores";
+  import { checklistState, simbriefData } from "#lib/stores";
   import type { ChecklistData } from "../../types/checklist";
 
   // Load and sort aircraft data

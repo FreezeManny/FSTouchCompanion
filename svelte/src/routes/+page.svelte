@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { toaster } from "$lib/toaster";
+  import { toaster } from "#lib/toaster";
 
-  import { settings, simbriefData } from "$lib/stores";
+  import { settings, simbriefData } from "#lib/stores";
   import { goto } from "$app/navigation";
-  import { isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
+  import { isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "#lib/websocket";
 
   type SimbriefData = {
     atc: { callsign: string };

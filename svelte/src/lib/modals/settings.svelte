@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { settings } from "$lib/stores";
+  import { settings } from "#lib/stores";
   import { Settings, XIcon } from '@lucide/svelte';
   import { createEventDispatcher, onDestroy } from 'svelte';
 

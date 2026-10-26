@@ -1,6 +1,6 @@
 <script lang="ts">
   import { loadAtc, AtcType, type AtcData } from "./atcFreqFunctions";
-  import { settings } from "$lib/stores";
+  import { settings } from "#lib/stores";
   import { Tabs, Popover, Portal } from "@skeletonlabs/skeleton-svelte";
 
   let atcControllers: AtcData[] = $state([]);

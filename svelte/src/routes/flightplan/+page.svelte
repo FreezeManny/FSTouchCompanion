@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { simbriefData, flightplanSettings } from "$lib/stores";
+  import { simbriefData, flightplanSettings } from "#lib/stores";
 
   let scrollContainer = $state<HTMLElement>();
   let hasRestored = $state(false);

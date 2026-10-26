@@ -10,7 +10,7 @@
     com2Switch as ws_com2Switch,
     com1Entry as ws_com1Entry,
     com2Entry as ws_com2Entry
-  } from "$lib/websocket";
+  } from "#lib/websocket";
 
   // Wrapper functions to pass WebSocket from store
   function com1Switch(): void {
