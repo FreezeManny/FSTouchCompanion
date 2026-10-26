@@ -23,6 +23,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -66,3 +68,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
+
+      - name: Label release PR as published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh label create "autorelease: published" --color "ededed" --force --repo "$REPO"
+          for pr in $(gh api "repos/$REPO/commits/$SHA/pulls" --jq '.[].number'); do
+            gh pr edit "$pr" --repo "$REPO" --remove-label "autorelease: tagged" --add-label "autorelease: published"
+          done
