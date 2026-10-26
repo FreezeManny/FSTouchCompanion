@@ -25,6 +25,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write  # upload the built binary as a release asset
+      issues: write  # ensure autorelease: published label exists
+      pull-requests: write  # label the release PR as autorelease: published
 
     steps:
       - name: Checkout repository
@@ -58,3 +60,18 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: fsConnect/build/bin/fsConnect.exe
+
+      - name: Label release PR as published
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh label create "autorelease: published" --color "ededed" --force --repo "$env:REPO"
+          $prs = gh api "repos/$env:REPO/commits/$env:SHA/pulls" --jq '.[].number'
+          foreach ($pr in $prs) {
+            if ($pr) {
+              gh pr edit $pr --repo "$env:REPO" --remove-label "autorelease: tagged" --add-label "autorelease: published"
+            }
+          }
