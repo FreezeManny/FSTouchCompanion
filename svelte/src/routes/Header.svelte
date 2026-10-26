@@ -5,8 +5,8 @@
 
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
-  import { settings } from "$lib/stores";
-  import SettingsModal from "$lib/modals/settings.svelte";
+  import { settings } from "#lib/stores";
+  import SettingsModal from "#lib/modals/settings.svelte";
 
   let valueSingle: string = $state(page.url.pathname);
   let settingsOpen = $state(false);

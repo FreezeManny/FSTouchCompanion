@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { Progress } from "@skeletonlabs/skeleton-svelte";
-  import { settings } from "$lib/stores";
+  import { settings } from "#lib/stores";
 
   let responseStatus: number = $state(200);
   let interval: ReturnType<typeof setInterval>;

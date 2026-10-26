@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { selectedAirports, simbriefData } from "$lib/stores";
+  import { selectedAirports, simbriefData } from "#lib/stores";
   import { RefreshCcw } from "@lucide/svelte";
-  import { toaster } from "$lib/toaster";
+  import { toaster } from "#lib/toaster";
 
   type SimbriefError = {
     message: string;

@@ -3,12 +3,12 @@
 	import Header from "./Header.svelte";
 
 import { Toast } from '@skeletonlabs/skeleton-svelte';
-import { toaster } from '$lib/toaster';
+import { toaster } from '#lib/toaster';
 
 	// WebSocket Management
 	import { onMount, onDestroy } from "svelte";
-	import { settings } from "$lib/stores";
-	import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "$lib/websocket";
+	import { settings } from "#lib/stores";
+	import { websocketStore, isWebSocketOpen, connectionError, fsData, retryConnectionCallback } from "#lib/websocket";
 
 	interface Props {
 		children?: import('svelte').Snippet;
