@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/grumpypixel/msfs2020-simconnect-go v0.4.0
-	github.com/wailsapp/wails/v2 v2.17.0
+	github.com/wailsapp/wails/v2 v2.17.1
 )
 
 require (
